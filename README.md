@@ -1,2 +1,2 @@
-# c-ya
-Collect→Your Assets
+# Collect Your Assets
+

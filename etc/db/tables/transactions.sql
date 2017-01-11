@@ -1,0 +1,20 @@
+create table transactions (
+  id int unsigned primary key auto_increment,
+  account tinyint unsigned,
+  foreign key(account) references accounts(id) on update cascade on delete cascade,
+  extid varchar(32) comment 'transaction id from the financial institution',
+  key(account, extid),
+  transdate date,
+  posted date not null,
+  key(posted),
+  description varchar(64),
+  amount decimal(8,2) comment 'positive for deposits / payments; negative for withdrawals / charges',
+  city varchar(32),
+  state char(2),
+  zip mediumint(5) unsigned,
+  notes text,
+  category tinyint unsigned,
+  foreign key(category) references categories(id) on update cascade on delete cascade,
+  splitcat bool not null default 0 comment 'true when there are multiple categories in this transaction (see splitcats table)',
+  reviewed bool not null default 0
+);
