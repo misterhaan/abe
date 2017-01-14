@@ -1,5 +1,5 @@
 <?php
-set_include_path(__DIR__);
+set_include_path(__DIR__ . ':' . __DIR__ . '/banks');
 
 define('INSTALL_PATH', dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT'])))));
 

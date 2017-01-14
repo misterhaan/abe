@@ -1,5 +1,5 @@
 <?php
-require_once dirname($_SERVER['SCRIPT_FILENAME']) . '/etc/class/cya.php';
+require_once __DIR__ . '/etc/class/cya.php';
 
 if(isset($_GET['ajax'])) {
   $ajax = new cyaAjax();
@@ -162,7 +162,8 @@ function InstallDatabase() {
     $ajax->Fail('Error creating ' . count($ajax->Data->tableErrors) . ' of ' . count($tables) . ' tables.');
   // TODO:  create routines (functions and procedures) once there are some
   elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
-    // TODO:  insert database rows
+    ImportBanks();
+    // TODO:  insert more database rows
     return;
     if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
       ;  // done here!
@@ -170,6 +171,26 @@ function InstallDatabase() {
       $ajax->Fail('Error configuring data version.');
   } else
     $ajax->Fail('Error initializing configuration.');
+}
+
+function ImportBanks() {
+  global $ajax, $db;
+  if(false !== $f = fopen(__DIR__ . '/etc/db/data/banks.csv', 'r')) {
+    $db->real_query('start transaction');
+    if(false !== $ins = $db->prepare('insert into banks (class, name, url) select * from (select ? as class, ? as name, ? as url) as b where not exists (select class from banks where class=?) limit 1'))
+      if($ins->bind_param('ssss', $class, $name, $url, $class)) {
+        while(list($class, $name, $url) = fgetcsv($f)) {
+          if(!$ins->execute())
+            $ajax->Fail('Error importing bank:  ' . $ins->error);
+        }
+        $ins->close();
+      } else
+        $ajax->Fail('Error binding bank import parameters:  ' . $ins->error);
+    else
+      $ajax->Fail('Database error preparing to import banks:  ' . $db->error);
+    $db->real_query('commit');
+  } else
+    $ajax->Fail('Unable to read banks data file.');
 }
 
 function DatabaseUpgradeForm() {

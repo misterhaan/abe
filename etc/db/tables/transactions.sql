@@ -7,7 +7,7 @@ create table transactions (
   transdate date,
   posted date not null,
   key(posted),
-  description varchar(64),
+  name varchar(64),
   amount decimal(8,2) comment 'positive for deposits / payments; negative for withdrawals / charges',
   city varchar(32),
   state char(2),
