@@ -7,6 +7,7 @@ $html->Open(cyaHtml::SITE_NAME_FULL);
       <h1><?php echo cyaHtml::SITE_NAME_FULL; ?></h1>
       <nav id=mainmenu>
         <a href=accounts.php>Accounts</a>
+        <a href=transactions.php>Transactions</a>
       </nav>
 <?php
 $html->Close();
