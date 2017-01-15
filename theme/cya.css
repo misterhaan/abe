@@ -64,6 +64,23 @@ input, select, textarea, button {
   font-family: inconsolata;
 }
 
+.loading:before,
+.working:after {
+  font-family: fontawesome;
+  font-size: .9em;
+  color: #999;
+  display: inline-block;
+  content: "\f110";
+  -webkit-animation: fa-spin 1s infinite steps(8);
+  animation: fa-spin 1s infinite steps(8);
+}
+.loading:before {
+  margin-right: 1em;
+}
+.working:after {
+  margin-left: .5em;
+}
+
 /*------------------------------------------------[ page header and footer ]--*/
 body > header {
   background-color: #e73;
@@ -172,4 +189,40 @@ body > header .actions a.add:before {
 }
 #accountlist .actions a.edit:before {
   content: "\f044";
+}
+
+/*----------------------------------------------------------[ transactions ]--*/
+#transactions {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#transactions header {
+  text-align: right;
+  padding: 0 .5em;
+}
+#transactions ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+#transactions li.transaction {
+  background-color: #eef;
+  margin: 1px 0;
+  padding: 0 .5em;
+  display: -webkit-flex;
+  display: flex;
+}
+#transactions li.transaction div {
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#transactions li.transaction div.amount {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+#transactions li.transaction .category {
+  font-size: .8em;
 }

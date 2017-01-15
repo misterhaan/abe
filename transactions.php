@@ -15,16 +15,15 @@ if(isset($_GET['ajax'])) {
 $html = new cyaHtml();
 $html->Open('Transactions');
 ?>
-      <h1>Transactions</h1>
       <ol id=transactions>
         <!-- ko foreach: dates -->
           <li class=date>
-            <header><time data-bind="text: date"></time></header>
+            <header><time data-bind="text: displayDate"></time></header>
             <ul data-bind="foreach: transactions">
-              <li>
+              <li class=transaction>
                 <div>
                   <div class=name data-bind="text: name"></div>
-                  <div class=category data-bind="text: category"></div>
+                  <div class=category data-bind="text: category ? category : '(uncategorized)'"></div>
                 </div>
                 <div class=amount data-bind="text: amount"></div>
               </li>
@@ -44,8 +43,9 @@ function GetTransactions() {
     $posted = '';
     $id = 0;
     while($t = $ts->fetch_object()) {
+      $displayDate = date('F j, Y (D)', strtotime($t->posted . ' 12:00 PM'));
       if(!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $t->posted)
-        $ajax->Data->dates[] = (object)['date' => $t->posted, 'transactions' => []];
+        $ajax->Data->dates[] = (object)['date' => $t->posted, 'displayDate' => $displayDate, 'transactions' => []];
       $ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = unserialize(serialize($t)); // ['id' => $id, 'posted' => $posted, 'name' => $name, 'category' => $category, 'amount' => $amount];
       $posted = $t->posted;
       $id = $t->id;
