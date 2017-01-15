@@ -1,18 +1,33 @@
 <?php
-  class cyaHtml {
-    const SITE_NAME_FULL = 'Collect Your Assets';
-    const SITE_NAME_SHORT = 'C-YA';
+class cyaHtml {
+  const SITE_NAME_FULL = 'Collect Your Assets';
+  const SITE_NAME_SHORT = 'C-YA';
 
-    private $isopen = false;
-    private $isclosed = false;
+  private $isopen = false;
+  private $isclosed = false;
 
-    public function Open($title) {
-      if($this->isopen)
-        return;
-      $this->isopen = true;
-      if(strpos($title, self::SITE_NAME_FULL) === false && strpos($title, self::SITE_NAME_SHORT) === false)
-        $title .= ' - ' . self::SITE_NAME_SHORT;
-      header('Content-Type: text/html; charset=utf-8');
+  private $back = '/';
+  private $actions = [];
+
+  public function cyaHtml() {
+    $this->back = INSTALL_PATH . '/';
+  }
+  
+  public function SetBack($url) {
+    $this->back = $url;
+  }
+
+  public function AddAction($url, $class, $text, $tooltip = '') {
+    $this->actions[] = ['url' => $url, 'class' => $class, 'text' => $text, 'tooltip' => $tooltip];
+  }
+
+  public function Open($title) {
+    if($this->isopen)
+      return;
+    $this->isopen = true;
+    if(strpos($title, self::SITE_NAME_FULL) === false && strpos($title, self::SITE_NAME_SHORT) === false)
+      $title .= ' - ' . self::SITE_NAME_SHORT;
+    header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
 <html lang=en>
@@ -25,24 +40,42 @@
     <script src="<?php echo INSTALL_PATH; ?>/knockout-3.4.1.js" type="text/javascript"></script>
     <script src="<?php echo INSTALL_PATH; ?>/cya.js" type="text/javascript"></script>
 <?php
-      if(file_exists(str_replace('.php', '.js', $_SERVER['SCRIPT_FILENAME']))) {
+    if(file_exists(str_replace('.php', '.js', $_SERVER['SCRIPT_FILENAME']))) {
 ?>
     <script src="<?php echo str_replace('.php', '.js', $_SERVER['SCRIPT_NAME']); ?>" type="text/javascript"></script>
 <?php
-      }
+    }
 ?>
   </head>
   <body>
     <header>
+      <span class=back>
+<?php
+    if($_SERVER['PHP_SELF'] != INSTALL_PATH . '/index.php') {
+?>
+        <a href="<?php echo $this->back; ?>"><span>back</span></a>
+<?php
+    }
+?>
+      </span>
+      <span class=actions>
+<?php
+    foreach($this->actions as $action) {
+?>
+        <a class=<?php echo $action['class']; ?> href="<?php echo $action['url']; ?>" title="<?php echo $action['tooltip']; ?>"><span><?php echo $action['text']; ?></span></a>
+<?php
+    }
+?>
+      </span>
     </header>
     <main role=main>
 <?php
-    }
+  }
 
-    public function Close() {
-      if(!$this->isopen || $this->isclosed)
-        return;
-      $this->isclosed = true;
+  public function Close() {
+    if(!$this->isopen || $this->isclosed)
+      return;
+    $this->isclosed = true;
 ?>
     </main>
     <footer>
@@ -51,6 +84,6 @@
   </body>
 </html>
 <?php
-    }
   }
+}
 ?>

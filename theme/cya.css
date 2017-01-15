@@ -1,0 +1,175 @@
+@font-face {
+  font-family: rosario;
+  font-style: normal;
+  font-weight: normal;
+  src: url(Rosario-Regular.woff);
+}
+@font-face {
+  font-family: rosario;
+  font-style: normal;
+  font-weight: bold;
+  src: url(Rosario-Bold.woff);
+}
+@font-face {
+  font-family: rosario;
+  font-style: italic;
+  font-weight: normal;
+  src: url(Rosario-Italic.woff);
+}
+@font-face {
+  font-family: rosario;
+  font-style: italic;
+  font-weight: bold;
+  src: url(Rosario-BoldItalic.woff);
+}
+@font-face {
+  font-family: monda;
+  font-weight: bold;
+  src: url(Monda-Bold.woff);
+}
+@font-face {
+  font-family: inconsolata;
+  src: url(InconsolataGo-Regular.woff);
+}
+@font-face {
+  font-family: fontawesome;
+  src: url(fontawesome-webfont.woff);
+}
+
+body {
+  background-color: #ccd;
+  padding: 0;
+  margin: 0;
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: 100%;
+  font-family: rosario;
+  font-size: 1.5em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: monda;
+}
+
+a:link,
+a:visited {
+  color: #593;
+}
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.balance,
+.amount {
+  font-family: inconsolata;
+}
+
+/*------------------------------------------------[ page header and footer ]--*/
+body > header {
+  background-color: #e73;
+  color: #fff;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  padding: 0 .5em;
+  /*position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;*/
+}
+body > header .back {
+  -webkit-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+body > header .back a span {
+  display: none;
+}
+body > header .back a:before {
+  font-family: fontawesome;
+  font-size: 1.5em;
+  color: #fff;
+  display: inline-block;
+  content: "\f104";
+}
+body > header .actions a span {
+  display: none;
+}
+body > header .actions a:before {
+  font-family: fontawesome;
+  color: #fff;
+  display: inline-block;
+  margin-left: .25em;
+  content: "\f29c";
+}
+body > header .actions a.add:before {
+  content: "\f067";
+}
+
+#copyright {
+  text-align: right;
+  margin: 1em .5em .25em;
+}
+
+/*--------------------------------------------------------------[ accounts ]--*/
+#accountlist .account {
+  margin: 1em .5em;
+  background-color: #eef;
+  border-radius: .25em;
+  -webkit-filter: drop-shadow(2px 2px 1px #999);
+  filter: drop-shadow(2px 2px 1px #999);
+}
+#accountlist h2 {
+  color: #fff;
+  background-color: #593;
+  padding: 0 .5em;
+  margin: 0;
+  font-size: 1em;
+  border-radius: .25em .25em 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#accountlist .detail {
+  margin: .25em 0;
+  padding: 0 .5em;
+  display: -webkit-flex;
+  display: flex;
+}
+#accountlist .bankname {
+  font-style: italic;
+}
+#accountlist .balance {
+  text-align: right;
+  -webkit-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+#accountlist .actions {
+  margin: .25em 0;
+  padding: 0 .5em .25em;
+  text-align: right;
+}
+#accountlist .actions a span {
+  display: none;
+}
+#accountlist .actions a:before {
+  font-family: fontawesome;
+  font-size: .9em;
+  color: #999;
+  display: inline-block;
+  margin-left: .5em;
+  content: "\f29c";
+}
+#accountlist .actions a:hover:before {
+  color: #593;
+}
+#accountlist .actions a.bank:before {
+  content: "\f19c";
+}
+#accountlist .actions a.import:before {
+  content: "\f093";
+}
+#accountlist .actions a.edit:before {
+  content: "\f044";
+}

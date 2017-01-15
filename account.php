@@ -13,6 +13,7 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new cyaHtml();
+$html->SetBack("accounts.php");
 $html->Open('Account');
 ?>
       <h1 data-bind="text: id ? name : 'Add account'"></h1>

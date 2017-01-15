@@ -11,21 +11,20 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new cyaHtml();
+$html->AddAction('account.php', 'add', '+', 'Add another account');
 $html->Open('Accounts');
 ?>
-      <h1>Accounts</h1>
-      <a href="account.php">Add account</a>
-
       <section id=accountlist data-bind="foreach: accounts">
         <div class=account>
           <h2 data-bind="text: name"></h2>
           <div class=detail>
-            <a data-bind="text: bankname, attr: {href: bankurl}"></a>
-            <span data-bind="text: balance"></span>
+            <span class=bankname data-bind="text: bankname"></span>
+            <span class=balance data-bind="text: balance"></span>
           </div>
           <div class=actions>
-            <a class=import data-bind="attr: {href: 'import.php?acct=' + id}">import</a>
-            <a class=edit data-bind="attr: {href: 'account.php?id=' + id}">edit</a>
+            <a class=bank data-bind="attr: {href: bankurl}" title="Visit this account’s bank website"><span>bank</span></a>
+            <a class=import data-bind="attr: {href: 'import.php?acct=' + id}" title="Import transactions to this account"><span>import</span></a>
+            <a class=edit data-bind="attr: {href: 'account.php?id=' + id}"><span>edit</span></a>
           </div>
         </div>
       </section>
