@@ -1,26 +1,23 @@
 @font-face {
-  font-family: rosario;
+  font-family: roboto;
   font-style: normal;
   font-weight: normal;
-  src: url(Rosario-Regular.woff);
+  src: local('Roboto'), local('Roboto-Regular'), url(Roboto-Regular.woff);
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
-  font-family: rosario;
+  font-family: roboto;
   font-style: normal;
   font-weight: bold;
-  src: url(Rosario-Bold.woff);
+  src: local('Roboto Bold'), local('Roboto-Bold'), url(Roboto-Bold.woff);
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
-  font-family: rosario;
+  font-family: roboto;
   font-style: italic;
   font-weight: normal;
-  src: url(Rosario-Italic.woff);
-}
-@font-face {
-  font-family: rosario;
-  font-style: italic;
-  font-weight: bold;
-  src: url(Rosario-BoldItalic.woff);
+  src: local('Roboto Bold'), local('Roboto-Italic'), url(Roboto-Italic.woff);
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
   font-family: monda;
@@ -42,12 +39,31 @@ body {
   margin: 0;
   -moz-text-size-adjust: none;
   -webkit-text-size-adjust: 100%;
-  font-family: rosario;
-  font-size: 1.5em;
+  font-family: roboto;
+  font-size: 1.4em;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: monda;
+h2, h3, h4, h5, h6 {
+  /*font-family: monda;*/
+  font-size: 1em;
+}
+h1 {
+  font-weight: normal;
+  font-size: 1em;
+  position: absolute;
+  display: inline-block;
+  white-space: nowrap;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  line-height: 1.55em;
+}
+h2,
+p {
+  margin: 1em .5em;
 }
 
 a:link,
@@ -61,7 +77,31 @@ input, select, textarea, button {
 
 .balance,
 .amount {
-  font-family: inconsolata;
+  /*font-family: inconsolata;*/
+}
+
+label {
+  display: block;
+  margin: .5em;
+}
+label span.label {
+  display: block;
+}
+label span.field {
+  display: block;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+label span.field input:not([type="checkbox"]),
+label span.field select {
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+button {
+  display: inline-block;
+  margin: .5em;
 }
 
 .loading:before,
@@ -74,6 +114,29 @@ input, select, textarea, button {
   -webkit-animation: fa-spin 1s infinite steps(8);
   animation: fa-spin 1s infinite steps(8);
 }
+@-webkit-keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+.calltoaction .working:after {
+  color: #ccc;
+}
 .loading:before {
   margin-right: 1em;
 }
@@ -81,15 +144,30 @@ input, select, textarea, button {
   margin-left: .5em;
 }
 
+.calltoaction {
+  text-align: center;
+}
+.calltoaction a {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 1em auto;
+  background: #593;
+  color: #fff;
+  padding: .25em 1em;
+  text-decoration: none;
+  border-radius: .25em;
+}
+
 /*------------------------------------------------[ page header and footer ]--*/
 body > header {
-  background-color: #e73;
+  background-color: #593;
   color: #fff;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center;
   align-items: center;
   padding: 0 .5em;
+  height: 1.55em;
   /*position: fixed;
   top: 0;
   left: 0;
@@ -123,10 +201,14 @@ body > header .actions a:before {
 body > header .actions a.add:before {
   content: "\f067";
 }
+body > header .actions a.import:before {
+  content: "\f093";
+}
 
 #copyright {
   text-align: right;
   margin: 1em .5em .25em;
+  font-size: .8em;
 }
 
 /*--------------------------------------------------------------[ accounts ]--*/
@@ -139,7 +221,7 @@ body > header .actions a.add:before {
 }
 #accountlist h2 {
   color: #fff;
-  background-color: #593;
+  background-color: #e73;
   padding: 0 .5em;
   margin: 0;
   font-size: 1em;
@@ -148,14 +230,39 @@ body > header .actions a.add:before {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+#accountlist h2:before {
+  font-family: fontawesome;
+  font-size: .9em;
+  color: #555;
+  display: inline-block;
+  margin-right: .5em;
+}
+#accountlist .creditvisa h2:before {
+  content: "\f1f0";
+}
+#accountlist .creditmc h2:before {
+  content: "\f1f1";
+}
+#accountlist .credit h2:before {
+  content: "\f283";
+}
+#accountlist .checking h2:before {
+  content: "\f0d6";
+  font-size: 1.05em;
+}
+#accountlist .savings h2:before {
+  content: "\f0b1";
+  font-size: 1.05em;
+}
 #accountlist .detail {
   margin: .25em 0;
   padding: 0 .5em;
   display: -webkit-flex;
   display: flex;
 }
-#accountlist .bankname {
+#accountlist .lastupdate {
   font-style: italic;
+  font-size: .8em;
 }
 #accountlist .balance {
   text-align: right;
@@ -199,7 +306,7 @@ body > header .actions a.add:before {
 }
 #transactions header {
   text-align: right;
-  padding: 0 .5em;
+  padding: .25em .5em 0;
 }
 #transactions ul {
   list-style-type: none;
@@ -209,7 +316,7 @@ body > header .actions a.add:before {
 #transactions li.transaction {
   background-color: #eef;
   margin: 1px 0;
-  padding: 0 .5em;
+  padding: .25em .5em .5em;
   display: -webkit-flex;
   display: flex;
 }
@@ -225,4 +332,28 @@ body > header .actions a.add:before {
 }
 #transactions li.transaction .category {
   font-size: .8em;
+}
+#transactions .amount:after {
+  font-family: fontawesome;
+  font-size: .9em;
+  display: inline-block;
+  color: #999;
+  margin-left: .25em;
+}
+#transactions .creditvisa .amount:after {
+  content: "\f1f0";
+}
+#transactions .creditmc .amount:after {
+  content: "\f1f1";
+}
+#transactions .credit .amount:after {
+  content: "\f283";
+}
+#transactions .checking .amount:after {
+  content: "\f0d6";
+  font-size: 1.05em;
+}
+#transactions .savings .amount:after {
+  content: "\f0b1";
+  font-size: 1.05em;
 }

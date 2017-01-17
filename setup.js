@@ -6,12 +6,12 @@ $(function() {
 
 function SaveDbSettings(e) {
   var form = this;
-  $(form).find("button").prop("disabled", true).addClass("waiting");
+  $(form).find("button").prop("disabled", true).addClass("working");
   $.post("setup.php?ajax=savedbsetup", $(form).serialize(), function(result) {
     if(!result.fail)
       window.location.reload(true);
     else {
-      $(form).find("button").prop("disabled", false).removeClass("waiting");
+      $(form).find("button").prop("disabled", false).removeClass("working");
       alert(result.message);
     }
   }, "json");
@@ -20,12 +20,12 @@ function SaveDbSettings(e) {
 
 function CreateDb() {
   var form = this;
-  $(form).find("button").prop("disabled", true).addClass("waiting");
+  $(form).find("button").prop("disabled", true).addClass("working");
   $.post("setup.php?ajax=createdb", $(form).serialize(), function(result) {
     if(!result.fail)
       window.location.reload(true);
     else {
-      $(form).find("button").prop("disabled", false).removeClass("waiting");
+      $(form).find("button").prop("disabled", false).removeClass("working");
       alert(result.message);
     }
   }, "json");
@@ -34,12 +34,12 @@ function CreateDb() {
 
 function InstallDb() {
   var link = this;
-  $(link).addClass("waiting");
+  $(link).addClass("working");
   $.post(link.href, {}, function(result) {
     if(!result.fail)
       window.location.reload(true);
     else {
-      $(link).removeClass("waiting");
+      $(link).removeClass("working");
       alert(result.message);
     }
   }, "json");

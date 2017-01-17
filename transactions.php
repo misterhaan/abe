@@ -13,14 +13,16 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new cyaHtml();
+$html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');
 ?>
+      <h1>Transactions</h1>
       <ol id=transactions>
         <!-- ko foreach: dates -->
           <li class=date>
             <header><time data-bind="text: displayDate"></time></header>
             <ul data-bind="foreach: transactions">
-              <li class=transaction>
+              <li class=transaction data-bind="css: acctclass">
                 <div>
                   <div class=name data-bind="text: name"></div>
                   <div class=category data-bind="text: category ? category : '(uncategorized)'"></div>
@@ -38,7 +40,7 @@ $html->Close();
 
 function GetTransactions() {
   global $ajax, $db;
-  if($ts = $db->query('select t.id, t.posted, t.name, c.name as category, t.amount from transactions as t left join categories as c on c.id=t.category where t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\' order by t.posted desc, t.id desc limit ' . MAX_TRANS)) {
+  if($ts = $db->query('select t.id, t.posted, at.class as acctclass, t.name, c.name as category, t.amount from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\' order by t.posted desc, t.id desc limit ' . MAX_TRANS)) {
     $ajax->Data->dates = [];
     $posted = '';
     $id = 0;

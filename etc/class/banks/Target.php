@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-class Target {
+class Target extends cyaBank {
   /**
    * Import transactions from a CSV file into a credit card account from Target.
    * @param string $filename Full path to the CSV file on the server.
@@ -22,14 +22,16 @@ class Target {
       if(false !== $ins = $db->prepare('insert into transactions (account, transdate, posted, name, amount, city, state) values (?, ?, ?, ?, ?, ?, ?)'))
         if($ins->bind_param('isssdss', $account, $transdate, $posted, $name, $amount, $city, $state)) {
           $ajax->Data->count = 0;
+          $net = 0;
           while($line = fgetcsv($fh)) {
             // translate the data
             $transdate = date('Y-m-d', strtotime($line[0]));
             $posted = date('Y-m-d', strtotime($line[1]));
-            $name = ucwords(strtolower(trim(substr($line[2], 0, 25))));
+            $name = self::TitleCase(trim(substr($line[2], 0, 25)));
             $amount = +$line[3];
-            $city = ucwords(strtolower(trim(substr($line[2], 25, 13))));
+            $city = self::TitleCase(trim(substr($line[2], 25, 13)));
             $state = substr($line[4], 38, 2);
+            $net += $amount;
 
             if($ins->execute())
               $ajax->Data->count++;
@@ -38,6 +40,7 @@ class Target {
           }
           // close the statement
           $ins->close();
+          self::UpdateAccount($account, false, $net);
         } else
           $ajax->Fail('Error binding import parameters:  ' . $ins->error);
       else

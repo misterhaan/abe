@@ -4,9 +4,9 @@ require_once __DIR__ . '/etc/class/cya.php';
 if(isset($_GET['ajax'])) {
   $ajax = new cyaAjax();
   switch($_GET['ajax']) {
-    case 'banklist': GetBankList(); break;
-    case 'get':      GetAccount(); break;
-    case 'save':     SaveAccount(); break;
+    case 'lists': GetLists(); break;
+    case 'get':   GetAccount(); break;
+    case 'save':  SaveAccount(); break;
   }
   $ajax->Send();
   die;
@@ -24,9 +24,11 @@ $html->Open('Account');
         </label>
         <label>
           <span class=label>Bank:</span>
-          <span class=field><select data-bind="value: bank, options: banklist, optionsText: 'name', optionsValue: 'id'">
-            <option data-bind="text: name, attr: {value: id}"></option>
-          </select></span>
+          <span class=field><select data-bind="value: bank, options: banklist, optionsText: 'name', optionsValue: 'id'"></select></span>
+        </label>
+        <label>
+          <span class=label>Type:</span>
+          <span class=field><select data-bind="value: type, options: typelist, optionsText: 'name', optionsValue: 'id'"></select></span>
         </label>
         <label>
           <span class=label>Balance:</span>
@@ -34,27 +36,34 @@ $html->Open('Account');
         </label>
         <label>
           <span class=label>Closed:</span>
-          <span class=field><input type=checkbox data-bind="checked: closed"></span>
+          <span class=field><input type=checkbox data-bind="checked: closed"><span>Closed accounts are hidden on the accounts page and cannot import transactions.</span></span>
         </label>
         <button>Save</button>
       </form>
 <?php
 $html->Close();
 
-function GetBankList() {
+function GetLists() {
   global $ajax, $db;
   $ajax->Data->banks = [];
+  $ajax->Data->types = [];
   $ajax->Data->banks[] = (object)['id' => false, 'name' => ''];
+  $ajax->Data->types[] = (object)['id' => false, 'name' => '', 'class' => ''];
   if($banks = $db->query('select id, name from banks order by name'))
     while($bank = $banks->fetch_object())
       $ajax->Data->banks[] = $bank;
   else
     $ajax->Fail('Error looking up supported banks.');
+  if($types = $db->query('select id, name, class from account_types order by name'))
+    while($type = $types->fetch_object())
+      $ajax->Data->types[] = $type;
+  else
+    $ajax->Fail('Error looking up account types.');
 }
 
 function GetAccount() {
   global $ajax, $db;
-  if($acct = $db->query('select id, bank, name, balance, closed from accounts where id=' . +$_GET['id'] . ' limit 1'))
+  if($acct = $db->query('select id, bank, account_type, name, balance, closed from accounts where id=' . +$_GET['id'] . ' limit 1'))
     if($acct = $acct->fetch_object())
       $ajax->Data = $acct;
     else
@@ -66,10 +75,10 @@ function GetAccount() {
 function SaveAccount() {
   global $ajax, $db;
   $id = isset($_POST['id']) && $_POST['id'] ? +$_POST['id'] : false;
-  $set = 'accounts set bank=?, name=?, balance=?, closed=?';
+  $set = 'accounts set bank=?, name=?, account_type=?, balance=?, updated=?, closed=?';
   if($id)
     if($put = $db->prepare('update ' . $set . ' where id=? limit 1'))
-      if($put->bind_param('isdii', $bank, $name, $balance, $closed, $id))
+      if($put->bind_param('isidiii', $bank, $name, $account_type, $balance, $updated, $closed, $id))
         ;  // good
       else
         $ajax->Fail('Error binding parameters for account update:  ' . $put->error);
@@ -77,7 +86,7 @@ function SaveAccount() {
       $ajax->Fail('Error preparing to update account:  ' . $db->error);
   else
     if($put = $db->prepare('insert into ' . $set))
-      if($put->bind_param('isdi', $bank, $name, $balance, $closed))
+      if($put->bind_param('isidii', $bank, $name, $account_type, $balance, $updated, $closed))
         ;  // good
       else
         $ajax->Fail('Error binding parameters for account insert:  ' . $put->error);
@@ -86,7 +95,9 @@ function SaveAccount() {
   if(!$ajax->Data->fail) {
     $bank = +$_POST['bank'];
     $name = trim($_POST['name']);
+    $account_type = +$_POST['type'];
     $balance = +$_POST['balance'];
+    $updated = +time();
     $closed = $_POST['closed'] ? 1 : 0;
     if(!$put->execute())
       $ajax->Fail('Error saving account:  ' . $put->error);

@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-class StateFarm {
+class StateFarm extends cyaBank {
   /**
    * Import transactions from a CSV file into a credit card account from State
    * Farm.
@@ -26,16 +26,18 @@ class StateFarm {
       if(false !== $ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip) values (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
         if($ins->bind_param('issssdsss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip)) {
           $ajax->Data->count = 0;
+          $net = 0;
           while($line = fgetcsv($fh)) {
             // translate the data
             $extid = $line[7];
             $transdate = date('Y-m-d', strtotime($line[0]));
             $posted = date('Y-m-d', strtotime($line[1]));
-            $name = ucwords(strtolower($line[3]));
+            $name = self::TitleCase($line[3]);
             $amount = -str_replace(['$', '(', ')'], ['', '-', ''], $line[2]);
-            $city = ucwords(strtolower($line[4]));
+            $city = self::TitleCase($line[4]);
             $state = $line[5];
             $zip = $line[6];
+            $net += $amount;
 
             if($ins->execute())
               $ajax->Data->count++;
@@ -44,6 +46,7 @@ class StateFarm {
           }
           // close the statement
           $ins->close();
+          self::UpdateAccount($account, false, $net);
         } else
           $ajax->Fail('Error binding import parameters:  ' . $ins->error);
       else

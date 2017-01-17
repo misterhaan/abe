@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-class Amazon {
+class Amazon extends cyaBank {
   /**
    * Import transactions from a CSV file into a credit card account from Amazon.
    * @param string $filename Full path to the CSV file on the server.
@@ -25,18 +25,20 @@ class Amazon {
       if(false !== $ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
         if($ins->bind_param('issssdsss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $notes)) {
           $ajax->Data->count = 0;
+          $net = 0;
           while($line = fgetcsv($fh)) {
             // translate the data
             $extid = trim($line[2]) ? $line[2] : null;
             $transdate = date('Y-m-d', strtotime($line[0]));
             $posted = date('Y-m-d', strtotime($line[1]));
-            $name = ucwords(strtolower(trim(substr($line[4], 0, 25))));
+            $name = self::TitleCase(trim(substr($line[4], 0, 25)));
             $amount = +$line[3];
-            $city = ucwords(strtolower(trim(substr($line[4], 25, 13))));
+            $city = self::TitleCase(trim(substr($line[4], 25, 13)));
             $state = substr($line[4], 38, 2);
             $notes = substr($line[4], 41);
             for($l = 5; $l < count($line); $l++)
               $notes .= ',' . $line[$l];
+            $net += $amount;
 
             if($ins->execute())
               $ajax->Data->count++;
@@ -45,6 +47,7 @@ class Amazon {
           }
           // close the statement
           $ins->close();
+          self::UpdateAccount($account, false, $net);
         } else
           $ajax->Fail('Error binding import parameters:  ' . $ins->error);
       else

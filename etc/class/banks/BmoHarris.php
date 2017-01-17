@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-class BmoHarris {
+class BmoHarris extends cyaBank {
   /**
    * Import transactions from a CSV file into an account from BMO Harris Bank.
    * @param string $filename Full path to the CSV file on the server.
@@ -26,12 +26,14 @@ class BmoHarris {
       if(false !== $ins = $db->prepare('insert into transactions (account, extid, posted, name, amount) values (?, ?, ?, ?, ?)'))
         if($ins->bind_param('isssd', $account, $extid, $posted, $name, $amount)) {
           $ajax->Data->count = 0;
+          $net = 0;
           while($line = fgetcsv($fh)) {
             // translate the data
             $extid = $line[6];
             $posted = date('Y-m-d', strtotime($line[1]));
-            $name = $line[7] == 'Check' ? 'Check ' . $line[5] : ucwords(strtolower($line[2]));
+            $name = $line[7] == 'Check' ? 'Check ' . $line[5] : self::TitleCase($line[2]);
             $amount = $line[8] == 'Debit' ? -$line[3] : +$line[3];
+            $net += $amount;
 
             if($ins->execute())
               $ajax->Data->count++;
@@ -40,6 +42,7 @@ class BmoHarris {
           }
           // close the statement
           $ins->close();
+          self::UpdateAccount($account, false, $net);
         } else
           $ajax->Fail('Error binding import parameters:  ' . $ins->error);
       else

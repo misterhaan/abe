@@ -163,8 +163,8 @@ function InstallDatabase() {
   // TODO:  create routines (functions and procedures) once there are some
   elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
     ImportBanks();
+    ImportAccountTypes();
     // TODO:  insert more database rows
-    return;
     if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
       ;  // done here!
     else
@@ -177,12 +177,11 @@ function ImportBanks() {
   global $ajax, $db;
   if(false !== $f = fopen(__DIR__ . '/etc/db/data/banks.csv', 'r')) {
     $db->real_query('start transaction');
-    if(false !== $ins = $db->prepare('insert into banks (class, name, url) select * from (select ? as class, ? as name, ? as url) as b where not exists (select class from banks where class=?) limit 1'))
+    if($ins = $db->prepare('insert into banks (class, name, url) select * from (select ? as class, ? as name, ? as url) as b where not exists (select class from banks where class=?) limit 1'))
       if($ins->bind_param('ssss', $class, $name, $url, $class)) {
-        while(list($class, $name, $url) = fgetcsv($f)) {
+        while(list($class, $name, $url) = fgetcsv($f))
           if(!$ins->execute())
             $ajax->Fail('Error importing bank:  ' . $ins->error);
-        }
         $ins->close();
       } else
         $ajax->Fail('Error binding bank import parameters:  ' . $ins->error);
@@ -191,6 +190,25 @@ function ImportBanks() {
     $db->real_query('commit');
   } else
     $ajax->Fail('Unable to read banks data file.');
+}
+
+function ImportAccountTypes() {
+  global $ajax, $db;
+  if(false !== $f = fopen(__DIR__ . '/etc/db/data/account_types.csv', 'r')) {
+    $db->real_query('start transaction');
+    if($ins = $db->prepare('insert into account_types (name, class) select * from (select ? as name, ? as class) as a where not exists (select class from account_types where name=?) limit 1'))
+      if($ins->bind_param('sss', $name, $class, $name)) {
+        while(list($name, $class) = fgetcsv($f))
+          if(!$ins->execute())
+            $ajax->Fail('Error importing account type:  ' . $ins->error);
+        $ins->close();
+      } else
+        $ajax->Fail('Error binding account type import parameters:  ' . $ins->error);
+    else
+      $ajax->Fail('Database error preparing to import account types:  ' . $db->error);
+    $db->real_query('commit');
+  } else
+    $ajax->Fail('Unable to read account types data file.');
 }
 
 function DatabaseUpgradeForm() {

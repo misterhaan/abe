@@ -40,6 +40,9 @@ function __autoload($class) {
     case 'cyaAjax':
       require_once 'cyaAjax.php';
       break;
+    case 'cyaBank':
+      require_once 'cyaBank.php';
+      break;
     case 'cyaFormat':
       require_once 'cyaFormat.php';
       break;

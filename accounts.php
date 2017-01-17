@@ -14,11 +14,12 @@ $html = new cyaHtml();
 $html->AddAction('account.php', 'add', '+', 'Add another account');
 $html->Open('Accounts');
 ?>
+      <h1>Accounts</h1>
       <section id=accountlist data-bind="foreach: accounts">
-        <div class=account>
+        <div class=account data-bind="css: typeclass">
           <h2 data-bind="text: name"></h2>
           <div class=detail>
-            <span class=bankname data-bind="text: bankname"></span>
+            <time class=lastupdate data-bind="text: 'Updated ' + updated"></time>
             <span class=balance data-bind="text: balance"></span>
           </div>
           <div class=actions>
@@ -33,10 +34,13 @@ $html->Close();
 
 function GetAccountList() {
   global $ajax, $db;
-  if($accts = $db->query('select a.id, a.name, b.name as bankname, b.url as bankurl, a.balance from accounts as a left join banks as b on b.id=a.bank where not a.closed order by a.name')) {
+  if($accts = $db->query('select a.id, a.name, at.class as typeclass, a.updated, b.url as bankurl, a.balance from accounts as a left join banks as b on b.id=a.bank left join account_types as at on at.id=a.account_type where not a.closed order by a.updated desc')) {
     $ajax->Data->accounts = [];
-    while($acct = $accts->fetch_object())
+    while($acct = $accts->fetch_object()) {
+      $acct->balance = number_format($acct->balance, 2);
+      $acct->updated = date('F j', $acct->updated);
       $ajax->Data->accounts[] = $acct;
+    }
   } else
     $ajax->Fail('Error looking up account list:  ' . $db->error);
 }
