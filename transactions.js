@@ -33,7 +33,17 @@ function GetParams(dates) {
   if(dates.length) {
     var oldest = dates[dates.length - 1];
     var oldid = oldest.transactions()[oldest.transactions().length - 1];
-    return {oldest: oldest.date, oldid: oldid.id};
+    return {oldest: oldest.date, oldid: oldid.id, acct: FindAccountID()};
   }
-  return {oldest: "9999-12-31", oldid: 0};
+  return {oldest: "9999-12-31", oldid: 0, acct: FindAccountID()};
+}
+
+function FindAccountID() {
+  var qs = window.location.search.substring(1).split("&");
+  for(var i = 0; i < qs.length; i++) {
+    var p = qs[i].split("=");
+    if(p[0] = "acct")
+      return p[1];
+  }
+  return 0;
 }

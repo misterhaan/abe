@@ -23,6 +23,7 @@ $html->Open('Accounts');
             <span class=balance data-bind="text: balance"></span>
           </div>
           <div class=actions>
+            <a class=transactions data-bind="attr: {href: 'transactions.php?acct=' + id}" title="See transactions from this account"><span>transactions</span></a>
             <a class=bank data-bind="attr: {href: bankurl}" title="Visit this account’s bank website"><span>bank</span></a>
             <a class=import data-bind="attr: {href: 'import.php?acct=' + id}" title="Import transactions to this account"><span>import</span></a>
             <a class=edit data-bind="attr: {href: 'account.php?id=' + id}"><span>edit</span></a>
