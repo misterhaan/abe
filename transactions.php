@@ -40,7 +40,7 @@ $html->Close();
 
 function GetTransactions() {
   global $ajax, $db;
-  $ts = 'select t.id, t.posted, at.class as acctclass, t.name, c.name as category, t.amount from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where ' . (isset($_GET['acct']) && +$_GET['acct'] ? 't.account=\'' . +$_GET['acct'] . '\' and ' : '') . '(t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\') order by t.posted desc, t.id desc limit ' . (isset($_GET['limit']) && +$_GET['limit'] ? +$_GET['limit'] : MAX_TRANS);
+  $ts = 'select t.id, t.posted, at.class as acctclass, t.name, c.name as category, t.amount from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where ' . (isset($_GET['acct']) && +$_GET['acct'] ? 't.account=\'' . +$_GET['acct'] . '\' and ' : '') . '(t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\') order by t.posted desc, t.id desc limit ' . MAX_TRANS;
   if($ts = $db->query($ts)) {
     $ajax->Data->dates = [];
     $posted = '';
