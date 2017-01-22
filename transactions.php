@@ -22,12 +22,29 @@ $html->Open('Transactions');
           <li class=date>
             <header><time data-bind="text: displayDate"></time></header>
             <ul data-bind="foreach: transactions">
-              <li class=transaction data-bind="css: acctclass">
+              <li class=transaction data-bind="css: acctclass, click: $root.Select">
                 <div>
                   <div class=name data-bind="text: name"></div>
                   <div class=category data-bind="text: category ? category : '(uncategorized)'"></div>
                 </div>
                 <div class=amount data-bind="text: amount"></div>
+                <div class=full data-bind="visible: $root.selection() == $data">
+                  <div class=transaction>
+                    <div>
+                      <div class=name data-bind="text: name"></div>
+                      <div class=category data-bind="text:category ? category : '(uncategorized)'"></div>
+                    </div>
+                    <div class=amount data-bind="text: amount"></div>
+                    <a class=close data-bind="click: $root.SelectNone"><span>close</span></a>
+                  </div>
+                  <div>
+                    <div class=account data-bind="css: acctclass, text: acctname"></div>
+                    <div>Transaction <time data-bind="visible: transdate, text: transdate"></time></div>
+                    <div>Posted <time data-bind="text: posted"></time></div>
+                    <div class=note data-bind="visible: notes, text: notes"></div>
+                    <div class=location data-bind="visible: city, text: city + (state ? ', ' + state + (zip ? ' ' + zip : '') : '')"></div>
+                  </div>
+                </div>
               </li>
             </ul>
           </li>
@@ -40,7 +57,7 @@ $html->Close();
 
 function GetTransactions() {
   global $ajax, $db;
-  $ts = 'select t.id, t.posted, at.class as acctclass, t.name, c.name as category, t.amount from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where ' . (isset($_GET['acct']) && +$_GET['acct'] ? 't.account=\'' . +$_GET['acct'] . '\' and ' : '') . '(t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\') order by t.posted desc, t.id desc limit ' . MAX_TRANS;
+  $ts = 'select t.id, t.posted, t.transdate, at.class as acctclass, a.name as acctname, t.name, c.name as category, t.amount, t.notes, t.city, t.state, t.zip from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where ' . (isset($_GET['acct']) && +$_GET['acct'] ? 't.account=\'' . +$_GET['acct'] . '\' and ' : '') . '(t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\') order by t.posted desc, t.id desc limit ' . MAX_TRANS;
   if($ts = $db->query($ts)) {
     $ajax->Data->dates = [];
     $posted = '';

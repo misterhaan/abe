@@ -4,9 +4,10 @@ $(function() {
 
 function TransactionsModel() {
   var self = this;
-  self.loading = ko.observableArray(false);
+  self.loading = ko.observable(false);
   self.dates = ko.observableArray([]);
-  self.more = ko.observableArray(false);
+  self.selection = ko.observable(false);
+  self.more = ko.observable(false);
 
   self.GetTransactions = function() {
     self.loading(true);
@@ -27,6 +28,15 @@ function TransactionsModel() {
     }, "json");
   };
   self.GetTransactions();
+
+  self.Select = function(transaction) {
+    self.selection(transaction);
+  };
+
+  self.SelectNone = function(transaction, e) {
+    self.selection(false);
+    e.stopImmediatePropagation();
+  };
 }
 
 function GetParams(dates) {

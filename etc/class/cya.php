@@ -2,10 +2,8 @@
 set_include_path(__DIR__ . ':' . __DIR__ . '/banks');
 
 $install_path = dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT']))));
-
-if ($install_path == '/') {
-	$install_path = '';
-}
+if($install_path == '/')
+  $install_path = '';
 define('INSTALL_PATH', $install_path);
 
 ini_set('default_charset', 'UTF-8');
@@ -36,7 +34,7 @@ function IsSetup() {
 }
 
 function GoSetup() {
-  header('Location: /setup.php');
+  header('Location: ' . INSTALL_PATH . '/setup.php');
   die;
 }
 

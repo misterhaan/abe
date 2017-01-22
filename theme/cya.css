@@ -220,8 +220,7 @@ body > header .actions a.import:before {
   width: 6em;
   text-align: center;
   background-color: #eef;
-  -webkit-filter: drop-shadow(2px 2px 1px #999);
-  filter: drop-shadow(2px 2px 1px #999);
+  box-shadow: 2px 2px 1px #999;
   margin: 1em .5em;
   padding: .25em .5em;
   border-radius: .25em;
@@ -245,8 +244,7 @@ body > header .actions a.import:before {
   margin: 1em .5em;
   background-color: #eef;
   border-radius: .25em;
-  -webkit-filter: drop-shadow(2px 2px 1px #999);
-  filter: drop-shadow(2px 2px 1px #999);
+  box-shadow: 2px 2px 1px #999;
 }
 #accountlist h2 {
   color: #fff;
@@ -347,46 +345,102 @@ body > header .actions a.import:before {
 #transactions li.transaction {
   background-color: #eef;
   margin: 1px 0;
+}
+#transactions .transaction {
   padding: .25em .5em .5em;
   display: -webkit-flex;
   display: flex;
 }
-#transactions li.transaction div {
+#transactions .transaction div {
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-#transactions li.transaction div.amount {
+#transactions .transaction div.amount {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
 }
-#transactions li.transaction .category {
+#transactions .transaction .category {
   font-size: .8em;
 }
-#transactions .amount:after {
+#transactions li > .amount:after,
+#transactions .account:before {
   font-family: fontawesome;
   font-size: .9em;
   display: inline-block;
   color: #999;
   margin-left: .25em;
 }
-#transactions .creditvisa .amount:after {
+#transactions .account:before {
+  margin-left: 0;
+  margin-right: .25em;
+}
+#transactions li.creditvisa > .amount:after,
+#transactions .account.creditvisa:before {
   content: "\f1f0";
 }
-#transactions .creditmc .amount:after {
+#transactions li.creditmc > .amount:after,
+#transactions .account.creditmc:before {
   content: "\f1f1";
 }
-#transactions .credit .amount:after {
+#transactions li.credit > .amount:after,
+#transactions .account.credit:before {
   content: "\f283";
 }
-#transactions .checking .amount:after {
+#transactions li.checking > .amount:after,
+#transactions .account.checking:before {
   content: "\f0d6";
   font-size: 1.05em;
 }
-#transactions .savings .amount:after {
+#transactions li.savings > .amount:after,
+#transactions .account.savings:before {
   content: "\f0b1";
   font-size: 1.05em;
+}
+#transactions .full {
+  position: absolute;
+  left: .25em;
+  right: .25em;
+  padding: .25em .5em .5em;
+  background-color: #eef;
+  border: 1px solid #e73;
+  border-radius: .25em;
+  box-shadow: 2px 2px 2px #999;
+}
+#transactions .full > div {
+  padding: 0;
+}
+#transactions a.close span {
+  display: none;
+}
+#transactions a.close:before {
+  font-family: fontawesome;
+  color: #a33;
+  content: "\f00d";
+  margin-left: .25em;
+  display: inline-block;
+  padding: 0 .125em .125em;
+}
+#transactions a.close:hover:before {
+  background-color: #a33;
+  color: #fff;
+  border-radius: .25em;
+}
+#transactions .note:before,
+#transactions .location:before {
+  font-family: fontawesome;
+  margin-right: .25em;
+  color: #999;
+  display: inline-block;
+}
+#transactions .note:before {
+  content: "\f24a";
+  font-size: .8em;
+  margin-top: -.05em;
+}
+#transactions .location:before {
+  content: "\f041";
 }
 #transactions li.loading {
   padding: .25em .5em;
