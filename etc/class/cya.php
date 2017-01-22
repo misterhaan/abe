@@ -1,7 +1,12 @@
 <?php
 set_include_path(__DIR__ . ':' . __DIR__ . '/banks');
 
-define('INSTALL_PATH', dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT'])))));
+$install_path = dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT']))));
+
+if ($install_path == '/') {
+	$install_path = '';
+}
+define('INSTALL_PATH', $install_path);
 
 ini_set('default_charset', 'UTF-8');
 mb_internal_encoding('UTF-8');
@@ -31,7 +36,7 @@ function IsSetup() {
 }
 
 function GoSetup() {
-  header('Location: ' . $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT'])))) . '/setup.php');
+  header('Location: /setup.php');
   die;
 }
 
