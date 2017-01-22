@@ -360,9 +360,7 @@ body > header .actions a.import:before {
 #transactions .transaction div.amount {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
-}
-#transactions .transaction .category {
-  font-size: .8em;
+  margin-left: .75em;
 }
 #transactions li > .amount:after,
 #transactions .account:before {
@@ -427,17 +425,37 @@ body > header .actions a.import:before {
   color: #fff;
   border-radius: .25em;
 }
+#transactions .category,
+#transactions .account,
+#transactions .transdate,
+#transactions .posted,
+#transactions .note,
+#transactions .location {
+  font-size: .8em;
+}
+#transactions .category:before,
+#transactions .transdate:before,
+#transactions .posted:before,
 #transactions .note:before,
 #transactions .location:before {
   font-family: fontawesome;
   margin-right: .25em;
   color: #999;
   display: inline-block;
+  width: 1.125em;
+  text-align: center;
+}
+#transactions .category:before {
+  content: "\f02b";
+}
+#transactions .transdate:before {
+  content: "\f133";
+}
+#transactions .posted:before {
+  content: "\f274";
 }
 #transactions .note:before {
   content: "\f24a";
-  font-size: .8em;
-  margin-top: -.05em;
 }
 #transactions .location:before {
   content: "\f041";

@@ -32,15 +32,15 @@ $html->Open('Transactions');
                   <div class=transaction>
                     <div>
                       <div class=name data-bind="text: name"></div>
-                      <div class=category data-bind="text:category ? category : '(uncategorized)'"></div>
                     </div>
                     <div class=amount data-bind="text: amount"></div>
                     <a class=close data-bind="click: $root.SelectNone"><span>close</span></a>
                   </div>
                   <div>
+                    <div class=category data-bind="text:category ? category : '(uncategorized)'"></div>
                     <div class=account data-bind="css: acctclass, text: acctname"></div>
-                    <div>Transaction <time data-bind="visible: transdate, text: transdate"></time></div>
-                    <div>Posted <time data-bind="text: posted"></time></div>
+                    <div class=transdate data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>
+                    <div class=posted>Posted <time data-bind="text: posted"></time></div>
                     <div class=note data-bind="visible: notes, text: notes"></div>
                     <div class=location data-bind="visible: city, text: city + (state ? ', ' + state + (zip ? ' ' + zip : '') : '')"></div>
                   </div>
