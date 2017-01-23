@@ -40,6 +40,16 @@ class Amazon extends cyaBank {
               $notes .= ',' . $line[$l];
             $net += $amount;
 
+            // sometimes they use the city as a continuation of the name
+            if($city == 'You' && substr($name, -5) == 'Thank') {
+              $name .= ' You';
+              $city = '';
+            }
+            if($city == 'Credit' && substr($name, -9) == 'Statement') {
+              $name .= ' Credit';
+              $city = '';
+            }
+
             if($ins->execute())
               $ajax->Data->count++;
             else
