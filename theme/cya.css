@@ -400,7 +400,7 @@ body > header .actions a.import:before {
   position: absolute;
   left: .25em;
   right: .25em;
-  padding: .25em .5em .5em;
+  padding: .25em .5em;
   background-color: #eef;
   border: 1px solid #e73;
   border-radius: .25em;
@@ -424,6 +424,22 @@ body > header .actions a.import:before {
   background-color: #a33;
   color: #fff;
   border-radius: .25em;
+}
+#transactions label {
+  margin: 0;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+#transactions input {
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#transactions .full .details div,
+#transactions .full .details label {
+  margin: .25em 0;
 }
 #transactions .category,
 #transactions .account,
@@ -453,6 +469,7 @@ body > header .actions a.import:before {
 }
 #transactions .posted:before {
   content: "\f274";
+  transform: translate(.04em);
 }
 #transactions .note:before {
   content: "\f24a";
@@ -462,4 +479,21 @@ body > header .actions a.import:before {
 }
 #transactions li.loading {
   padding: .25em .5em;
+}
+#transactions a.edit span,
+#transactions a.save span {
+  display: none;
+}
+#transactions a.edit:before,
+#transactions a.save:before,
+#transactions .working:after {
+  font-family: fontawesome;
+  display: inline-block;
+  margin-left: calc(100% - 1em);
+}
+#transactions a.edit:before {
+  content: "\f044";
+}
+#transactions a.save:before {
+  content: "\f0c7";
 }

@@ -161,16 +161,28 @@ function InstallDatabase() {
   if(count($ajax->Data->tableErrors))
     $ajax->Fail('Error creating ' . count($ajax->Data->tableErrors) . ' of ' . count($tables) . ' tables.');
   // TODO:  create routines (functions and procedures) once there are some
-  elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
-    ImportBanks();
-    ImportAccountTypes();
-    // TODO:  insert more database rows
-    if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
-      ;  // done here!
-    else
-      $ajax->Fail('Error configuring data version.');
-  } else
-    $ajax->Fail('Error initializing configuration.');
+  else {
+    $ajax->Data->routineErrors = [];
+    $routinedir = __DIR__ . '/etc/db/routines/';
+    $routines = ['GetCategoryID'];
+    foreach($routines as $routine) {
+      $sql = trim(file_get_contents($routinedir . $routine . '.sql'));
+      if(!$db->real_query($sql))
+        $ajax->Data->routineErrors[] = ['routine' => $routine, 'errno' => $db->errno, 'error' => $db->error];
+    }
+    if(count($ajax->Data->routineErrors))
+      $ajax->Fail('Error creating ' . count($ajax->Data->routineErrors) . ' of ' . count($routines) . ' routines.');
+    elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
+      ImportBanks();
+      ImportAccountTypes();
+      // TODO:  insert more database rows
+      if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
+        ;  // done here!
+      else
+        $ajax->Fail('Error configuring data version.');
+    } else
+      $ajax->Fail('Error initializing configuration.');
+  }
 }
 
 function ImportBanks() {
