@@ -6,6 +6,23 @@
  */
 abstract class cyaBank {
   /**
+   * Import transactions from a file into an account.
+   * @param string $filename Full path to the file on the server.
+   * @param integer $account ID of the account the transactions belong to.
+   * @return boolean True if successful.
+   */
+  public function ImportTransactions($origname, $filename, $account) {
+    global $ajax;
+    $ext = explode('.', $origname);
+    $ext = $ext[count($ext) - 1];
+    $import = 'Import' . ucfirst(strtolower($ext)) . 'Transactions';
+    if(method_exists(static::class, $import))
+      static::$import($filename, $account);
+    else
+      $ajax->Fail('C-YA does not support ' . $ext . ' file transaction import for this bank.');
+  }
+
+  /**
    * Changes the casing of a string to Title Case.
    * @param string $string String in all-caps.
    * @return string The string, converted to Title Case.
