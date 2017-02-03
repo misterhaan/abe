@@ -11,6 +11,7 @@ function ImportModel() {
     if(!result.fail) {
       for(var a = 0; a < result.accounts.length; a++)
         self.accountlist.push(result.accounts[a]);
+      self.accountlist.sort(function(a, b) { return a.name.localeCompare(b.name); });
       self.account(FindAccountID());
     } else
       alert(result.message);
