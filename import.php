@@ -35,7 +35,7 @@ function Import() {
     if($acct = $acct->fetch_object()) {
       $bankclass = $acct->class;
       require_once $bankclass . '.php';
-      $bankclass::ImportCsvTransactions($_FILES['transfile']['tmp_name'], $acct->id);
+      $bankclass::ImportTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $acct->id);
     } else
       $ajax->Fail('Account not found.');
   else
