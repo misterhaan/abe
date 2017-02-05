@@ -12,7 +12,7 @@ class cyaHtml {
   public function cyaHtml() {
     $this->back = INSTALL_PATH . '/';
   }
-  
+
   public function SetBack($url) {
     $this->back = $url;
   }

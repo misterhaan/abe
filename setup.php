@@ -160,7 +160,6 @@ function InstallDatabase() {
   }
   if(count($ajax->Data->tableErrors))
     $ajax->Fail('Error creating ' . count($ajax->Data->tableErrors) . ' of ' . count($tables) . ' tables.');
-  // TODO:  create routines (functions and procedures) once there are some
   else {
     $ajax->Data->routineErrors = [];
     $routinedir = __DIR__ . '/etc/db/routines/';
@@ -175,7 +174,6 @@ function InstallDatabase() {
     elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
       ImportBanks();
       ImportAccountTypes();
-      // TODO:  insert more database rows
       if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
         ;  // done here!
       else
@@ -236,7 +234,7 @@ function DatabaseUpgradeForm() {
 }
 
 function UpgradeDatabase() {
-  global $ajax, $db;
+  global $ajax, $db, $config;
   // TODO:  add upgrade code once there have been structure or data changes after a release.
   $ajax->Fail('Not implemented.');
 }

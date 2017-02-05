@@ -56,6 +56,7 @@ class BmoHarris extends cyaBank {
                     $name = self::TitleCase(str_replace('&amp;', '&', $data));
                     break;
                   default:
+                    // log unexpected tags
                     $ajax->Data->extradata[] = ['extid' => $extid, 'tag' => $tag];
                     break;
                 }
@@ -82,6 +83,16 @@ class BmoHarris extends cyaBank {
       fclose($fh);
     } else
       $ajax->Fail('Unable to open file.');
+  }
+
+  /**
+   * Import transactions from a QBO file into an account from BMO Harris Bank.
+   * @param string $filename Full path to the QBO file on the server.
+   * @param integer $account ID of the account the transactions belong to.
+   */
+  public function ImportQboTransactions($filename, $account) {
+    // The qbo file is basically the same as ofx, just with some extra stuff we will ignore anyway.
+    self::ImportOfxTransactions($filename, $account);
   }
 
   /**

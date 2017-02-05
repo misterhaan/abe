@@ -7,6 +7,7 @@
 abstract class cyaBank {
   /**
    * Import transactions from a file into an account.
+   * @param string $origname Original filename, used to infer file format from extension.
    * @param string $filename Full path to the file on the server.
    * @param integer $account ID of the account the transactions belong to.
    * @return boolean True if successful.
