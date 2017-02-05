@@ -74,12 +74,6 @@ input, select, textarea, button {
   font-family: inherit;
   font-size: inherit;
 }
-
-.balance,
-.amount {
-  /*font-family: inconsolata;*/
-}
-
 label {
   display: block;
   margin: .5em;
@@ -99,9 +93,22 @@ label span.field select {
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
 }
+input, select, textarea {
+  background-color: #fff;
+  border: none;
+  border-radius: .25em;
+  padding: .125em .25em;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
 button {
   display: inline-block;
   margin: .5em;
+  background-color: #593;
+  color: #fff;
+  border: none;
+  border-radius: .25em;
 }
 
 .loading:before,
@@ -354,8 +361,12 @@ body > header .actions a.import:before {
 #transactions .transaction div {
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+#transactions .transaction div.full {
+  overflow: visible;
 }
 #transactions .transaction div.amount {
   -webkit-flex: 0 0 auto;
@@ -480,20 +491,44 @@ body > header .actions a.import:before {
 #transactions li.loading {
   padding: .25em .5em;
 }
-#transactions a.edit span,
-#transactions a.save span {
-  display: none;
-}
-#transactions a.edit:before,
-#transactions a.save:before,
 #transactions .working:after {
   font-family: fontawesome;
   display: inline-block;
-  margin-left: calc(100% - 1em);
 }
-#transactions a.edit:before {
-  content: "\f044";
+#transactions input.newcat {
+  background-color: #ffc;
 }
-#transactions a.save:before {
-  content: "\f0c7";
+#transactions .suggestions {
+  font-size: .8em;
+  position: absolute;
+  margin-top: -.25em;
+  margin-left: 1.5em;
+  padding: 0;
+  background-color: #ccd;
+  box-shadow: 2px 2px 1px #999;
+  border-radius: 0 0 .25em .25em;
+  list-style-type: none;
+}
+#transactions .suggestions > li:last-child > div:last-child,
+#transactions .suggestions > li:last-child li:last-child > div:last-child {
+  border-radius: 0 0 .25em .25em;
+}
+#transactions .full .suggestions li > div {
+  background-color: #fff;
+  padding: .125em .5em .125em .25em;
+  margin: 1px;
+}
+#transactions .full .suggestions li > div:hover,
+#transactions .full .suggestions li > div.kbcursor {
+  cursor: pointer;
+  background-color: #593;
+  color: #fff;
+}
+#transactions .suggestions ol {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+#transactions .full .suggestions ol li div {
+  padding-left: 1em;
 }

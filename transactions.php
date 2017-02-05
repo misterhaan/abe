@@ -1,13 +1,14 @@
 <?php
 require_once __DIR__ . '/etc/class/cya.php';
 
-define('MAX_TRANS', 50);
+define('MAX_TRANS', 100);
 
 if(isset($_GET['ajax'])) {
   $ajax = new cyaAjax();
   switch($_GET['ajax']) {
     case 'get': GetTransactions(); break;
     case 'save': SaveTransactions(); break;
+    case 'categories': GetCategories(); break;
   }
   $ajax->Send();
   die;
@@ -27,33 +28,40 @@ $html->Open('Transactions');
             <ul data-bind="foreach: transactions">
               <li class=transaction data-bind="css: acctclass, click: $root.Select">
                 <div>
-                  <div class=name data-bind="visible: !$root.editing() || $root.selection(), text: name"></div>
-                  <label class=name data-bind="visible: $root.editing() && !$root.selection(), click: $root.CaptureClick"><input data-bind="value: name"></label>
-                  <div class=category data-bind="visible: !$root.editing() || $root.selection(), text: category() ? category() : '(uncategorized)'"></div>
-                  <label class=category data-bind="visible: $root.editing() && !$root.selection(), click: $root.CaptureClick"><input data-bind="value: category"></label>
+                  <div class=name data-bind="text: name"></div>
+                  <div class=category data-bind="text: category() ? category() : '(uncategorized)'"></div>
                 </div>
                 <div class=amount data-bind="text: amount"></div>
-                <div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data">
+                <div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data, click: $root.CaptureClick">
                   <div class=transaction>
                     <div>
-                      <div class=name data-bind="visible: !$root.editing(), text: name"></div>
-                      <label class=name data-bind="visible: $root.editing, click: $root.CaptureClick"><input data-bind="value: name"></label>
+                      <label class=name><input data-bind="value: name"></label>
                     </div>
                     <div class=amount data-bind="text: amount"></div>
-                    <a class=close data-bind="click: $root.SelectNone"><span>close</span></a>
+                    <a class=close data-bind="visible: !$root.saving(), click: $root.CloseAndSave" title="Save changes and close"><span>close</span></a>
+                    <span class=working data-bind="visible: $root.saving"></span>
                   </div>
                   <div class=details>
-                    <div class=category data-bind="visible: !$root.editing(), text:category() ? category() : '(uncategorized)'"></div>
-                    <label class=category data-bind="visible: $root.editing"><input data-bind="value: category"></label>
+                    <label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)"></label>
+                    <ol class=suggestions data-bind="visible: suggestingCategories, foreach: $root.categories">
+                      <!-- ko if: name.containsAnyCase($parent.category()) || subs.nameContainsAnyCase($parent.category()) -->
+                      <li>
+                        <div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
+                        <!-- ko if: subs.length && subs.nameContainsAnyCase($parent.category()) -->
+                        <ol data-bind="foreach: subs">
+                          <!-- ko if: name.containsAnyCase($parents[1].category()) -->
+                          <li><div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
+                          <!-- /ko -->
+                        </ol>
+                        <!-- /ko -->
+                      </li>
+                      <!-- /ko -->
+                    </ol>
                     <div class=account data-bind="css: acctclass, text: acctname"></div>
                     <div class=transdate data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>
                     <div class=posted>Posted <time data-bind="text: posted"></time></div>
-                    <div class=note data-bind="visible: notes() && !$root.editing(), text: notes"></div>
-                    <label class=note data-bind="visible: $root.editing"><input data-bind="value: notes"></label>
+                    <label class=note><input data-bind="value: notes"></label>
                     <div class=location data-bind="visible: city, text: city + (state ? ', ' + state + (zip ? ' ' + zip : '') : '')"></div>
-                    <a class=edit href="#edit" data-bind="visible: !$root.editing(), click: $root.Edit"><span>edit</span></a>
-                    <a class=save href="#save" data-bind="visible: $root.editing() && !$root.saving(), click: $root.Save"><span>save</span></a>
-                    <span class=working data-bind="visible: $root.saving"></span>
                   </div>
                 </div>
               </li>
@@ -102,9 +110,24 @@ function SaveTransactions() {
           $ajax->Fail('Error executing update for transaction:  ' . $update->error);
       }
       $update->close();
+      GetCategories();
     } else
       $ajax->Fail('Error binding transactions parameters:  ' . $update->error);
   else
     $ajax->Fail('Error preparing to update transactions:  ' . $db->error);
+}
+
+function GetCategories() {
+  global $ajax, $db;
+  if($cats = $db->query('select id, name, parent from categories order by isnull(parent) desc, name')) {
+    $ajax->Data->categories = [];
+    while($cat = $cats->fetch_object()) {
+      if($cat->parent)
+        $p = $ajax->Data->categories[$cat->parent]['subs'][] = ['id' => $cat->id, 'name' => $cat->name];
+      else
+        $ajax->Data->categories[$cat->id] = ['id' => $cat->id, 'name' => $cat->name, 'subs' => []];
+    }
+    $ajax->Data->categories = array_values($ajax->Data->categories);
+  }
 }
 ?>
