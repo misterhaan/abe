@@ -1,4 +1,4 @@
 <?php
-  class cyaFormat {
-  }
+class cyaFormat {
+}
 ?>

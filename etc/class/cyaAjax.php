@@ -1,68 +1,67 @@
 <?php
-  /**
-   * ajax return class for responding to ajax requests.  currently supports json
-   * and may be extendd to add xml and / or others.
-   * @author misterhaan
-   *
-   */
-  class cyaAjax {
-    // return data in this format.  can override via $_GET['format'] but only json works currently
-    private $format = 'json';
+/**
+ * ajax return class for responding to ajax requests.  currently supports json
+ * and may be extendd to add xml and / or others.
+ * @author misterhaan
+ *
+ */
+class cyaAjax {
+	// return data in this format.  can override via $_GET['format'] but only json works currently
+	private $format = 'json';
 
-    /**
-     * returned data object.  starts with ->fail set to false and should have other data added.
-     * @var object
-     */
-    public $Data;
+	/**
+	 * returned data object.  starts with ->fail set to false and should have other data added.
+	 * @var object
+	 */
+	public $Data;
 
-    /**
-     * sets the format based on $_GET['format'] (default json) and initializes
-     * return data object.
-     */
-    public function cyaAjax() {
-      $this->Data = new stdClass();
-      $this->Data->fail = false;
-      if(isset($_GET['format']))
-        switch(strtolower($_GET['format'])) {
-          case 'json':
-          case 'xml':
-          case 'txt':
-            $this->format = strtolower($_GET['format']);
-            break;
-          default:
-            $this->Data->fail = true;
-            $this->Data->message = 'format "' . strtolower($_GET['format']) . '" is not supported.  please choose from json, xml, or txt.';
-            break;
-        }
-    }
+	/**
+	 * sets the format based on $_GET['format'] (default json) and initializes
+	 * return data object.
+	 */
+	public function cyaAjax() {
+		$this->Data = new stdClass();
+		$this->Data->fail = false;
+		if(isset($_GET['format']))
+			switch(strtolower($_GET['format'])) {
+				case 'json':
+				case 'xml':
+				case 'txt':
+					$this->format = strtolower($_GET['format']);
+					break;
+				default:
+					$this->Fail('format "' . strtolower($_GET['format']) . '" is not supported.  please choose from json, xml, or txt.');
+					break;
+			}
+	}
 
-    /**
-     * mark the request failed and add a reason.
-     * @param string $message failure reason
-     */
-    public function Fail($message) {
-      $this->Data->fail = true;
-      $this->Data->message = $message;
-    }
+	/**
+	 * mark the request failed and add a reason.
+	 * @param string $message failure reason
+	 */
+	public function Fail($message) {
+		$this->Data->fail = true;
+		$this->Data->message = $message;
+	}
 
-    /**
-     * Send the ajax response.
-     */
-    public function Send() {
-      switch($this->format) {
-        case 'json':
-          $this->SendJson();
-          break;
-        // TODO:  add XML and TXT
-      }
-    }
+	/**
+	 * Send the ajax response.
+	 */
+	public function Send() {
+		switch($this->format) {
+			case 'json':
+				$this->SendJson();
+				break;
+			// TODO:  add XML and TXT
+		}
+	}
 
-    /**
-     * Send the ajax response in json format.
-     */
-    private function SendJson() {
-      header('Content-Type: application/json');
-      echo json_encode($this->Data);
-    }
-  }
+	/**
+	 * Send the ajax response in json format.
+	 */
+	private function SendJson() {
+		header('Content-Type: application/json');
+		echo json_encode($this->Data);
+	}
+}
 ?>

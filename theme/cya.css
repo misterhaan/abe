@@ -1,456 +1,458 @@
 @font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: normal;
-  src: local('Roboto'), local('Roboto-Regular'), url(Roboto-Regular.woff);
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+	font-family: roboto;
+	font-style: normal;
+	font-weight: normal;
+	src: local('Roboto'), local('Roboto-Regular'), url(Roboto-Regular.woff);
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: bold;
-  src: local('Roboto Bold'), local('Roboto-Bold'), url(Roboto-Bold.woff);
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+	font-family: roboto;
+	font-style: normal;
+	font-weight: bold;
+	src: local('Roboto Bold'), local('Roboto-Bold'), url(Roboto-Bold.woff);
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
-  font-family: roboto;
-  font-style: italic;
-  font-weight: normal;
-  src: local('Roboto Bold'), local('Roboto-Italic'), url(Roboto-Italic.woff);
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+	font-family: roboto;
+	font-style: italic;
+	font-weight: normal;
+	src: local('Roboto Bold'), local('Roboto-Italic'), url(Roboto-Italic.woff);
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
-  font-family: monda;
-  font-weight: bold;
-  src: url(Monda-Bold.woff);
+	font-family: monda;
+	font-weight: bold;
+	src: url(Monda-Bold.woff);
 }
 @font-face {
-  font-family: inconsolata;
-  src: url(InconsolataGo-Regular.woff);
+	font-family: inconsolata;
+	src: url(InconsolataGo-Regular.woff);
 }
 @font-face {
-  font-family: fontawesome;
-  src: url(fontawesome-webfont.woff);
+	font-family: fontawesome;
+	src: url(fontawesome-webfont.woff);
 }
 
 body {
-  background-color: #ccd;
-  padding: 0;
-  margin: 0;
-  -moz-text-size-adjust: none;
-  -webkit-text-size-adjust: 100%;
-  font-family: roboto;
-  font-size: 1.4em;
+	background-color: #ccd;
+	padding: 0;
+	margin: 0;
+	-moz-text-size-adjust: none;
+	-webkit-text-size-adjust: 100%;
+	font-family: roboto;
+	font-size: 1.4em;
 }
 
 h2, h3, h4, h5, h6 {
-  /*font-family: monda;*/
-  font-size: 1em;
+	/*font-family: monda;*/
+	font-size: 1em;
 }
 h1 {
-  font-weight: normal;
-  font-size: 1em;
-  position: absolute;
-  display: inline-block;
-  white-space: nowrap;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, 0);
-  color: #fff;
-  margin: 0;
-  padding: 0;
-  line-height: 1.55em;
+	font-weight: normal;
+	font-size: 1em;
+	position: absolute;
+	display: inline-block;
+	white-space: nowrap;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	line-height: 1.55em;
 }
 h2,
 p {
-  margin: 1em .5em;
+	margin: 1em .5em;
 }
 
 a:link,
 a:visited {
-  color: #593;
+	color: #593;
 }
+
 input, select, textarea, button {
-  font-family: inherit;
-  font-size: inherit;
+	font-family: inherit;
+	font-size: inherit;
 }
 label {
-  display: block;
-  margin: .5em;
+	display: block;
+	margin: .5em;
 }
 label span.label {
-  display: block;
+	display: block;
 }
 label span.field {
-  display: block;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-align-items: center;
-  align-items: center;
+	display: block;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-items: center;
+	align-items: center;
 }
 label span.field input:not([type="checkbox"]),
 label span.field select {
-  -webkit-flex: 1 1 auto;
-  flex: 1 1 auto;
+	-webkit-flex: 1 1 auto;
+	flex: 1 1 auto;
 }
 input, select, textarea {
-  background-color: #fff;
-  border: none;
-  border-radius: .25em;
-  padding: .125em .25em;
+	background-color: #fff;
+	border: none;
+	border-radius: .25em;
+	padding: .125em .25em;
 }
 input:focus, select:focus, textarea:focus {
-  outline: none;
+	outline: none;
 }
 button {
-  display: inline-block;
-  margin: .5em;
-  background-color: #593;
-  color: #fff;
-  border: none;
-  border-radius: .25em;
+	display: inline-block;
+	margin: .5em;
+	background-color: #593;
+	color: #fff;
+	border: none;
+	border-radius: .25em;
 }
 
 .loading:before,
 .working:after {
-  font-family: fontawesome;
-  font-size: .9em;
-  color: #999;
-  display: inline-block;
-  content: "\f110";
-  -webkit-animation: fa-spin 1s infinite steps(8);
-  animation: fa-spin 1s infinite steps(8);
+	font-family: fontawesome;
+	font-size: .9em;
+	color: #999;
+	display: inline-block;
+	content: "\f110";
+	-webkit-animation: fa-spin 1s infinite steps(8);
+	animation: fa-spin 1s infinite steps(8);
 }
 @-webkit-keyframes fa-spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	100%
+	{
+		-webkit-transform: rotate(359deg);
+		transform: rotate(359deg);
+	}
 }
 @keyframes fa-spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(359deg);
+		transform: rotate(359deg);
+	}
 }
 .calltoaction .working:after {
-  color: #ccc;
+	color: #ccc;
 }
 .loading:before {
-  margin-right: .5em;
+	margin-right: .5em;
 }
 .working:after {
-  margin-left: .5em;
+	margin-left: .5em;
 }
 
 .calltoaction {
-  text-align: center;
+	text-align: center;
 }
 .calltoaction a {
-  display: inline-block;
-  white-space: nowrap;
-  margin: 1em auto;
-  background: #593;
-  color: #fff;
-  padding: .25em 1em;
-  text-decoration: none;
-  border-radius: .25em;
+	display: inline-block;
+	white-space: nowrap;
+	margin: 1em auto;
+	background: #593;
+	color: #fff;
+	padding: .25em 1em;
+	text-decoration: none;
+	border-radius: .25em;
 }
 
 /*------------------------------------------------[ page header and footer ]--*/
 body > header {
-  background-color: #593;
-  color: #fff;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-align-items: center;
-  align-items: center;
-  padding: 0 .5em;
-  height: 1.55em;
-  /*position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;*/
+	background-color: #593;
+	color: #fff;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-items: center;
+	align-items: center;
+	padding: 0 .5em;
+	height: 1.55em;
+	/*position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1;*/
 }
 body > header .back {
-  -webkit-flex: 1 0 auto;
-  flex: 1 0 auto;
+	-webkit-flex: 1 0 auto;
+	flex: 1 0 auto;
 }
 body > header .back a span {
-  display: none;
+	display: none;
 }
 body > header .back a:before {
-  font-family: fontawesome;
-  font-size: 1.5em;
-  color: #fff;
-  display: inline-block;
-  content: "\f104";
+	font-family: fontawesome;
+	font-size: 1.5em;
+	color: #fff;
+	display: inline-block;
+	content: "\f104";
 }
 body > header .actions a span {
-  display: none;
+	display: none;
 }
 body > header .actions a:before {
-  font-family: fontawesome;
-  color: #fff;
-  display: inline-block;
-  margin-left: .25em;
-  content: "\f29c";
+	font-family: fontawesome;
+	color: #fff;
+	display: inline-block;
+	margin-left: .25em;
+	content: "\f29c";
 }
 body > header .actions a.add:before {
-  content: "\f067";
+	content: "\f067";
 }
 body > header .actions a.import:before {
-  content: "\f093";
+	content: "\f093";
 }
 
 #copyright {
-  text-align: right;
-  margin: 1em .5em .25em;
-  font-size: .8em;
+	text-align: right;
+	margin: 1em .5em .25em;
+	font-size: .8em;
 }
 
 /*------------------------------------------------------------[ front page ]--*/
 #mainmenu {
-  text-align: center;
+	text-align: center;
 }
 #mainmenu a {
-  display: inline-block;
-  width: 6em;
-  text-align: center;
-  background-color: #eef;
-  box-shadow: 2px 2px 1px #999;
-  margin: 1em .5em;
-  padding: .25em .5em;
-  border-radius: .25em;
-  text-decoration: none;
+	display: inline-block;
+	width: 6em;
+	text-align: center;
+	background-color: #eef;
+	box-shadow: 2px 2px 1px #999;
+	margin: 1em .5em;
+	padding: .25em .5em;
+	border-radius: .25em;
+	text-decoration: none;
 }
 #mainmenu a:before {
-  display: block;
-  font-family: fontawesome;
-  font-size: 2em;
-  padding: .25em 0;
+	display: block;
+	font-family: fontawesome;
+	font-size: 2em;
+	padding: .25em 0;
 }
 #mainmenu a[href='accounts.php']:before {
-  content: "\f19c";
+	content: "\f19c";
 }
 #mainmenu a[href='transactions.php']:before {
-  content: "\f0ae";
+	content: "\f0ae";
 }
 
 /*--------------------------------------------------------------[ accounts ]--*/
 #accountlist .account {
-  margin: 1em .5em;
-  background-color: #eef;
-  border-radius: .25em;
-  box-shadow: 2px 2px 1px #999;
+	margin: 1em .5em;
+	background-color: #eef;
+	border-radius: .25em;
+	box-shadow: 2px 2px 1px #999;
 }
 #accountlist h2 {
-  color: #fff;
-  background-color: #e73;
-  padding: .25em .5em;
-  margin: 0;
-  border-radius: .25em .25em 0 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	color: #fff;
+	background-color: #e73;
+	padding: .25em .5em;
+	margin: 0;
+	border-radius: .25em .25em 0 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 #accountlist .lastupdate:before {
-  font-family: fontawesome;
-  color: #999;
-  display: inline-block;
-  margin-right: .5em;
-  font-style: normal;
+	font-family: fontawesome;
+	color: #999;
+	display: inline-block;
+	margin-right: .5em;
+	font-style: normal;
 }
 #accountlist .creditvisa .lastupdate:before {
-  content: "\f1f0";
+	content: "\f1f0";
 }
 #accountlist .creditmc .lastupdate:before {
-  content: "\f1f1";
+	content: "\f1f1";
 }
 #accountlist .credit .lastupdate:before {
-  content: "\f283";
+	content: "\f283";
 }
 #accountlist .checking .lastupdate:before {
-  content: "\f0d6";
-  font-size: 1.05em;
+	content: "\f0d6";
+	font-size: 1.05em;
 }
 #accountlist .savings .lastupdate:before {
-  content: "\f0b1";
-  font-size: 1.05em;
+	content: "\f0b1";
+	font-size: 1.05em;
 }
 #accountlist .detail {
-  margin: .25em 0;
-  padding: 0 .5em;
-  display: -webkit-flex;
-  display: flex;
+	margin: .25em 0;
+	padding: 0 .5em;
+	display: -webkit-flex;
+	display: flex;
 }
 #accountlist .lastupdate {
-  font-style: italic;
-  font-size: .8em;
+	font-style: italic;
+	font-size: .8em;
 }
 #accountlist .balance {
-  text-align: right;
-  -webkit-flex: 1 0 auto;
-  flex: 1 0 auto;
+	text-align: right;
+	-webkit-flex: 1 0 auto;
+	flex: 1 0 auto;
 }
 #accountlist .actions {
-  margin: .25em 0;
-  padding: 0 .5em .25em;
-  text-align: right;
+	margin: .25em 0;
+	padding: 0 .5em .25em;
+	text-align: right;
 }
 #accountlist .actions a span {
-  display: none;
+	display: none;
 }
 #accountlist .actions a:before {
-  font-family: fontawesome;
-  font-size: .9em;
-  color: #999;
-  display: inline-block;
-  margin-left: .5em;
-  content: "\f29c";
+	font-family: fontawesome;
+	font-size: .9em;
+	color: #999;
+	display: inline-block;
+	margin-left: .5em;
+	content: "\f29c";
 }
 #accountlist .actions a:hover:before {
-  color: #593;
+	color: #593;
 }
 #accountlist .actions a.transactions:before {
-  content: "\f0ae";
+	content: "\f0ae";
 }
 #accountlist .actions a.bank:before {
-  content: "\f19c";
+	content: "\f19c";
 }
 #accountlist .actions a.import:before {
-  content: "\f093";
+	content: "\f093";
 }
 #accountlist .actions a.edit:before {
-  content: "\f044";
+	content: "\f044";
 }
 
 /*----------------------------------------------------------[ transactions ]--*/
 #transactions {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
 }
 #transactions header {
-  text-align: right;
-  padding: .25em .5em 0;
+	text-align: right;
+	padding: .25em .5em 0;
 }
 #transactions ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
 }
 #transactions li.transaction {
-  background-color: #eef;
-  margin: 1px 0;
+	background-color: #eef;
+	margin: 1px 0;
 }
 #transactions .transaction {
-  padding: .25em .5em .5em;
-  display: -webkit-flex;
-  display: flex;
+	padding: .25em .5em .5em;
+	display: -webkit-flex;
+	display: flex;
 }
 #transactions .transaction div {
-  -webkit-flex: 1 1 auto;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	-webkit-flex: 1 1 auto;
+	flex: 1 1 auto;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 #transactions .transaction div.full {
-  overflow: visible;
+	overflow: visible;
 }
 #transactions .transaction div.amount {
-  -webkit-flex: 0 0 auto;
-  flex: 0 0 auto;
-  margin-left: .75em;
+	-webkit-flex: 0 0 auto;
+	flex: 0 0 auto;
+	margin-left: .75em;
 }
 #transactions li > .amount:after,
 #transactions .account:before {
-  font-family: fontawesome;
-  font-size: .9em;
-  display: inline-block;
-  color: #999;
-  margin-left: .25em;
+	font-family: fontawesome;
+	font-size: .9em;
+	display: inline-block;
+	color: #999;
+	margin-left: .25em;
 }
 #transactions .account:before {
-  margin-left: 0;
-  margin-right: .25em;
+	margin-left: 0;
+	margin-right: .25em;
 }
 #transactions li.creditvisa > .amount:after,
 #transactions .account.creditvisa:before {
-  content: "\f1f0";
+	content: "\f1f0";
 }
 #transactions li.creditmc > .amount:after,
 #transactions .account.creditmc:before {
-  content: "\f1f1";
+	content: "\f1f1";
 }
 #transactions li.credit > .amount:after,
 #transactions .account.credit:before {
-  content: "\f283";
+	content: "\f283";
 }
 #transactions li.checking > .amount:after,
 #transactions .account.checking:before {
-  content: "\f0d6";
-  font-size: 1.05em;
+	content: "\f0d6";
+	font-size: 1.05em;
 }
 #transactions li.savings > .amount:after,
 #transactions .account.savings:before {
-  content: "\f0b1";
-  font-size: 1.05em;
+	content: "\f0b1";
+	font-size: 1.05em;
 }
 #transactions .full {
-  position: absolute;
-  left: .25em;
-  right: .25em;
-  padding: .25em .5em;
-  background-color: #eef;
-  border: 1px solid #e73;
-  border-radius: .25em;
-  box-shadow: 2px 2px 2px #999;
+	position: absolute;
+	left: .25em;
+	right: .25em;
+	padding: .25em .5em;
+	background-color: #eef;
+	border: 1px solid #e73;
+	border-radius: .25em;
+	box-shadow: 2px 2px 2px #999;
 }
 #transactions .full > div {
-  padding: 0;
+	padding: 0;
 }
 #transactions a.close span {
-  display: none;
+	display: none;
 }
 #transactions a.close:before {
-  font-family: fontawesome;
-  color: #a33;
-  content: "\f00d";
-  margin-left: .25em;
-  display: inline-block;
-  padding: 0 .125em .125em;
+	font-family: fontawesome;
+	color: #a33;
+	content: "\f00d";
+	margin-left: .25em;
+	display: inline-block;
+	padding: 0 .125em .125em;
 }
 #transactions a.close:hover:before {
-  background-color: #a33;
-  color: #fff;
-  border-radius: .25em;
+	background-color: #a33;
+	color: #fff;
+	border-radius: .25em;
 }
 #transactions label {
-  margin: 0;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-align-items: center;
-  align-items: center;
+	margin: 0;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-items: center;
+	align-items: center;
 }
 #transactions input {
-  -webkit-flex: 1 1 auto;
-  flex: 1 1 auto;
-  min-width: 0;
+	-webkit-flex: 1 1 auto;
+	flex: 1 1 auto;
+	min-width: 0;
 }
 #transactions .full .details div,
 #transactions .full .details label {
-  margin: .25em 0;
+	margin: .25em 0;
 }
 #transactions .category,
 #transactions .account,
@@ -458,77 +460,77 @@ body > header .actions a.import:before {
 #transactions .posted,
 #transactions .note,
 #transactions .location {
-  font-size: .8em;
+	font-size: .8em;
 }
 #transactions .category:before,
 #transactions .transdate:before,
 #transactions .posted:before,
 #transactions .note:before,
 #transactions .location:before {
-  font-family: fontawesome;
-  margin-right: .25em;
-  color: #999;
-  display: inline-block;
-  width: 1.125em;
-  text-align: center;
+	font-family: fontawesome;
+	margin-right: .25em;
+	color: #999;
+	display: inline-block;
+	width: 1.125em;
+	text-align: center;
 }
 #transactions .category:before {
-  content: "\f02b";
+	content: "\f02b";
 }
 #transactions .transdate:before {
-  content: "\f133";
+	content: "\f133";
 }
 #transactions .posted:before {
-  content: "\f274";
-  transform: translate(.04em);
+	content: "\f274";
+	transform: translate(.04em);
 }
 #transactions .note:before {
-  content: "\f24a";
+	content: "\f24a";
 }
 #transactions .location:before {
-  content: "\f041";
+	content: "\f041";
 }
 #transactions li.loading {
-  padding: .25em .5em;
+	padding: .25em .5em;
 }
 #transactions .working:after {
-  font-family: fontawesome;
-  display: inline-block;
+	font-family: fontawesome;
+	display: inline-block;
 }
 #transactions input.newcat {
-  background-color: #ffc;
+	background-color: #ffc;
 }
 #transactions .suggestions {
-  font-size: .8em;
-  position: absolute;
-  margin-top: -.25em;
-  margin-left: 1.5em;
-  padding: 0;
-  background-color: #ccd;
-  box-shadow: 2px 2px 1px #999;
-  border-radius: 0 0 .25em .25em;
-  list-style-type: none;
+	font-size: .8em;
+	position: absolute;
+	margin-top: -.25em;
+	margin-left: 1.5em;
+	padding: 0;
+	background-color: #ccd;
+	box-shadow: 2px 2px 1px #999;
+	border-radius: 0 0 .25em .25em;
+	list-style-type: none;
 }
 #transactions .suggestions > li:last-child > div:last-child,
 #transactions .suggestions > li:last-child li:last-child > div:last-child {
-  border-radius: 0 0 .25em .25em;
+	border-radius: 0 0 .25em .25em;
 }
 #transactions .full .suggestions li > div {
-  background-color: #fff;
-  padding: .125em .5em .125em .25em;
-  margin: 1px;
+	background-color: #fff;
+	padding: .125em .5em .125em .25em;
+	margin: 1px;
 }
 #transactions .full .suggestions li > div:hover,
 #transactions .full .suggestions li > div.kbcursor {
-  cursor: pointer;
-  background-color: #593;
-  color: #fff;
+	cursor: pointer;
+	background-color: #593;
+	color: #fff;
 }
 #transactions .suggestions ol {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
 }
 #transactions .full .suggestions ol li div {
-  padding-left: 1em;
+	padding-left: 1em;
 }
