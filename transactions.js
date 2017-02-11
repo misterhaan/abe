@@ -214,7 +214,7 @@ var TransactionsModel = new function() {
 						var tr = self.dates()[d].transactions()[t];
 						transactions.push(tr);
 						// data needs the id to know which transaction, plus anything that (could have) changed.
-						data.push({id: tr.id, name: tr.name(), category: tr.category(), notes: tr.notes()});
+						data.push({id: tr.id, name: tr.name().trim(), category: tr.category().trim(), notes: tr.notes().trim()});
 					}
 			if(data.length)  // should be true if self.changed was true
 				$.post("?ajax=save", {transactions: data}, function(result) {

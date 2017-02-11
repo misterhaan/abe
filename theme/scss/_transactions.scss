@@ -38,7 +38,6 @@
 	.account:before {
 		@extend %fa-label;
 		margin-left: 0;
-		margin-right: .25em;
 	}
 	li.creditvisa > .amount:after,
 	.account.creditvisa:before {
@@ -94,7 +93,7 @@
 			color: $red;
 			content: "\f00d";
 			margin-left: .25em;
-			padding: 0 .125em .125em;
+			padding: 0 .125em .07em;
 		}
 		&:hover:before {
 			background-color: $red;
@@ -119,7 +118,7 @@
 	.posted,
 	.note,
 	.location {
-		font-size: .8em;
+		font-size: .85em;
 	}
 	.category:before,
 	.transdate:before,
@@ -128,7 +127,6 @@
 	.location:before {
 		@extend %fa-label;
 		font-size: 1em;
-		margin-right: .25em;
 		width: 1.125em;
 		text-align: center;
 	}
@@ -152,7 +150,7 @@
 		padding: .25em .5em;
 	}
 	.suggestions {
-		font-size: .8em;
+		font-size: .85em;
 		position: absolute;
 		margin-top: -.25em;
 		margin-left: 1.5em;

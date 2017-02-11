@@ -36,13 +36,13 @@ $html->Open('Transactions');
 								<div class=amount data-bind="text: amount"></div>
 								<div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data, click: $root.CaptureClick">
 									<div class=transaction>
-										<div><label class=name><input data-bind="value: name"></label></div>
+										<div><label class=name><input data-bind="value: name" maxlength=64></label></div>
 										<div class=amount data-bind="text: amount"></div>
 										<a class=close data-bind="visible: !$root.saving(), click: $root.CloseAndSave" title="Save changes and close"><span>close</span></a>
 										<span class=working data-bind="visible: $root.saving"></span>
 									</div>
 									<div class=details>
-										<label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)"></label>
+										<label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)" maxlength=24></label>
 										<ol class=suggestions data-bind="visible: suggestingCategories, foreach: $root.categories">
 											<!-- ko if: name.containsAnyCase($parent.category()) || subs.nameContainsAnyCase($parent.category()) -->
 												<li>
