@@ -1,0 +1,79 @@
+// Styles for the Collect Your Assets account list page (/accounts.php)
+
+#accountlist {
+	.account {
+		margin: 1em .5em;
+		background-color: $lightgreyblue;
+		border-radius: $gentlecorner;
+		box-shadow: 2px 2px 1px $darkgrey;
+	}
+	h2 {
+		color: #fff;
+		background-color: $orange;
+		padding: .25em .5em;
+		margin: 0;
+		border-radius: $gentlecorner $gentlecorner 0 0;
+		@extend %ellipsis;
+	}
+	.lastupdate {
+		font-style: italic;
+		font-size: .8em;
+	}
+	.lastupdate:before {
+		@extend %fa-label;
+		font-style: normal;
+	}
+	.creditvisa .lastupdate:before {
+		@extend %icon-visa;
+	}
+	.creditmc .lastupdate:before {
+		@extend %icon-mastercard;
+	}
+	.credit .lastupdate:before {
+		@extend %icon-credit;
+	}
+	.checking .lastupdate:before {
+		@extend %icon-checking;
+	}
+	.savings .lastupdate:before {
+		@extend %icon-savings;
+	}
+	.detail {
+		@extend %flex-container;
+		margin: .25em 0;
+		padding: 0 .5em;
+	}
+	.balance {
+		@extend %flex-item-grow;
+		text-align: right;
+	}
+	.actions {
+		margin: .25em 0;
+		padding: 0 .5em .25em;
+		text-align: right;
+		a {
+			@extend %fa-replaced;
+			&:before {
+				font-size: .9em;
+				color: $darkgrey;
+				margin-left: .5em;
+				content: "\f29c";
+			}
+			&:hover:before {
+				color: $green;
+			}
+			&.transactions:before {
+				content: "\f0ae";
+			}
+			&.bank:before {
+				content: "\f19c";
+			}
+			&.import:before {
+				content: "\f093";
+			}
+			&.edit:before {
+				content: "\f044";
+			}
+		}
+	}
+}

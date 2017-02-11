@@ -1,0 +1,54 @@
+// cya.scss contains general styles for all of Collect Your Assets.
+
+@import "!base";
+
+body {
+	background-color: $medgreyblue;
+	padding: 0;
+	margin: 0;
+	-moz-text-size-adjust: none;
+	-webkit-text-size-adjust: 100%;
+	font-family: roboto;
+	font-size: 1.4em;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-size: 1em;
+}
+h2,
+p {
+	margin: 1em .5em;
+}
+a:link,
+a:visited {
+	color: $green;
+}
+.loading:before,
+.working:after {
+	@extend %fa-label;
+	content: "\f110";
+	-webkit-animation: fa-spin 1s infinite steps(8);
+	animation: fa-spin 1s infinite steps(8);
+}
+.calltoaction .working:after {
+	color: #ccc;
+}
+.working:after {
+	margin-left: .5em;
+	margin-right: 0;
+}
+
+.calltoaction {
+	text-align: center;
+}
+.calltoaction a {
+	@extend button;
+	display: inline-block;
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+@import "!forms";
+@import "!headfoot";
+@import "index";
+@import "accounts";
+@import "transactions"

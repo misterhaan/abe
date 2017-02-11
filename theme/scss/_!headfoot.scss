@@ -1,0 +1,67 @@
+// Header and footer styles for Collect Your Assets
+
+body > header {
+	background-color: $green;
+	color: #fff;
+	@extend %flex-container-center;
+	padding: 0 .5em;
+	height: 1.55em;
+	//position: fixed;
+	//top: 0;
+	//left: 0;
+	//right: 0;
+	//z-index: 1;
+
+	.back {
+		@extend %flex-item-grow;
+
+		a {
+			@extend %fa-replaced;
+
+			&:before {
+				font-size: 1.5em;
+				color: #fff;
+				content: "\f104";
+			}
+		}
+	}
+	.actions {
+		@extend %flex-item-fixed;
+
+		a {
+			@extend %fa-replaced;
+
+			&:before {
+				margin-left: .25em;
+				color: #fff;
+				content: "\f29c";
+			}
+		}
+		a.add:before {
+			content: "\f067";
+		}
+		a.import:before {
+			content: "\f093";
+		}
+	}
+}
+
+h1 {
+	font-weight: normal;
+	position: absolute;
+	display: inline-block;
+	white-space: nowrap;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	line-height: 1.55em;
+}
+
+#copyright {
+	text-align: right;
+	margin: 1em .5em .25em;
+	font-size: .8em;
+}

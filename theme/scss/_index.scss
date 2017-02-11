@@ -1,0 +1,28 @@
+// styles for the Collect Your Assets main menu (/index.php)
+
+#mainmenu {
+	text-align: center;
+	a {
+		display: inline-block;
+		width: 6em;
+		text-align: center;
+		background-color: $lightgreyblue;
+		box-shadow: 2px 2px 1px $darkgrey;
+		margin: 1em .5em;
+		padding: .25em .5em;
+		border-radius: $gentlecorner;
+		text-decoration: none;
+		&:before {
+			@extend %fontawesome;
+			display: block;
+			font-size: 2em;
+			padding: .25em 0;
+		}
+		&[href='accounts.php']:before {
+			content: "\f19c";
+		}
+		&[href='transactions.php']:before {
+			content: "\f0ae";
+		}
+	}
+}

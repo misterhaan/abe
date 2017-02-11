@@ -28,8 +28,10 @@ class BmoHarris extends cyaBank {
 								$intrans = false;
 								if($checknum)
 									$name .= ' ' . $checknum;
-								if($ins->execute())
+								if($ins->execute()) {
 									$ajax->Data->count++;
+									$net += $amount;
+								}
 								else
 									$ajax->Fail('Error executing transaction import:  ' . $ins->error);
 							} else {

@@ -1,0 +1,177 @@
+#transactions {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	header {
+		text-align: right;
+		padding: .25em .5em 0;
+	}
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
+	li.transaction {
+		background-color: $lightgreyblue;
+		margin: 1px 0;
+	}
+	.transaction {
+		@extend %flex-container;
+		padding: .25em .5em .5em;
+		div {
+			@extend %flex-item-fill;
+			@extend %ellipsis;
+		}
+		div.full {
+			overflow: visible;
+		}
+		div.amount {
+			@extend %flex-item-fixed;
+			margin-left: .75em;
+		}
+	}
+	li > .amount:after {
+		@extend %fa-label;
+		margin-left: .25em;
+		margin-right: 0;
+	}
+	.account:before {
+		@extend %fa-label;
+		margin-left: 0;
+		margin-right: .25em;
+	}
+	li.creditvisa > .amount:after,
+	.account.creditvisa:before {
+		@extend %icon-visa;
+	}
+	li.creditmc > .amount:after,
+	.account.creditmc:before {
+		@extend %icon-mastercard;
+	}
+	li.credit > .amount:after,
+	.account.credit:before {
+		@extend %icon-credit;
+	}
+	li.checking > .amount:after,
+	.account.checking:before {
+		@extend %icon-checking;
+	}
+	li.savings > .amount:after,
+	.account.savings:before {
+		@extend %icon-savings;
+	}
+	.full {
+		position: absolute;
+		left: .25em;
+		right: .25em;
+		padding: .25em .5em;
+		background-color: $lightgreyblue;
+		border: 1px solid $orange;
+		border-radius: $gentlecorner;
+		box-shadow: 2px 2px 2px $darkgrey;
+		.details div,
+		.details label {
+			margin: .25em 0;
+		}
+		.suggestions li > div {
+			background-color: #fff;
+			padding: .125em .5em .125em .25em;
+			margin: 1px;
+			&:hover,
+			&.kbcursor {
+				cursor: pointer;
+				background-color: $green;
+				color: #fff;
+			}
+		}
+	}
+	.full > div {
+		padding: 0;
+	}
+	a.close {
+		@extend %fa-replaced;
+		&:before {
+			color: $red;
+			content: "\f00d";
+			margin-left: .25em;
+			padding: 0 .125em .125em;
+		}
+		&:hover:before {
+			background-color: $red;
+			color: #fff;
+			border-radius: $gentlecorner;
+		}
+	}
+	label {
+		@extend %flex-container-center;
+		margin: 0;
+	}
+	input {
+		@extend %flex-item-fill;
+		min-width: 0;
+		&.newcat {
+			background-color: $lightyellow;
+		}
+	}
+	.category,
+	.account,
+	.transdate,
+	.posted,
+	.note,
+	.location {
+		font-size: .8em;
+	}
+	.category:before,
+	.transdate:before,
+	.posted:before,
+	.note:before,
+	.location:before {
+		@extend %fa-label;
+		font-size: 1em;
+		margin-right: .25em;
+		width: 1.125em;
+		text-align: center;
+	}
+	.category:before {
+		content: "\f02b";
+	}
+	.transdate:before {
+		content: "\f133";
+	}
+	.posted:before {
+		content: "\f274";
+		transform: translate(.04em);
+	}
+	.note:before {
+		content: "\f24a";
+	}
+	.location:before {
+		content: "\f041";
+	}
+	li.loading {
+		padding: .25em .5em;
+	}
+	.suggestions {
+		font-size: .8em;
+		position: absolute;
+		margin-top: -.25em;
+		margin-left: 1.5em;
+		padding: 0;
+		background-color: $medgreyblue;
+		box-shadow: 2px 2px 1px $darkgrey;
+		border-radius: 0 0 $gentlecorner $gentlecorner;
+		list-style-type: none;
+		ol {
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+			li div {
+				padding-left: 1em;
+			}
+		}
+	}
+	.suggestions > li:last-child > div:last-child,
+	.suggestions > li:last-child li:last-child > div:last-child {
+		border-radius: 0 0 $gentlecorner $gentlecorner;
+	}
+}

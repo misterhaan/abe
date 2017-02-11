@@ -1,0 +1,44 @@
+// styles for form elements common to all of Collect Your Assets
+
+input, select, textarea, button {
+	font-family: inherit;
+	font-size: inherit;
+}
+label {
+	display: block;
+	margin: .5em;
+
+	span.label {
+		display: block;
+	}
+	span.field {
+		@extend %flex-container-center;
+
+		input:not([type="checkbox"]),
+		select {
+			@extend %flex-item-fill;
+		}
+	}
+}
+input, select, textarea {
+	background-color: #fff;
+	border: none;
+	border-radius: $gentlecorner;
+	padding: .125em .25em;
+
+	&:focus {
+		outline: none;
+	}
+}
+button {
+	margin: .5em;
+	padding: .25em .75em;
+	background-color: $green;
+	color: #fff;
+	border: none;
+	border-radius: $gentlecorner;
+
+	&:focus {
+		outline: none;
+	}
+}
