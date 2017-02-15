@@ -7,13 +7,11 @@ input, select, textarea, button {
 label {
 	display: block;
 	margin: .5em;
-
 	span.label {
 		display: block;
 	}
 	span.field {
 		@extend %flex-container-center;
-
 		input:not([type="checkbox"]),
 		select {
 			@extend %flex-item-fill;
@@ -25,7 +23,6 @@ input, select, textarea {
 	border: none;
 	border-radius: $gentlecorner;
 	padding: .125em .25em;
-
 	&:focus {
 		outline: none;
 	}
@@ -37,7 +34,7 @@ button {
 	color: #fff;
 	border: none;
 	border-radius: $gentlecorner;
-
+	cursor: pointer;
 	&:focus {
 		outline: none;
 	}

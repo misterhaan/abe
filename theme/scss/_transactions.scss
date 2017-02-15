@@ -41,6 +41,9 @@
 		@extend %fa-label;
 		margin-left: 0;
 	}
+	.account.all:before {
+		content: "\f19c";
+	}
 	li.creditvisa > .amount:after,
 	.account.creditvisa:before {
 		@extend %icon-visa;
@@ -103,12 +106,12 @@
 			background-color: $lightyellow;
 		}
 	}
-	.category,
-	.account,
-	.transdate,
-	.posted,
-	.note,
-	.location {
+	ol .category,
+	ol .account,
+	ol .transdate,
+	ol .posted,
+	ol .note,
+	ol .location {
 		font-size: .85em;
 	}
 	.category:before,
