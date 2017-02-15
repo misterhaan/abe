@@ -372,6 +372,12 @@ var TransactionsModel = new function() {
 		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
 	};
 
+	self.HideFilterAcctSuggestions = function() {
+		window.setTimeout(function() {
+			self.suggestingAccounts(false);
+		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+	};
+
 	/**
 	 * Set the category of the full-view tranaction to the specified category.
 	 * @param category Category being chosen.

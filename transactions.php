@@ -34,7 +34,7 @@ $html->Open('Transactions');
 						<!-- ko foreach: filterAccounts -->
 							<span class="account" data-bind="css: typeclass"><span data-bind="text: name"></span><a class=remove data-bind="click: $root.RemoveAccount"></a></span>
 						<!-- /ko -->
-						<input data-bind="textInput: filterAcct, event: { dblclick: ShowAcctSuggestions, keydown: AccountFilterKey }" placeholder="Find an account">
+						<input data-bind="textInput: filterAcct, event: { dblclick: ShowAcctSuggestions, keydown: AccountFilterKey, blur: HideFilterAcctSuggestions }" placeholder="Find an account">
 					</label>
 					<ol class=suggestions data-bind="visible: suggestingAccounts, foreach: accountsForFilter">
 						<li><div data-bind="text: name, click: $root.ChooseAccount, attr: {'class': 'account ' + typeclass}, css: {kbcursor: $data == $root.acctCursor()}"></div></li>
