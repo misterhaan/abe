@@ -1,3 +1,9 @@
+/**
+ * Delay before hiding suggestions when the field loses focus.  If clicking a
+ * suggestion doesn't work, this should be increased.
+ */
+var hideSuggestDelay = 250;
+
 $(function() {
 	ko.applyBindings(TransactionsModel, $("#transactions")[0]);
 	$("a[href='#showFilters']").click(function(e) {
@@ -15,14 +21,9 @@ $(function() {
 $(window).keydown(function(e) {
 	switch(e.keyCode) {
 		case 27:  // esc
-			if(TransactionsModel.showFilters()) {
-				if(TransactionsModel.suggestingFilterCategories())
-					TransactionsModel.suggestingFilterCategories(false);
-				else if(TransactionsModel.suggestingAccounts())
-					TransactionsModel.suggestingAccounts(false);
-				else
-					TransactionsModel.CancelFilters();
-			} else
+			if(TransactionsModel.showFilters())
+				TransactionsModel.CancelFilters();
+			else
 				TransactionsModel.CloseAndSave();
 			return false;
 		case 33:  // page up
@@ -73,14 +74,20 @@ var TransactionsModel = new function() {
 	 */
 	self.more = ko.observable(false);
 
+	/**
+	 * Accounts to suggest.
+	 */
 	self.accounts = ko.observableArray([]);
+	/**
+	 * Keyboard-highlighted account.  False for none.
+	 */
 	self.acctCursor = ko.observable(false);
 	/**
 	 * Categories to suggest.
 	 */
 	self.categories = ko.observableArray([]);
 	/**
-	 * Keyboard-highlighted category.  False for none.
+	 * Keyboard-highlighted category.  Used for filters and transactions full view.  False for none.
 	 */
 	self.catCursor = ko.observable(false);
 
@@ -97,22 +104,34 @@ var TransactionsModel = new function() {
 		if(self.showFilters()) {
 			self.filterAcct("");
 			self.filterCat("");
-			// use slice to make copies
+			// use slice to make copies.  they will be restored on cancel.
 			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice()};
 		}
 	});
 
+	/**
+	 * Accounts to include transactions from.
+	 */
 	self.filterAccounts = ko.observableArray([]);
+	/**
+	 * The account field on the filter menu.
+	 */
 	self.filterAcct = ko.observable("");
 	self.filterAcct.subscribe(function() {
 		if(self.filterAcct())
 			self.suggestingAccounts(true);
 	});
+	/**
+	 * Whether the accounts field dropdown is visible.
+	 */
 	self.suggestingAccounts = ko.observable(false);
 	self.suggestingAccounts.subscribe(function() {
 		if(!self.suggestingAccounts())
 			self.acctCursor(false);
 	});
+	/**
+	 * Options for the dropdown of the account field in the filter menu.
+	 */
 	self.accountsForFilter = ko.computed(function() {
 		self = self || TransactionsModel;
 		var accts = [];
@@ -122,17 +141,29 @@ var TransactionsModel = new function() {
 		return accts;
 	});
 
+	/**
+	 * Categories to include transactions from.
+	 */
 	self.filterCategories = ko.observableArray([]);
+	/**
+	 * Category field on the filter menu.
+	 */
 	self.filterCat = ko.observable("");
 	self.filterCat.subscribe(function() {
 		if(self.filterCat())
 			self.suggestingFilterCategories(true);
 	});
+	/**
+	 * Whether the filter menu category field dropdown is visible.
+	 */
 	self.suggestingFilterCategories = ko.observable(false);
 	self.suggestingFilterCategories.subscribe(function() {
 		if(!self.suggestingFilterCategories())
 			self.catCursor(false);
 	});
+	/**
+	 * Options for the dropdown of the category field in the filter menu.
+	 */
 	self.categoriesForFilter = ko.computed(function() {
 		self = self || TransactionsModel;
 		var cats = [];
@@ -174,7 +205,8 @@ var TransactionsModel = new function() {
 	};
 
 	/**
-	 * Load categories from the server.  Also loads the first set of transactions.
+	 * Load categories from the server.  Also loads the first set of transactions
+	 * if accounts have been loaded.
 	 */
 	(self.GetCategories = function() {
 		self.loading(true);
@@ -191,6 +223,10 @@ var TransactionsModel = new function() {
 		}, "json");
 	})();
 
+	/**
+	 * Load accounts from the server.  Also loads the first set of transactions if
+	 * categories have been loaded.
+	 */
 	(self.GetAccounts = function() {
 		$.get("accounts.php?ajax=accountlist", null, function(result) {
 			if(!result.fail) {
@@ -348,10 +384,16 @@ var TransactionsModel = new function() {
 		transaction.suggestingCategories(true);
 	};
 	
+	/**
+	 * Show category suggestions for the filter menu's category field.
+	 */
 	self.ShowFilterCatSuggestions = function() {
 		self.suggestingFilterCategories(true);
 	};
 
+	/**
+	 * Show account suggestions for the filter menu's account field.
+	 */
 	self.ShowAcctSuggestions = function() {
 		self.suggestingAccounts(true);
 	};
@@ -363,19 +405,25 @@ var TransactionsModel = new function() {
 	self.HideSuggestions = function(transaction) {
 		window.setTimeout(function() {
 			transaction.suggestingCategories(false);
-		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+		}, hideSuggestDelay);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
 	};
 
+	/**
+	 * Hide category suggestions for the filter menu's category field.
+	 */
 	self.HideFilterCatSuggestions = function() {
 		window.setTimeout(function() {
 			self.suggestingFilterCategories(false);
-		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+		}, hideSuggestDelay);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
 	};
 
+	/**
+	 * Hide account suggestions for the filter menu's account field.
+	 */
 	self.HideFilterAcctSuggestions = function() {
 		window.setTimeout(function() {
 			self.suggestingAccounts(false);
-		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+		}, hideSuggestDelay);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
 	};
 
 	/**
@@ -386,21 +434,37 @@ var TransactionsModel = new function() {
 		self.selection().category(category.name);
 		self.selection().suggestingCategories(false);
 	};
-	
+
+	/**
+	 * Include the specified category in the filter.
+	 * @param category Category being included.
+	 */
 	self.ChooseFilterCategory = function(category) {
 		self.filterCategories.push(category);
 		self.suggestingFilterCategories(false);
 	};
 
+	/**
+	 * Include the specified account in the filter.
+	 * @param account Account being chosen.
+	 */
 	self.ChooseAccount = function(account) {
 		self.filterAccounts.push(account);
 		self.suggestingAccounts(false);
 	};
 
+	/**
+	 * Remove the specified category from the filter.
+	 * @param category Category to remove.
+	 */
 	self.RemoveFilterCategory = function(category) {
 		self.filterCategories.splice(self.filterCategories.indexOf(category), 1);
 	};
 
+	/**
+	 * Remove the specified account from the filter.
+	 * @param account Account to remove.
+	 */
 	self.RemoveAccount = function(account) {
 		self.filterAccounts.splice(self.filterAccounts.indexOf(account), 1);
 	};
@@ -524,9 +588,24 @@ var TransactionsModel = new function() {
 		}
 		return true;  // knockout will suppress the event unless we return true
 	};
-	
+
+	/**
+	 * Keyboard shortcuts for filter menu category field:
+	 * ESC hides suggestions
+	 * Up arrow highlights the previous suggestion.  It will wrap from the top to the bottom.
+	 * Down arrow highlights the next suggestion.  It will wrap from the bottom to the top.
+	 * Enter selects the highlighted category.
+	 * Tab selects the highlighted category and then moves to the next field.
+	 */
 	self.CategoryFilterKey = function(model, e) {
 		switch(e.keyCode) {
+			case 27:  // escape
+				if(self.suggestingFilterCategories()) {
+					self.suggestingFilterCategories(false);
+					e.stopImmediatePropagation();
+					return false;
+				}
+				break;  // if it's not hiding the suggestions it should hide the filter menu
 			case 38:  // up arrow
 				self.suggestingFilterCategories(true);
 				if(TransactionsModel.catCursor()) {
@@ -604,8 +683,23 @@ var TransactionsModel = new function() {
 		return true;  // knockout will suppress the event unless we return true
 	};
 
+	/**
+	 * Keyboard shortcuts for filter menu account field:
+	 * ESC hides suggestions
+	 * Up arrow highlights the previous suggestion.  It will wrap from the top to the bottom.
+	 * Down arrow highlights the next suggestion.  It will wrap from the bottom to the top.
+	 * Enter selects the highlighted category.
+	 * Tab selects the highlighted category and then moves to the next field.
+	 */
 	self.AccountFilterKey = function(model, e) {
 		switch(e.keyCode) {
+			case 27:  // escape
+				if(self.suggestingAccounts()) {
+					self.suggestingAccounts(false);
+					e.stopImmediatePropagation();
+					return false;
+				}
+				break;  // if it's not hiding the suggestions it should hide the filter menu
 			case 38:  // up arrow
 				self.suggestingAccounts(true);
 				if(TransactionsModel.acctCursor()) {
@@ -658,12 +752,18 @@ var TransactionsModel = new function() {
 		return true;  // knockout will suppress the event unless we return true
 	};
 
+	/**
+	 * Clear loaded transactions and reload with the new filters.
+	 */
 	self.UpdateFilters = function() {
 		self.showFilters(false);
 		self.dates([]);
 		self.GetTransactions();
 	};
 
+	/**
+	 * Cancel changes to filters.
+	 */
 	self.CancelFilters = function() {
 		self.showFilters(false);
 		self.filterAccounts(self.oldFilters.accounts);
