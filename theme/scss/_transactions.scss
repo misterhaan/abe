@@ -1,7 +1,9 @@
 #transactions {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+	ol {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
 	header {
 		text-align: right;
 		padding: .25em .5em 0;
@@ -68,20 +70,9 @@
 		border: 1px solid $orange;
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 2px $darkgrey;
-		.details div,
-		.details label {
+		.details > div,
+		.details > label {
 			margin: .25em 0;
-		}
-		.suggestions li > div {
-			background-color: #fff;
-			padding: .125em .5em .125em .25em;
-			margin: 1px;
-			&:hover,
-			&.kbcursor {
-				cursor: pointer;
-				background-color: $green;
-				color: #fff;
-			}
 		}
 	}
 	.full > div {
@@ -101,7 +92,7 @@
 			border-radius: $gentlecorner;
 		}
 	}
-	label {
+	ol label {
 		@extend %flex-container-center;
 		margin: 0;
 	}
@@ -133,6 +124,13 @@
 	.category:before {
 		content: "\f02b";
 	}
+	.category.all:before {
+		content: "\f02c";
+	}
+	div.quick > .category:before {
+		margin-right: .25em;
+		width: auto;
+	}
 	.transdate:before {
 		content: "\f133";
 	}
@@ -153,7 +151,7 @@
 		font-size: .85em;
 		position: absolute;
 		margin-top: -.25em;
-		margin-left: 1.5em;
+		margin-left: 1.8em;
 		padding: 0;
 		background-color: $medgreyblue;
 		box-shadow: 2px 2px 1px $darkgrey;
@@ -167,9 +165,66 @@
 				padding-left: 1em;
 			}
 		}
+		li > div {
+			background-color: #fff;
+			color: #000;
+			padding: .125em .5em .125em .25em;
+			margin: 1px;
+			font-size: 1em;
+			&:hover,
+			&.kbcursor {
+				cursor: pointer;
+				background-color: $green;
+				color: #fff;
+			}
+		}
 	}
 	.suggestions > li:last-child > div:last-child,
 	.suggestions > li:last-child li:last-child > div:last-child {
 		border-radius: 0 0 $gentlecorner $gentlecorner;
+	}
+	#filters {
+		position: absolute;
+		width: 13em;
+		z-index: 1;
+		right: 0;
+		background-color: $medgreyblue;
+		border: 2px solid $green;
+		border-top: none;
+		border-right: none;
+		border-radius: 0 0 0 $gentlecorner;
+		padding: 0 .25em .25em;
+		label > .account,
+		.category {
+			display: -webkit-inline-flex;
+			display: inline-flex;
+			-webkit-align-items: center;
+			align-items: center;
+			&:before {
+				margin-left: .25em;
+				margin-right: .25em;
+			}
+			a:before {
+				@extend %fontawesome;
+				content: "\f00d";
+				font-size: .75em;
+				color: $red;
+				margin: 0 .5em;
+				cursor: pointer;
+			}
+		}
+		input {
+			display: block;
+			margin: .25em 0;
+			width: calc(100% - .5em);
+		}
+		.suggestions {
+			margin-top: -.6em;
+			margin-left: .9em;
+			.account:hover:before,
+			.account.kbcursor:before {
+				color: $medgreyblue;
+			}
+		}
 	}
 }

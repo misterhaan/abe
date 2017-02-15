@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/etc/class/cya.php';
 
-define('MAX_TRANS', 100);  // how many transactions to load at a time
+define('MAX_TRANS', 50);  // how many transactions to load at a time (should probably move to a setting)
 
 // ajax requests come in as ?ajax=function, so run the appropriate function
 if(isset($_GET['ajax'])) {
@@ -19,58 +19,99 @@ $html = new cyaHtml();
 // if we're viewing transactions for one account, back should go to the account list.  otherwise to the main menu
 if(isset($_GET['acct']))
 	$html->SetBack('accounts.php');
+$html->AddAction('#showFilters', 'filter', 'Filter', 'Filter transactions');
 $html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');
 ?>
 			<h1>Transactions</h1>
-			<ol id=transactions>
-				<!-- ko foreach: dates -->
-					<li class=date>
-						<header><time data-bind="text: displayDate"></time></header>
-						<ul data-bind="foreach: transactions">
-							<li class=transaction data-bind="css: acctclass, click: $root.Select">
-								<div>
-									<div class=name data-bind="text: name"></div>
-									<div class=category data-bind="text: category() ? category() : '(uncategorized)'"></div>
-								</div>
-								<div class=amount data-bind="text: amount"></div>
-								<div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data, click: $root.CaptureClick">
-									<div class=transaction>
-										<div><label class=name><input data-bind="value: name" maxlength=64></label></div>
-										<div class=amount data-bind="text: amount"></div>
-										<a class=close data-bind="visible: !$root.saving(), click: $root.CloseAndSave" title="Save changes and close"><span>close</span></a>
-										<span class=working data-bind="visible: $root.saving"></span>
+			<div id=transactions>
+				<div id=filters data-bind="visible: showFilters">
+					<label>
+						Accounts:
+						<!-- ko ifnot: filterAccounts().length -->
+							<span class="all account">(all)</span>
+						<!-- /ko -->
+						<!-- ko foreach: filterAccounts -->
+							<span class="account" data-bind="css: typeclass"><span data-bind="text: name"></span><a class=remove data-bind="click: $root.RemoveAccount"></a></span>
+						<!-- /ko -->
+						<input data-bind="textInput: filterAcct, event: { dblclick: ShowAcctSuggestions, keydown: AccountFilterKey }" placeholder="Find an account">
+					</label>
+					<ol class=suggestions data-bind="visible: suggestingAccounts, foreach: accountsForFilter">
+						<li><div data-bind="text: name, click: $root.ChooseAccount, attr: {'class': 'account ' + typeclass}, css: {kbcursor: $data == $root.acctCursor()}"></div></li>
+					</ol>
+					<label class=categories>
+						Categories:
+						<!-- ko ifnot: filterCategories().length -->
+							<span class="all category">(all)</span>
+						<!-- /ko -->
+						<!-- ko foreach: filterCategories -->
+							<span class="category"><span data-bind="text: name"></span><a class=remove data-bind="click: $root.RemoveFilterCategory"></a></span>
+						<!-- /ko -->
+						<input data-bind="textInput: filterCat, event: { dblclick: ShowFilterCatSuggestions, keydown: $root.CategoryFilterKey, blur: HideFilterCatSuggestions }" maxlength=24 placeholder="Find a category">
+					</label>
+					<ol class=suggestions data-bind="visible: suggestingFilterCategories, foreach: categoriesForFilter">
+						<li>
+							<div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
+							<!-- ko if: subs.length -->
+							<ol data-bind="foreach: subs">
+								<li><div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
+							</ol>
+							<!-- /ko -->
+						</li>
+					</ol>
+					<div class=calltoaction>
+						<button data-bind="click: UpdateFilters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters">Cancel</a>
+					</div>
+				</div>
+				<ol>
+					<!-- ko foreach: dates -->
+						<li class=date>
+							<header><time data-bind="text: displayDate"></time></header>
+							<ul data-bind="foreach: transactions">
+								<li class=transaction data-bind="css: acctclass, click: $root.Select">
+									<div class=quick>
+										<div class=name data-bind="text: name"></div>
+										<div class=category data-bind="text: category() ? category() : '(uncategorized)'"></div>
 									</div>
-									<div class=details>
-										<label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)" maxlength=24></label>
-										<ol class=suggestions data-bind="visible: suggestingCategories, foreach: $root.categories">
-											<!-- ko if: name.containsAnyCase($parent.category()) || subs.nameContainsAnyCase($parent.category()) -->
-												<li>
-													<div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
-													<!-- ko if: subs.length && subs.nameContainsAnyCase($parent.category()) -->
-														<ol data-bind="foreach: subs">
-															<!-- ko if: name.containsAnyCase($parents[1].category()) -->
-																<li><div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
-															<!-- /ko -->
-														</ol>
-													<!-- /ko -->
-												</li>
-											<!-- /ko -->
-										</ol>
-										<div class=account data-bind="css: acctclass, text: acctname"></div>
-										<div class=transdate data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>
-										<div class=posted>Posted <time data-bind="text: posted"></time></div>
-										<label class=note><input data-bind="value: notes"></label>
-										<div class=location data-bind="visible: city, text: city + (state ? ', ' + state + (zip ? ' ' + zip : '') : '')"></div>
+									<div class=amount data-bind="text: amount"></div>
+									<div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data, click: $root.CaptureClick">
+										<div class=transaction>
+											<div><label class=name><input data-bind="value: name" maxlength=64></label></div>
+											<div class=amount data-bind="text: amount"></div>
+											<a class=close data-bind="visible: !$root.saving(), click: $root.CloseAndSave" title="Save changes and close"><span>close</span></a>
+											<span class=working data-bind="visible: $root.saving"></span>
+										</div>
+										<div class=details>
+											<label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)" maxlength=24></label>
+											<ol class=suggestions data-bind="visible: suggestingCategories, foreach: $root.categories">
+												<!-- ko if: name.containsAnyCase($parent.category()) || subs.nameContainsAnyCase($parent.category()) -->
+													<li>
+														<div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
+														<!-- ko if: subs.length && subs.nameContainsAnyCase($parent.category()) -->
+															<ol data-bind="foreach: subs">
+																<!-- ko if: name.containsAnyCase($parents[1].category()) -->
+																	<li><div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
+																<!-- /ko -->
+															</ol>
+														<!-- /ko -->
+													</li>
+												<!-- /ko -->
+											</ol>
+											<div class=account data-bind="css: acctclass, text: acctname"></div>
+											<div class=transdate data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>
+											<div class=posted>Posted <time data-bind="text: posted"></time></div>
+											<label class=note><input data-bind="value: notes"></label>
+											<div class=location data-bind="visible: city, text: city + (state ? ', ' + state + (zip ? ' ' + zip : '') : '')"></div>
+										</div>
 									</div>
-								</div>
-							</li>
-						</ul>
-					</li>
-				<!-- /ko -->
-				<li class=loading data-bind="visible: loading">Loading...</li>
-				<li class=calltoaction data-bind="visible: more"><a href="#GetTransactions" data-bind="click: GetTransactions">Load more</a></li>
-			</ol>
+								</li>
+							</ul>
+						</li>
+					<!-- /ko -->
+					<li class=loading data-bind="visible: loading">Loading...</li>
+					<li class=calltoaction data-bind="visible: more"><a href="#GetTransactions" data-bind="click: GetTransactions">Load more</a></li>
+				</ol>
+			</div>
 <?php
 $html->Close();
 
@@ -79,6 +120,52 @@ $html->Close();
  */
 function GetTransactions() {
 	global $ajax, $db;
+	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?)'))
+		if($select->bind_param('isiss', $maxcount, $oldest, $oldid, $accountids, $categoryids)) {
+			$maxcount = MAX_TRANS;
+			$oldest = $_GET['oldest'];
+			$oldid = $_GET['oldid'];
+			$accountids = $_GET['accts'] ? $_GET['accts'] : null;
+			$categoryids = $_GET['cats'] || $_GET['cats'] === '0' ? $_GET['cats'] : null;
+			if($select->execute())
+				if($select->store_result())
+					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $notes, $city, $state, $zip)) {
+						$ajax->Data->dates = [];
+						while($select->fetch()) {
+							$displayDate = date('F j, Y (D)', strtotime($posted . ' 12:00 PM'));
+							if(!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $posted)
+								$ajax->Data->dates[] = (object)['date' => $posted, 'displayDate' => $displayDate, 'transactions' => []];
+							// show commas if 10k or more
+							if(+$amount >= 10000.00 || +$amount <= -10000.00)
+								$amount = number_format(+$amount, 2);
+							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = (object)['id' => $id, 'posted' => $posted, 'transdate' => $transdate, 'acctclass' => $acctclass, 'acctname' => $acctname, 'name' => $name, 'category' => $category, 'amount' => $amount, 'notes' => $notes, 'city' => $city, 'state' => $state, 'zip' => $zip];
+							$oldest = $posted;
+							$oldid = $id;
+						}
+						$ajax->Data->more = false;
+						$maxcount = 1;
+						$select->free_result();
+						$db->next_result();  // get past the extra stored procedure result
+						if($select->execute())
+							if($select->store_result())
+								$ajax->Data->more = $select->num_rows > 0;
+							else
+								$ajax->Fail('Error storing result checking for more:  ' . $select->error);
+						else
+							$ajax->Fail('Error executing check for more:  ' . $select->error);
+					} else
+						$ajax->Fail('Error binding statement results:  ' . $select->error);
+				else
+					$ajax->Fail('Error storing result looking up transactions:  ' . $select->error);
+			else
+				$ajax->Fail('Error executing statement to look up transactions:  ' . $select->error);
+			$select->close();
+		} else
+			$ajax->Fail('Error binding parameters to look up transactions:  ' . $select->error);
+	else
+		$ajax->Fail('Error preparing to look up transactions:  ' . $db->error);
+	return;
+	
 	$ts = 'select t.id, t.posted, t.transdate, at.class as acctclass, a.name as acctname, t.name, c.name as category, t.amount, t.notes, t.city, t.state, t.zip from transactions as t left join categories as c on c.id=t.category left join accounts as a on a.id=t.account left join account_types as at on at.id=a.account_type where ' . (isset($_GET['acct']) && +$_GET['acct'] ? 't.account=\'' . +$_GET['acct'] . '\' and ' : '') . '(t.posted<\'' . $db->escape_string($_GET['oldest']) . '\' or t.posted=\'' . $db->escape_string($_GET['oldest']) . '\' and t.id<\'' . $db->escape_string($_GET['oldid']) . '\') order by t.posted desc, t.id desc limit ' . MAX_TRANS;
 	if($ts = $db->query($ts)) {
 		$ajax->Data->dates = [];

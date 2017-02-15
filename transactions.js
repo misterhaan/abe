@@ -1,5 +1,9 @@
 $(function() {
 	ko.applyBindings(TransactionsModel, $("#transactions")[0]);
+	$("a[href='#showFilters']").click(function(e) {
+		TransactionsModel.showFilters(true);
+		return false;
+	});
 });
 
 /**
@@ -11,7 +15,15 @@ $(function() {
 $(window).keydown(function(e) {
 	switch(e.keyCode) {
 		case 27:  // esc
-			TransactionsModel.CloseAndSave();
+			if(TransactionsModel.showFilters()) {
+				if(TransactionsModel.suggestingFilterCategories())
+					TransactionsModel.suggestingFilterCategories(false);
+				else if(TransactionsModel.suggestingAccounts())
+					TransactionsModel.suggestingAccounts(false);
+				else
+					TransactionsModel.CancelFilters();
+			} else
+				TransactionsModel.CloseAndSave();
 			return false;
 		case 33:  // page up
 			TransactionsModel.SelectPrevious();
@@ -61,6 +73,8 @@ var TransactionsModel = new function() {
 	 */
 	self.more = ko.observable(false);
 
+	self.accounts = ko.observableArray([]);
+	self.acctCursor = ko.observable(false);
 	/**
 	 * Categories to suggest.
 	 */
@@ -74,6 +88,70 @@ var TransactionsModel = new function() {
 	 * Transaction that is currently selected for full view.  False for none.
 	 */
 	self.selection = ko.observable(false);
+
+	/**
+	 * Whether the filters menu should be displayed.
+	 */
+	self.showFilters = ko.observable(false);
+	self.showFilters.subscribe(function() {
+		if(self.showFilters()) {
+			self.filterAcct("");
+			self.filterCat("");
+			// use slice to make copies
+			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice()};
+		}
+	});
+
+	self.filterAccounts = ko.observableArray([]);
+	self.filterAcct = ko.observable("");
+	self.filterAcct.subscribe(function() {
+		if(self.filterAcct())
+			self.suggestingAccounts(true);
+	});
+	self.suggestingAccounts = ko.observable(false);
+	self.suggestingAccounts.subscribe(function() {
+		if(!self.suggestingAccounts())
+			self.acctCursor(false);
+	});
+	self.accountsForFilter = ko.computed(function() {
+		self = self || TransactionsModel;
+		var accts = [];
+		for(var a = 0; a < self.accounts().length; a++)
+			if((!self.filterAcct() || self.accounts()[a].name.containsAnyCase(self.filterAcct())) && self.filterAccounts().indexOf(self.accounts()[a]) < 0)
+				accts.push(self.accounts()[a]);
+		return accts;
+	});
+
+	self.filterCategories = ko.observableArray([]);
+	self.filterCat = ko.observable("");
+	self.filterCat.subscribe(function() {
+		if(self.filterCat())
+			self.suggestingFilterCategories(true);
+	});
+	self.suggestingFilterCategories = ko.observable(false);
+	self.suggestingFilterCategories.subscribe(function() {
+		if(!self.suggestingFilterCategories())
+			self.catCursor(false);
+	});
+	self.categoriesForFilter = ko.computed(function() {
+		self = self || TransactionsModel;
+		var cats = [];
+		var uncat = {id: 0, name: "(uncategorized)", subs: []};
+		if((!self.filterCat() || uncat.name.containsAnyCase(self.filterCat())) && self.filterCategories().indexOf(uncat) < 0)
+			cats.push(uncat);
+		for(var pc = 0; pc < self.categories().length; pc++) {
+			var cat = self.categories()[pc];
+			var subs = [];
+			for(var sc = 0; sc < cat.subs.length; sc++)
+				if(cat.subs[sc].name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat.subs[sc]) < 0)
+					subs.push(cat.subs[sc]);
+			if(subs.length || cat.name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat) < 0) {
+				cat.subs = subs;
+				cats.push(cat);
+			}
+		}
+		return cats;
+	});
 
 	/**
 	 * Get more transaction from the server.
@@ -103,11 +181,32 @@ var TransactionsModel = new function() {
 		$.get("?ajax=categories", null, function(result) {
 			if(!result.fail) {
 				self.categories(result.categories);
-				self.GetTransactions();
+				if(self.accountsLoaded)
+					self.GetTransactions();
+				self.categoriesLoaded = true;
 			} else {
 				self.loading(false);
 				alert(result.message);
 			}
+		}, "json");
+	})();
+
+	(self.GetAccounts = function() {
+		$.get("accounts.php?ajax=accountlist", null, function(result) {
+			if(!result.fail) {
+				self.accounts(result.accounts);
+				var thisAcct = FindAccountID();
+				for(var a = 0; a < result.accounts.length; a++)
+					if(result.accounts[a].id == thisAcct) {
+						self.filterAccounts.push(result.accounts[a]);
+						break;
+					}
+				if(self.categoriesLoaded)
+					self.GetTransactions();
+				self.accountsLoaded = true;
+			}
+			else
+				alert(result.message);
 		}, "json");
 	})();
 
@@ -197,6 +296,7 @@ var TransactionsModel = new function() {
 	 * transaction.
 	 */
 	self.CloseAndSave = function() {
+		$(":focus").blur();
 		self.Save(true);
 	};
 	/**
@@ -214,7 +314,7 @@ var TransactionsModel = new function() {
 						var tr = self.dates()[d].transactions()[t];
 						transactions.push(tr);
 						// data needs the id to know which transaction, plus anything that (could have) changed.
-						data.push({id: tr.id, name: tr.name().trim(), category: tr.category().trim(), notes: tr.notes().trim()});
+						data.push({id: tr.id, name: tr.name().trim(), category: tr.category() ? tr.category().trim() : tr.category(), notes: tr.notes().trim()});
 					}
 			if(data.length)  // should be true if self.changed was true
 				$.post("?ajax=save", {transactions: data}, function(result) {
@@ -247,6 +347,14 @@ var TransactionsModel = new function() {
 	self.ShowSuggestions = function(transaction) {
 		transaction.suggestingCategories(true);
 	};
+	
+	self.ShowFilterCatSuggestions = function() {
+		self.suggestingFilterCategories(true);
+	};
+
+	self.ShowAcctSuggestions = function() {
+		self.suggestingAccounts(true);
+	};
 
 	/**
 	 * Hide category suggestions for the specified transaction.
@@ -255,7 +363,13 @@ var TransactionsModel = new function() {
 	self.HideSuggestions = function(transaction) {
 		window.setTimeout(function() {
 			transaction.suggestingCategories(false);
-		}, 10);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
+	};
+
+	self.HideFilterCatSuggestions = function() {
+		window.setTimeout(function() {
+			self.suggestingFilterCategories(false);
+		}, 100);  // need to delay this because ios (safari?) won't fire tap / click events on the suggestion items
 	};
 
 	/**
@@ -265,6 +379,24 @@ var TransactionsModel = new function() {
 	self.ChooseCategory = function(category) {
 		self.selection().category(category.name);
 		self.selection().suggestingCategories(false);
+	};
+	
+	self.ChooseFilterCategory = function(category) {
+		self.filterCategories.push(category);
+		self.suggestingFilterCategories(false);
+	};
+
+	self.ChooseAccount = function(account) {
+		self.filterAccounts.push(account);
+		self.suggestingAccounts(false);
+	};
+
+	self.RemoveFilterCategory = function(category) {
+		self.filterCategories.splice(self.filterCategories.indexOf(category), 1);
+	};
+
+	self.RemoveAccount = function(account) {
+		self.filterAccounts.splice(self.filterAccounts.indexOf(account), 1);
 	};
 
 	/**
@@ -386,6 +518,151 @@ var TransactionsModel = new function() {
 		}
 		return true;  // knockout will suppress the event unless we return true
 	};
+	
+	self.CategoryFilterKey = function(model, e) {
+		switch(e.keyCode) {
+			case 38:  // up arrow
+				self.suggestingFilterCategories(true);
+				if(TransactionsModel.catCursor()) {
+					var prevcat = false;
+					for(var c = 0; c < self.categoriesForFilter().length; c++)
+						if(self.categoriesForFilter()[c] == TransactionsModel.catCursor())
+							if(prevcat) {
+								TransactionsModel.catCursor(prevcat);
+								return false;
+							} else {
+								prevcat = self.categoriesForFilter().last();
+								if(prevcat.subs && prevcat.subs.length)
+									prevcat = prevcat.subs.last();
+								TransactionsModel.catCursor(prevcat);
+								return false;
+							}
+						else {
+							prevcat = self.categoriesForFilter()[c];
+							for(var sc = 0; sc < self.categoriesForFilter()[c].subs.length; sc++)
+								if(self.categoriesForFilter()[c].subs[sc] == TransactionsModel.catCursor()) {
+									TransactionsModel.catCursor(prevcat);
+									return false;
+								} else
+									prevcat = self.categoriesForFilter()[c].subs[sc];
+						}
+				}
+				prevcat = self.categoriesForFilter().last();
+				if(prevcat.subs && prevcat.subs.length)
+					prevcat = prevcat.subs.last();
+				TransactionsModel.catCursor(prevcat);
+				return false;
+			case 40:  // down arrow
+				self.suggestingFilterCategories(true);
+				if(TransactionsModel.catCursor()) {
+					var nextcat = false;
+					for(var c = self.categoriesForFilter().length - 1; c >= 0; c--) {
+						for(var sc = self.categoriesForFilter()[c].subs.length - 1; sc >= 0; sc--)
+							if(self.categoriesForFilter()[c].subs[sc] == TransactionsModel.catCursor())
+								if(nextcat) {
+									TransactionsModel.catCursor(nextcat);
+									return false;
+								} else {
+									TransactionsModel.catCursor(self.categoriesForFilter()[0]);
+									return false;
+								}
+							else
+								nextcat = self.categoriesForFilter()[c].subs[sc];
+						if(self.categoriesForFilter()[c] == TransactionsModel.catCursor())
+							if(nextcat) {
+								TransactionsModel.catCursor(nextcat);
+								return false;
+							} else {
+								TransactionsModel.catCursor(self.categoriesForFilter()[0]);
+								return false;
+							}
+						else
+							nextcat = self.categoriesForFilter()[c];
+					}
+				}
+				TransactionsModel.catCursor(self.categoriesForFilter()[0]);
+				return false;
+			case 13:  // enter key
+				if(TransactionsModel.catCursor()) {
+					self.ChooseFilterCategory(TransactionsModel.catCursor());
+					return false;
+				}
+				break;
+			case 9:  // tab key
+				if(TransactionsModel.catCursor()) {
+					self.ChooseFilterCategory(TransactionsModel.catCursor());
+					self.suggestingFilterCategories(false);
+				}
+				break;
+		}
+		return true;  // knockout will suppress the event unless we return true
+	};
+
+	self.AccountFilterKey = function(model, e) {
+		switch(e.keyCode) {
+			case 38:  // up arrow
+				self.suggestingAccounts(true);
+				if(TransactionsModel.acctCursor()) {
+					var prev = false;
+					for(var a = 0; a < self.accountsForFilter().length; a++)
+						if(self.accountsForFilter()[a] == TransactionsModel.acctCursor())
+							if(prev) {
+								TransactionsModel.acctCursor(prev);
+								return false;
+							} else {
+								TransactionsModel.acctCursor(self.accountsForFilter().last());
+								return false;
+							}
+						else
+							prev = self.accountsForFilter()[a];
+				}
+				TransactionsModel.acctCursor(self.accountsForFilter().last());
+				return false;
+			case 40:  // down arrow
+				self.suggestingAccounts(true);
+				if(TransactionsModel.acctCursor()) {
+					var next = false;
+					for(var a = self.accountsForFilter().length - 1; a >= 0; a--)
+						if(self.accountsForFilter()[a] == TransactionsModel.acctCursor())
+							if(next) {
+								TransactionsModel.acctCursor(next);
+								return false;
+							} else {
+								TransactionsModel.acctCursor(self.accountsForFilter()[0]);
+								return false;
+							}
+						else
+							next = self.accountsForFilter()[a];
+				}
+				TransactionsModel.acctCursor(self.accountsForFilter()[0]);
+				return false;
+			case 13:  // enter key
+				if(TransactionsModel.acctCursor()) {
+					self.ChooseAccount(TransactionsModel.acctCursor());
+					return false;
+				}
+				break;
+			case 9:  // tab key
+				if(TransactionsModel.acctCursor()) {
+					self.ChooseAccount(TransactionsModel.acctCursor());
+					self.suggestingAccounts(false);
+				}
+				break;
+		}
+		return true;  // knockout will suppress the event unless we return true
+	};
+
+	self.UpdateFilters = function() {
+		self.showFilters(false);
+		self.dates([]);
+		self.GetTransactions();
+	};
+
+	self.CancelFilters = function() {
+		self.showFilters(false);
+		self.filterAccounts(self.oldFilters.accounts);
+		self.filterCategories(self.oldFilters.categories);
+	};
 
 	/**
 	 * Prevent a click event from being handled by a parent element.
@@ -458,12 +735,25 @@ function ObserveTransaction(transaction) {
  * @returns Parameters for GetTransactions.
  */
 function GetParams(dates) {
+	var params = {};
 	if(dates.length) {
-		var oldest = dates.last();
-		var oldid = oldest.transactions().last();
-		return {oldest: oldest.date, oldid: oldid.id, acct: FindAccountID()};
+		params.oldest = dates.last();
+		params.oldid = params.oldest.transactions().last().id;
+		params.oldest = params.oldest.date;
+	} else {
+		params.oldest = "9999-12-31";
+		params.oldid = 0;
 	}
-	return {oldest: "9999-12-31", oldid: 0, acct: FindAccountID()};
+	params.accts = [];
+	for(var a = 0; a < TransactionsModel.filterAccounts().length; a++)
+		params.accts.push(TransactionsModel.filterAccounts()[a].id);
+	params.accts = params.accts.join(",");
+	params.cats = [];
+	for(var c = 0; c < TransactionsModel.filterCategories().length; c++)
+		params.cats.push(TransactionsModel.filterCategories()[c].id);
+	params.cats = params.cats.join(",");
+	
+	return params;
 }
 
 /**
@@ -474,10 +764,10 @@ function FindAccountID() {
 	var qs = window.location.search.substring(1).split("&");
 	for(var i = 0; i < qs.length; i++) {
 		var p = qs[i].split("=");
-		if(p[0] = "acct")
+		if(p[0] == "acct")
 			return p[1];
 	}
-	return 0;
+	return null;
 }
 
 /**

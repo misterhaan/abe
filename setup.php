@@ -183,7 +183,7 @@ function InstallDatabase() {
 	else {
 		$ajax->Data->routineErrors = [];
 		$routinedir = __DIR__ . '/etc/db/routines/';
-		$routines = ['GetCategoryID'];
+		$routines = ['GetCategoryID', 'GetTransactions'];
 		foreach($routines as $routine) {
 			$sql = trim(file_get_contents($routinedir . $routine . '.sql'));
 			if(!$db->real_query($sql))
