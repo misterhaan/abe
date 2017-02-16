@@ -1,4 +1,4 @@
-create procedure GetTransactions (in maxcount smallint unsigned, in oldest date, in oldid int unsigned, in accountids varchar(64), in categoryids varchar(255)) begin
+create procedure GetTransactions (in maxcount smallint unsigned, in oldest date, in oldid int unsigned, in accountids varchar(64), in categoryids varchar(255), in daterangestart date, in daterangeend date) begin
 
 	if oldest is null then
 		set oldest = '9999-12-31';
@@ -26,6 +26,14 @@ create procedure GetTransactions (in maxcount smallint unsigned, in oldest date,
 		end if;
 	end if;
 
+	if daterangestart is null then
+		set daterangestart = '0000-00-00';
+	end if;
+
+	if daterangeend is null then
+		set daterangeend = '9999-12-31';
+	end if;
+
 	select t.id, t.posted, t.transdate, at.class as acctclass, a.name as acctname, t.name, c.name as category, t.amount, t.notes, t.city, t.state, t.zip
 		from transactions as t
 			left join categories as c on c.id=t.category
@@ -34,6 +42,7 @@ create procedure GetTransactions (in maxcount smallint unsigned, in oldest date,
 		where
 			(accountids is null or instr(accountids, concat(',', t.account, ',')))
 			and (categoryids is null or instr(categoryids, concat(',', ifnull(t.category, 0), ',')))
+			and (t.posted>=daterangestart and t.posted<=daterangeend)
 			and (t.posted<oldest or t.posted=oldest and t.id<oldid)
 		order by t.posted desc, t.id desc
 		limit maxcount;

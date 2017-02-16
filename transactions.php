@@ -59,6 +59,14 @@ $html->Open('Transactions');
 							<!-- /ko -->
 						</li>
 					</ol>
+					<label class=date>
+						<span>Since:</span>
+						<input type=date data-bind="value: dateStart">
+					</label>
+					<label class=date>
+						<span>Before:</span>
+						<input type=date data-bind="value: dateEnd">
+					</label>
 					<div class=calltoaction>
 						<button data-bind="click: UpdateFilters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters">Cancel</a>
 					</div>
@@ -120,13 +128,15 @@ $html->Close();
  */
 function GetTransactions() {
 	global $ajax, $db;
-	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?)'))
-		if($select->bind_param('isiss', $maxcount, $oldest, $oldid, $accountids, $categoryids)) {
+	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?)'))
+		if($select->bind_param('isissss', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend)) {
 			$maxcount = MAX_TRANS;
 			$oldest = $_GET['oldest'];
 			$oldid = $_GET['oldid'];
 			$accountids = $_GET['accts'] ? $_GET['accts'] : null;
 			$categoryids = $_GET['cats'] || $_GET['cats'] === '0' ? $_GET['cats'] : null;
+			$datestart = $_GET['datestart'] ? $_GET['datestart'] : null;
+			$dateend = $_GET['dateend'] ? $_GET['dateend'] : null;
 			if($select->execute())
 				if($select->store_result())
 					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $notes, $city, $state, $zip)) {

@@ -105,7 +105,7 @@ var TransactionsModel = new function() {
 			self.filterAcct("");
 			self.filterCat("");
 			// use slice to make copies.  they will be restored on cancel.
-			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice()};
+			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd()};
 		}
 	});
 
@@ -182,6 +182,29 @@ var TransactionsModel = new function() {
 			}
 		}
 		return cats;
+	});
+
+	/**
+	 * Earliest date to include transactions from.  Should be YYYY-MM-DD or an empty string.
+	 */
+	self.dateStart = ko.observable("");
+	self.dateStart.subscribe(function() {
+		if(!(self.dateStart() == "" || /^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(self.dateStart()))) {
+			// attempt to format the date to YYYY-MM-DD
+			var d = new Date(self.dateStart());
+			self.dateStart(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) );
+		}
+	});
+	/**
+	 * Latest date to include transactions from.  Should be YYYY-MM-DD or an empty string.
+	 */
+	self.dateEnd = ko.observable("");
+	self.dateEnd.subscribe(function() {
+		if(!(self.dateEnd() == "" || /^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(self.dateEnd()))) {
+			// attempt to format the date to YYYY-MM-DD
+			var d = new Date(self.dateEnd());
+			self.dateEnd(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) );
+		}
 	});
 
 	/**
@@ -768,6 +791,8 @@ var TransactionsModel = new function() {
 		self.showFilters(false);
 		self.filterAccounts(self.oldFilters.accounts);
 		self.filterCategories(self.oldFilters.categories);
+		self.dateStart(self.oldFilters.dateStart);
+		self.dateEnd(self.oldFilters.dateEnd);
 	};
 
 	/**
@@ -858,7 +883,8 @@ function GetParams(dates) {
 	for(var c = 0; c < TransactionsModel.filterCategories().length; c++)
 		params.cats.push(TransactionsModel.filterCategories()[c].id);
 	params.cats = params.cats.join(",");
-	
+	params.datestart = TransactionsModel.dateStart();
+	params.dateend = TransactionsModel.dateEnd();
 	return params;
 }
 

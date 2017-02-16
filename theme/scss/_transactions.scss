@@ -188,7 +188,7 @@
 	}
 	#filters {
 		position: absolute;
-		width: 13em;
+		width: 14.25em;
 		z-index: 1;
 		right: 0;
 		background-color: $medgreyblue;
@@ -227,6 +227,13 @@
 			.account:hover:before,
 			.account.kbcursor:before {
 				color: $medgreyblue;
+			}
+		}
+		label.date {
+			@extend %flex-container-center;
+			span {
+				@extend %flex-item-fixed;
+				width: 3.75em;
 			}
 		}
 	}
