@@ -230,7 +230,8 @@
 			}
 		}
 		label.date,
-		label.amount {
+		label.amount,
+		label.search {
 			@extend %flex-container-center;
 			span {
 				@extend %flex-item-fixed;

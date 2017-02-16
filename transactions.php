@@ -26,7 +26,7 @@ $html->Open('Transactions');
 			<h1>Transactions</h1>
 			<div id=transactions>
 				<div id=filters data-bind="visible: showFilters">
-					<label>
+					<label title="Show transactions from these accounts">
 						Accounts:
 						<!-- ko ifnot: filterAccounts().length -->
 							<span class="all account">(all)</span>
@@ -39,7 +39,7 @@ $html->Open('Transactions');
 					<ol class=suggestions data-bind="visible: suggestingAccounts, foreach: accountsForFilter">
 						<li><div data-bind="text: name, click: $root.ChooseAccount, attr: {'class': 'account ' + typeclass}, css: {kbcursor: $data == $root.acctCursor()}"></div></li>
 					</ol>
-					<label class=categories>
+					<label class=categories title="Show transactions with these categories">
 						Categories:
 						<!-- ko ifnot: filterCategories().length -->
 							<span class="all category">(all)</span>
@@ -59,20 +59,24 @@ $html->Open('Transactions');
 							<!-- /ko -->
 						</li>
 					</ol>
-					<label class=date>
+					<label class=date title="Show transactions posted on or after this date">
 						<span>Since:</span>
 						<input type=date max="<?php echo date('Y-m-d'); ?>" data-bind="value: dateStart">
 					</label>
-					<label class=date>
+					<label class=date title="Show transactions posted on or before this date">
 						<span>Before:</span>
 						<input type=date max="<?php echo date('Y-m-d', time() + 86400); ?>" data-bind="value: dateEnd">
 					</label>
-					<label class=amount>
+					<label class=amount title="Show transactions that are at least this amount">
 						<span>Min $:</span>
 						<input type=number step=.01 min=0 data-bind="value: minAmount">
 					</label>
+					<label class=search title="Show transactions that have this text in the name">
+						<span>Search:</span>
+						<input data-bind="value: searchName" maxlength=64>
+					</label>
 					<div class=calltoaction>
-						<button data-bind="click: UpdateFilters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters">Cancel</a>
+						<button data-bind="click: UpdateFilters" title="Apply these filters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters" title="Go back to the transactions list">Cancel</a>
 					</div>
 				</div>
 				<ol>
@@ -132,8 +136,8 @@ $html->Close();
  */
 function GetTransactions() {
 	global $ajax, $db;
-	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?)'))
-		if($select->bind_param('isissssd', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount)) {
+	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+		if($select->bind_param('isissssds', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount, $search)) {
 			$maxcount = MAX_TRANS;
 			$oldest = $_GET['oldest'];
 			$oldid = $_GET['oldid'];
@@ -142,6 +146,7 @@ function GetTransactions() {
 			$datestart = $_GET['datestart'] ? $_GET['datestart'] : null;
 			$dateend = $_GET['dateend'] ? $_GET['dateend'] : null;
 			$minamount = $_GET['minamount'] ? $_GET['minamount'] : null;
+			$search = $_GET['search'] ? trim($_GET['search']) : null;
 			if($select->execute())
 				if($select->store_result())
 					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $notes, $city, $state, $zip)) {

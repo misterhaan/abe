@@ -105,7 +105,7 @@ var TransactionsModel = new function() {
 			self.filterAcct("");
 			self.filterCat("");
 			// use slice to make copies.  they will be restored on cancel.
-			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd(), minAmount: self.minAmount()};
+			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd(), minAmount: self.minAmount(), searchName: self.searchName()};
 		}
 	});
 
@@ -207,11 +207,19 @@ var TransactionsModel = new function() {
 		}
 	});
 
+	/**
+	 * Minimum transaction amount to include.
+	 */
 	self.minAmount = ko.observable("");
 	self.minAmount.subscribe(function() {
 		if(self.minAmount() != "")
 			self.minAmount((+self.minAmount()).toFixed(2));
 	});
+
+	/**
+	 * Include transactions that contain this text in their name.
+	 */
+	self.searchName = ko.observable("");
 
 	/**
 	 * Get more transaction from the server.
@@ -800,6 +808,7 @@ var TransactionsModel = new function() {
 		self.dateStart(self.oldFilters.dateStart);
 		self.dateEnd(self.oldFilters.dateEnd);
 		self.minAmount(self.oldFilters.minAmount);
+		self.searchName(self.oldFilters.searchName);
 	};
 
 	/**
@@ -893,6 +902,7 @@ function GetParams(dates) {
 	params.datestart = TransactionsModel.dateStart();
 	params.dateend = TransactionsModel.dateEnd();
 	params.minamount = TransactionsModel.minAmount();
+	params.search = TransactionsModel.searchName();
 	return params;
 }
 

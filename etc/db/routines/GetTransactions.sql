@@ -1,4 +1,4 @@
-create procedure GetTransactions (in maxcount smallint unsigned, in oldest date, in oldid int unsigned, in accountids varchar(64), in categoryids varchar(255), in daterangestart date, in daterangeend date, in minamount decimal(8,2)) begin
+create procedure GetTransactions (in maxcount smallint unsigned, in oldest date, in oldid int unsigned, in accountids varchar(64), in categoryids varchar(255), in daterangestart date, in daterangeend date, in minamount decimal(8,2), in namesearch varchar(64)) begin
 
 	if oldest is null then
 		set oldest = '9999-12-31';
@@ -44,6 +44,7 @@ create procedure GetTransactions (in maxcount smallint unsigned, in oldest date,
 			and (categoryids is null or instr(categoryids, concat(',', ifnull(t.category, 0), ',')))
 			and (t.posted>=daterangestart and t.posted<=daterangeend)
 			and (minamount is null or t.amount>=minamount or t.amount<=-minamount)
+			and (namesearch is null or instr(t.name, namesearch))
 			and (t.posted<oldest or t.posted=oldest and t.id<oldid)
 		order by t.posted desc, t.id desc
 		limit maxcount;
