@@ -61,11 +61,15 @@ $html->Open('Transactions');
 					</ol>
 					<label class=date>
 						<span>Since:</span>
-						<input type=date data-bind="value: dateStart">
+						<input type=date max="<?php echo date('Y-m-d'); ?>" data-bind="value: dateStart">
 					</label>
 					<label class=date>
 						<span>Before:</span>
-						<input type=date data-bind="value: dateEnd">
+						<input type=date max="<?php echo date('Y-m-d', time() + 86400); ?>" data-bind="value: dateEnd">
+					</label>
+					<label class=amount>
+						<span>Min $:</span>
+						<input type=number step=.01 min=0 data-bind="value: minAmount">
 					</label>
 					<div class=calltoaction>
 						<button data-bind="click: UpdateFilters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters">Cancel</a>
@@ -128,8 +132,8 @@ $html->Close();
  */
 function GetTransactions() {
 	global $ajax, $db;
-	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?)'))
-		if($select->bind_param('isissss', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend)) {
+	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?)'))
+		if($select->bind_param('isissssd', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount)) {
 			$maxcount = MAX_TRANS;
 			$oldest = $_GET['oldest'];
 			$oldid = $_GET['oldid'];
@@ -137,6 +141,7 @@ function GetTransactions() {
 			$categoryids = $_GET['cats'] || $_GET['cats'] === '0' ? $_GET['cats'] : null;
 			$datestart = $_GET['datestart'] ? $_GET['datestart'] : null;
 			$dateend = $_GET['dateend'] ? $_GET['dateend'] : null;
+			$minamount = $_GET['minamount'] ? $_GET['minamount'] : null;
 			if($select->execute())
 				if($select->store_result())
 					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $notes, $city, $state, $zip)) {

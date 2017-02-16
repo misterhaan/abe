@@ -229,11 +229,15 @@
 				color: $medgreyblue;
 			}
 		}
-		label.date {
+		label.date,
+		label.amount {
 			@extend %flex-container-center;
 			span {
 				@extend %flex-item-fixed;
 				width: 3.75em;
+			}
+			input[type=number] {
+				text-align: right;
 			}
 		}
 	}

@@ -9,6 +9,7 @@ create table transactions (
 	key(posted),
 	name varchar(64) not null default '',
 	amount decimal(8,2) comment 'positive for deposits / payments; negative for withdrawals / charges',
+	key(amount),
 	city varchar(32),
 	state char(2),
 	zip mediumint(5) unsigned,

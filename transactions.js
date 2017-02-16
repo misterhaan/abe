@@ -105,7 +105,7 @@ var TransactionsModel = new function() {
 			self.filterAcct("");
 			self.filterCat("");
 			// use slice to make copies.  they will be restored on cancel.
-			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd()};
+			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd(), minAmount: self.minAmount()};
 		}
 	});
 
@@ -205,6 +205,12 @@ var TransactionsModel = new function() {
 			var d = new Date(self.dateEnd());
 			self.dateEnd(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) );
 		}
+	});
+
+	self.minAmount = ko.observable("");
+	self.minAmount.subscribe(function() {
+		if(self.minAmount() != "")
+			self.minAmount((+self.minAmount()).toFixed(2));
 	});
 
 	/**
@@ -793,6 +799,7 @@ var TransactionsModel = new function() {
 		self.filterCategories(self.oldFilters.categories);
 		self.dateStart(self.oldFilters.dateStart);
 		self.dateEnd(self.oldFilters.dateEnd);
+		self.minAmount(self.oldFilters.minAmount);
 	};
 
 	/**
@@ -885,6 +892,7 @@ function GetParams(dates) {
 	params.cats = params.cats.join(",");
 	params.datestart = TransactionsModel.dateStart();
 	params.dateend = TransactionsModel.dateEnd();
+	params.minamount = TransactionsModel.minAmount();
 	return params;
 }
 
