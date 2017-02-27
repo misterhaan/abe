@@ -79,6 +79,12 @@ $html->Open('Transactions');
 						<button data-bind="click: UpdateFilters" title="Apply these filters">OK</button><a href="#closeFilters" data-bind="click: CancelFilters" title="Go back to the transactions list">Cancel</a>
 					</div>
 				</div>
+				<!-- ko if: !loading() && dates().length <= 0 -->
+					<p class=info>
+						No transactions found.  You could try changing the criteria or
+						importing some transactions using the icons in the upper right.
+					</p>
+				<!-- /ko -->
 				<ol>
 					<!-- ko foreach: dates -->
 						<li class=date>

@@ -18,9 +18,35 @@ h2,
 p {
 	margin: 1em .5em;
 }
+*[draggable] {
+	cursor: -webkit-grab;
+	cursor: grab;
+}
 a:link,
 a:visited {
 	color: $green;
+}
+a.edit,
+a.save,
+button.add {
+	@extend %fa-replaced;
+	span {
+		display: none;
+	}
+	&:before {
+		font-size: .9em;
+		margin-left: .5em;
+	}
+}
+a.edit:before {
+	content: "\f044";
+}
+a.save:before {
+	content: "\f0c7";
+}
+button.add:before {
+	content: "\f067";
+	margin: 0;
 }
 .loading:before,
 .working:after {
@@ -51,4 +77,5 @@ a:visited {
 @import "!headfoot";
 @import "index";
 @import "accounts";
-@import "transactions"
+@import "settings";
+@import "transactions";

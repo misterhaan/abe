@@ -1,0 +1,36 @@
+section#categories {
+	.droptarget {
+		background-color: $lightgreyblue;
+	}
+	.dragging {
+		opacity: .4;
+	}
+	margin: 0 .5em;
+	h2 {
+		margin: 1em 0;
+	}
+	ol {
+		list-style-type: none;
+		padding: 0;
+		ol {
+			padding-left: 1em;
+		}
+	}
+	> ol {
+		@media (min-width: 30em) { column-count: 2; }
+		@media (min-width: 45em) { column-count: 3; }
+		@media (min-width: 60em) { column-count: 4; }
+		@media (min-width: 75em) { column-count: 5; }
+		@media (min-width: 90em) { column-count: 6; }
+		@media (min-width: 105em) { column-count: 7; }
+		@media (min-width: 120em) { column-count: 8; }
+	}
+	li > span {
+		display: -webkit-inline-flex;
+		display: inline-flex;
+	}
+	li input {
+		@extend %flex-item-fill;
+		width: 100%;  // don't understand why, but this fixes it to not overflow
+	}
+}
