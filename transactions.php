@@ -93,7 +93,7 @@ $html->Open('Transactions');
 								<li class=transaction data-bind="css: acctclass, click: $root.Select">
 									<div class=quick>
 										<div class=name data-bind="text: name"></div>
-										<div class=category data-bind="text: category() ? category() : '(uncategorized)'"></div>
+										<div class=category data-bind="text: categoryList, css: {multi: categories().length > 1}"></div>
 									</div>
 									<div class=amount data-bind="text: amount"></div>
 									<div class=full data-bind="visible: $root.selection() == $data, scrollTo: $root.selection() == $data, click: $root.CaptureClick">
@@ -104,21 +104,20 @@ $html->Open('Transactions');
 											<span class=working data-bind="visible: $root.saving"></span>
 										</div>
 										<div class=details>
-											<label class=category><input data-bind="textInput: category, css: {newcat: newCategory}, event: { dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions }" placeholder="(uncategorized)" maxlength=24></label>
-											<ol class=suggestions data-bind="visible: suggestingCategories, foreach: $root.categories">
-												<!-- ko if: name.containsAnyCase($parent.category()) || subs.nameContainsAnyCase($parent.category()) -->
+											<!-- ko foreach: categories -->
+												<label class=category>
+													<input data-bind="textInput: name, css: {newcat: newCategory}, event: {focus: $root.CategoryFocus, dblclick: $root.ShowSuggestions, keydown: $root.CategoryKey, blur: $root.HideSuggestions}" placeholder="(uncategorized)" maxlength=24>
+													<input class=catamount data-bind="value: amount, event: {keypress: AmountKey}, enable: name">
+												</label>
+												<ol class=suggestions data-bind="visible: suggesting, foreach: $root.categoriesForTransaction">
 													<li>
-														<div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
-														<!-- ko if: subs.length && subs.nameContainsAnyCase($parent.category()) -->
-															<ol data-bind="foreach: subs">
-																<!-- ko if: name.containsAnyCase($parents[1].category()) -->
-																	<li><div data-bind="text: name, click: $root.ChooseCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
-																<!-- /ko -->
-															</ol>
-														<!-- /ko -->
+														<div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div>
+														<ol data-bind="foreach: subs">
+															<li><div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div></li>
+														</ol>
 													</li>
-												<!-- /ko -->
-											</ol>
+												</ol>
+											<!-- /ko -->
 											<div class=account data-bind="css: acctclass, text: acctname"></div>
 											<div class=transdate data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>
 											<div class=posted>Posted <time data-bind="text: posted"></time></div>
@@ -155,7 +154,7 @@ function GetTransactions() {
 			$search = $_GET['search'] ? trim($_GET['search']) : null;
 			if($select->execute())
 				if($select->store_result())
-					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $notes, $city, $state, $zip)) {
+					if($select->bind_result($id, $posted, $transdate, $acctclass, $acctname, $name, $category, $amount, $splitcat, $sc_names, $sc_amounts, $notes, $city, $state, $zip)) {
 						$ajax->Data->dates = [];
 						while($select->fetch()) {
 							$displayDate = date('F j, Y (D)', strtotime($posted . ' 12:00 PM'));
@@ -164,7 +163,16 @@ function GetTransactions() {
 							// show commas if 10k or more
 							if(+$amount >= 10000.00 || +$amount <= -10000.00)
 								$amount = number_format(+$amount, 2);
-							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = (object)['id' => $id, 'posted' => $posted, 'transdate' => $transdate, 'acctclass' => $acctclass, 'acctname' => $acctname, 'name' => $name, 'category' => $category, 'amount' => $amount, 'notes' => $notes, 'city' => $city, 'state' => $state, 'zip' => $zip];
+							$categories = [];
+							if($splitcat) {
+								$sc_names = explode("\n", $sc_names);
+								$sc_amounts = explode("\n", $sc_amounts);
+								for($i = 0; $i < count($sc_names); $i++)
+									$categories[] = (object)['name' => $sc_names[$i], 'amount' => number_format(+$sc_amounts[$i], 2, '.', '')];
+							} else {
+								$categories[] = (object)['name' => $category, 'amount' => number_format(+$amount, 2, '.', '')];
+							}
+							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = (object)['id' => $id, 'posted' => $posted, 'transdate' => $transdate, 'acctclass' => $acctclass, 'acctname' => $acctname, 'name' => $name, 'categories' => $categories, 'amount' => $amount, 'notes' => $notes, 'city' => $city, 'state' => $state, 'zip' => $zip];
 							$oldest = $posted;
 							$oldid = $id;
 						}
@@ -221,17 +229,57 @@ function GetTransactions() {
  */
 function SaveTransactions() {
 	global $ajax, $db;
-	if($update = $db->prepare('update transactions set name=?, notes=?, category=GetCategoryID(?), reviewed=1 where id=? limit 1'))
-		if($update->bind_param('sssi', $name, $notes, $catname, $id)) {
+	$delids = [];
+	$cats2split = [];
+	if($update = $db->prepare('update transactions set name=?, notes=?, category=GetCategoryID(?), splitcat=?, reviewed=1 where id=? limit 1'))
+		if($update->bind_param('sssii', $name, $notes, $catname, $splitcat, $id)) {
 			foreach($_POST['transactions'] as $t) {
 				$name = $t['name'];
 				$notes = $t['notes'];
-				$catname = $t['category'];
+				$catnames = explode("\n", $t['catnames']);
+				$splitcat = count($catnames) > 1;
+				$catname = $splitcat ? null : $catnames[0];
 				$id = +$t['id'];
-				if(!$update->execute())
+				if($update->execute()) {
+					$delids[] = $id;
+					if($splitcat) {
+						$catamounts = explode("\n", $t['catamounts']);
+						$catdata = (object)['transaction' => $id, 'cats' => []];
+						for($c = 0; $c < count($catnames); $c++)
+							$catdata->cats[] = (object)['name' => $catnames[$c], 'amount' => +$catamounts[$c]];
+						$cats2split[] = $catdata;
+					}
+				} else
 					$ajax->Fail('Error executing update for transaction:  ' . $update->error);
 			}
 			$update->close();
+			if($del = $db->prepare('delete from splitcats where transaction=?'))
+				if($del->bind_param('i', $id)) {
+					foreach($delids as $id)
+						if(!$del->execute())
+							$ajax->Fail('Error executing delete for transaction ' . $id . ':  ' . $del->error);
+					$del->close();
+					if(count($cats2split))
+						if($ins = $db->prepare('insert into splitcats (transaction, category, amount) values (?, GetCategoryID(?), ?)'))
+							if($ins->bind_param('isd', $transaction, $name, $amount)) {
+								foreach($cats2split as $t) {
+									$transaction = $t->transaction;
+									foreach($t->cats as $c)
+										if($name = $c->name) {
+											$amount = $c->amount;
+											if(!$ins->execute())
+												$ajax->Fail('Error executing insert split category (' . $transaction . ') ' . $name . ':  ' . $ins->error);
+										}
+								}
+								$ins->close();
+							} else
+								$ajax->Fail('Error binding to insert split categories:  ' . $ins->error);
+						else
+							$ajax->Fail('Error preparing to insert split categories:  ' . $db->error);
+				} else
+					$ajax->Fail('Error binding transactions to delete old split categories:  ' . $del->error);
+			else
+				$ajax->Fail('Error preparing to delete old split categories:  ' . $db->error);
 			GetCategories();
 		} else
 			$ajax->Fail('Error binding transactions parameters:  ' . $update->error);

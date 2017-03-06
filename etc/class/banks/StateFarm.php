@@ -47,8 +47,8 @@ class StateFarm extends cyaBank {
 						$net += $amount;
 
 						// sometimes they use the city as a continuation of the name
-						if($city == 'You' && substr($name, -5) == 'Thank') {
-							$name .= ' You';
+						if($city == 'You' && substr($name, -5) == 'Thank' || $city == 'Fee' && $name == 'International Transaction') {
+							$name .= ' ' . $city;
 							$city = '';
 						}
 

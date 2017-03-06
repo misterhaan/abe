@@ -98,6 +98,7 @@ var vm = new (function() {
 	};
 
 	self.Drop = function(category, e) {
+		$(e.target).removeClass("droptarget");
 		e.stopPropagation();
 		if(category != self.draggingCategory()) {
 			self.RemoveCategory(self.draggingCategory());

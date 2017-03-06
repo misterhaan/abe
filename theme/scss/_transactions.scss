@@ -105,6 +105,12 @@
 		&.newcat {
 			background-color: $lightyellow;
 		}
+		&.catamount {
+			@extend %flex-item-fixed;
+			width: 5em;
+			margin-left: .25em;
+			text-align: right;
+		}
 	}
 	ol .category,
 	ol .account,
@@ -127,6 +133,7 @@
 	.category:before {
 		content: "\f02b";
 	}
+	.category.multi:before,
 	.category.all:before {
 		content: "\f02c";
 	}
