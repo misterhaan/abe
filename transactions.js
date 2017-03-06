@@ -888,6 +888,8 @@ function ObserveCategory(category) {
 				ObserveCategory(blankcat);
 				tran.categories.push(blankcat);
 			}
+		else if(blankcat)
+			TransactionsModel.selection().categories.splice(TransactionsModel.selection().categories.indexOf(blankcat), 1);
 	});
 	category.suggesting = ko.observable(false);
 	category.newCategory = ko.computed(function() {
