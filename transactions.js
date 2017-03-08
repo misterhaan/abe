@@ -90,7 +90,16 @@ var TransactionsModel = new function() {
 	 * Categories to suggest.
 	 */
 	self.categories = ko.observableArray([]);
+	/**
+	 * Last transaction category field to receive focus.  When we need the active
+	 * category, it's this.
+	 */
 	self.activeCategory = ko.observable("");
+	/**
+	 * Category choices for the active category field of the selected transaction.
+	 * Does not include categories already chosen or that do not match what's been
+	 * typed into the field.
+	 */
 	self.categoriesForTransaction = ko.computed(function() {
 		self = self || TransactionsModel;
 		var cats = [];
@@ -235,10 +244,68 @@ var TransactionsModel = new function() {
 	self.searchName = ko.observable("");
 
 	/**
+	 * Initialize filters from the location hash.
+	 */
+	self.InitializeFilters = function() {
+		var info = ParseHash();
+		if(info.accts)
+			self.InitializeAccountFilter(info.accts);
+		if(info.cats)
+			self.InitializeCategoryFilter(info.cats);
+		if(info.datestart)
+			self.dateStart(info.datestart);
+		if(info.dateend)
+			self.dateEnd(info.dateend);
+		if(info.minamount)
+			self.minAmount(info.minamount);
+		if(info.search)
+			self.searchName(info.search);
+	};
+
+	/**
+	 * Initialize filtered accounts from the location hash.
+	 * @param accounts string Comma-separated account IDs to include.
+	 */
+	self.InitializeAccountFilter = function(accounts) {
+		accounts = accounts.split(",");
+		for(var fa = 0; fa < accounts.length; fa++)
+			if(accounts[fa])  // skip blank or zero values
+				for(var a = 0; a < self.accounts().length; a++)
+					if(self.accounts()[a].id == +accounts[fa]) {
+						self.filterAccounts.push(self.accounts()[a]);
+						break;
+					}
+	};
+
+	/**
+	 * Initialize filtered categories from the location hash.
+	 * @param cats string Comma-separated category IDs to include.
+	 */
+	self.InitializeCategoryFilter = function(cats) {
+		cats = cats.split(",");
+		for(var fc = 0; fc < cats.length; fc++)
+			if(cats[fc] === "0")  // category zero isn't in the category list
+				self.filterCategories.push({id: 0, name: "(uncategorized)", subs: []});
+			else if(cats[fc])  // skip blank values
+				findcat: for(var pc = 0; pc < self.categories().length; pc++)
+					if(self.categories()[pc].id == +cats[fc]) {
+						self.filterCategories.push(self.categories()[pc]);
+						break;
+					} else
+						for(var sc = 0; sc < self.categories()[pc].subs.length; sc++)
+							if(self.categories()[pc].subs[sc].id == +cats[fc]) {
+								self.filterCategories.push(self.categories()[pc].subs[sc]);
+								break findcat;
+							}
+	};
+
+	/**
 	 * Get more transaction from the server.
 	 */
-	self.GetTransactions = function() {
+	self.GetTransactions = function(checkHash) {
 		self.loading(true);
+		if(checkHash)
+			self.InitializeFilters();
 		$.get("?ajax=get", GetParams(self.dates()), function(result) {
 			if(!result.fail) {
 				for(var d = 0; d < result.dates.length; d++)
@@ -264,7 +331,7 @@ var TransactionsModel = new function() {
 			if(!result.fail) {
 				self.categories(result.categories);
 				if(self.accountsLoaded)
-					self.GetTransactions();
+					self.GetTransactions(true);
 				self.categoriesLoaded = true;
 			} else {
 				self.loading(false);
@@ -281,14 +348,8 @@ var TransactionsModel = new function() {
 		$.get("accounts.php?ajax=accountlist", null, function(result) {
 			if(!result.fail) {
 				self.accounts(result.accounts);
-				var thisAcct = FindAccountID();
-				for(var a = 0; a < result.accounts.length; a++)
-					if(result.accounts[a].id == thisAcct) {
-						self.filterAccounts.push(result.accounts[a]);
-						break;
-					}
 				if(self.categoriesLoaded)
-					self.GetTransactions();
+					self.GetTransactions(true);
 				self.accountsLoaded = true;
 			}
 			else
@@ -297,7 +358,7 @@ var TransactionsModel = new function() {
 	})();
 
 	/**
-	 * Select the specfied transaction for full view.
+	 * Select the specified transaction for full view.
 	 * @param transaction Transaction to select.
 	 */
 	self.Select = function(transaction) {
@@ -430,6 +491,9 @@ var TransactionsModel = new function() {
 		}
 	};
 
+	/**
+	 * Track which transaction category field received focus most recently.
+	 */
 	self.CategoryFocus = function(category) {
 		self.activeCategory(category);
 	};
@@ -789,7 +853,31 @@ var TransactionsModel = new function() {
 	self.UpdateFilters = function() {
 		self.showFilters(false);
 		self.dates([]);
+		self.UpdateHash();
 		self.GetTransactions();
+	};
+
+	/**
+	 * Update the hash with the current filter settings so they'll be remembered
+	 * through a refresh or bookmark.
+	 */
+	self.UpdateHash = function() {
+		var info = [];
+		if(self.filterAccounts().length)
+			info.push("accts=" + self.filterAccounts().map(function(a) { return a.id; }).join(","));
+		if(self.filterCategories().length)
+			info.push("cats=" + self.filterCategories().map(function(c) { return c.id; }).join(","));
+		if(self.dateStart())
+			info.push("datestart=" + self.dateStart());
+		if(self.dateEnd())
+			info.push("dateend=" + self.dateEnd());
+		if(self.minAmount())
+			info.push("minamount=" + self.minAmount());
+		if(self.searchName())
+			info.push("search=" + self.searchName());
+		info = info.length ? "#!" + info.join("/") : "";
+		if(info != window.location.hash)
+			window.location.hash = info;
 	};
 
 	/**
@@ -860,6 +948,11 @@ function ObserveTransaction(transaction) {
 	return transaction;
 }
 
+/**
+ * Make any transaction category properties that could change into knockout
+ * observables so knockout can update the page when they change.
+ * @param category Plain transaction category object.
+ */
 function ObserveCategory(category) {
 	(category.name = ko.observable(category.name)).subscribe(function() {
 		TransactionsModel.selection().changed = true;
@@ -941,20 +1034,6 @@ function GetParams(dates) {
 	params.minamount = TransactionsModel.minAmount();
 	params.search = TransactionsModel.searchName();
 	return params;
-}
-
-/**
- * Look up the account ID from the querystring.
- * @returns Account ID, or 0 if none.
- */
-function FindAccountID() {
-	var qs = window.location.search.substring(1).split("&");
-	for(var i = 0; i < qs.length; i++) {
-		var p = qs[i].split("=");
-		if(p[0] == "acct")
-			return p[1];
-	}
-	return null;
 }
 
 /**
