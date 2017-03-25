@@ -1,4 +1,4 @@
-create function GetCategoryID(categoryname varchar(16))
+create function GetCategoryID(categoryname varchar(24))
 returns tinyint unsigned
 begin
   if categoryname='' or categoryname is null then
