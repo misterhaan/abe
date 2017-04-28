@@ -36,6 +36,7 @@ $html->Close();
  */
 function Import() {
 	global $ajax, $db;
+	// TODO: make sure there's a file
 	if($acct = $db->query('select a.id, b.class from accounts as a left join banks as b on b.id=a.bank where a.id=\'' . +$_POST['acctid'] . '\' limit 1'))
 		if($acct = $acct->fetch_object()) {
 			$bankclass = $acct->class;

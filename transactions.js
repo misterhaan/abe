@@ -961,7 +961,7 @@ function ObserveCategory(category) {
 			category.suggesting(true);
 	});
 	(category.amount = ko.observable(category.amount)).subscribe(function() {
-		if((category.amount().indexOf("+") > 0 || category.amount().indexOf("-") > 0 || category.amount().indexOf("*") > 0 || category.amount().indexOf("/") > 0) && /\d+(\.\d+)?([\+\-\*\/]\-?\d+(\.\d+)?)*/.test(category.amount()))
+		if((category.amount().indexOf("+") > 0 || category.amount().indexOf("-") > 0 || category.amount().indexOf("*") > 0 || category.amount().indexOf("/") > 0) && /^-?\(?\d+(\.\d+)?([\+\-\*\/]\(?\-?\(?\d+(\.\d+)?\)?)*$/.test(category.amount()))
 			category.amount((+eval(category.amount())).toFixed(2));
 		else
 			category.amount((+category.amount()).toFixed(2));
@@ -997,11 +997,10 @@ function ObserveCategory(category) {
 						return false;
 		return true;
 	});
-	// only accept digits, decimal point, and basic math symbols
+	// only accept digits, decimal point, parentheses, and basic math symbols
 	category.AmountKey = function(category, e) {
-		if(e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 42 || e.keyCode == 43 || e.keyCode == 45 || e.keyCode == 46 || e.keyCode == 47)
+		if(e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 40 || e.keyCode == 41 || e.keyCode == 42 || e.keyCode == 43 || e.keyCode == 45 || e.keyCode == 46 || e.keyCode == 47)
 			return true;
-		console.log(e.keyCode);
 		return false;
 	};
 }
