@@ -1,0 +1,25 @@
+#spendmonthcat {
+	font-size: .8em;
+	border-spacing: 0;
+	margin: .75em auto;
+	th, td {
+		font-weight: normal;
+		margin: 0;
+		padding: .25em .5em;
+	}
+	tbody th {
+		text-align: left;
+	}
+	a {
+		display: block;
+		text-decoration: none;
+		color: #000;
+		text-align: right;
+	}
+	tbody tr:nth-child(odd) {
+		background-color: $lightgreyblue;
+	}
+	tbody tr.total {
+		background-color: #fff;
+	}
+}

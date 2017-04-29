@@ -22,11 +22,14 @@
 		&[href='accounts.php']:before {
 			content: "\f19c";
 		}
-		&[href='transactions.php']:before {
-			content: "\f0ae";
-		}
 		&[href='settings.php']:before {
 			content: "\f085";
+		}
+		&[href='spending.php']:before {
+			content: "\f200";
+		}
+		&[href='transactions.php']:before {
+			content: "\f0ae";
 		}
 	}
 }
