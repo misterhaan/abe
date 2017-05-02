@@ -160,18 +160,17 @@ function GetTransactions() {
 							$displayDate = date('F j, Y (D)', strtotime($posted . ' 12:00 PM'));
 							if(!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $posted)
 								$ajax->Data->dates[] = (object)['date' => $posted, 'displayDate' => $displayDate, 'transactions' => []];
-							// show commas if 10k or more
-							if(+$amount >= 10000.00 || +$amount <= -10000.00)
-								$amount = number_format(+$amount, 2);
 							$categories = [];
 							if($splitcat) {
 								$sc_names = explode("\n", $sc_names);
 								$sc_amounts = explode("\n", $sc_amounts);
 								for($i = 0; $i < count($sc_names); $i++)
 									$categories[] = (object)['name' => $sc_names[$i], 'amount' => number_format(+$sc_amounts[$i], 2, '.', '')];
-							} else {
+							} else
 								$categories[] = (object)['name' => $category, 'amount' => number_format(+$amount, 2, '.', '')];
-							}
+							// show commas if 10k or more
+							if(+$amount >= 10000.00 || +$amount <= -10000.00)
+								$amount = number_format(+$amount, 2);
 							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = (object)['id' => $id, 'posted' => $posted, 'transdate' => $transdate, 'acctclass' => $acctclass, 'acctname' => $acctname, 'name' => $name, 'categories' => $categories, 'amount' => $amount, 'notes' => $notes, 'city' => $city, 'state' => $state, 'zip' => $zip];
 							$oldest = $posted;
 							$oldid = $id;
