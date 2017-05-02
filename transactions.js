@@ -999,8 +999,30 @@ function ObserveCategory(category) {
 	});
 	// only accept digits, decimal point, parentheses, and basic math symbols
 	category.AmountKey = function(category, e) {
-		if(e.keyCode >= 48 && e.keyCode <= 57 || e.keyCode == 40 || e.keyCode == 41 || e.keyCode == 42 || e.keyCode == 43 || e.keyCode == 45 || e.keyCode == 46 || e.keyCode == 47)
-			return true;
+		switch(e.which) {
+			case 0:  // control keys
+			case 8:  // backspace (firefox only)
+			case 13:  // enter
+			case 40:  // (
+			case 41:  // )
+			case 42:  // *
+			case 43:  // +
+			case 45:  // -
+			case 46:  // .
+			case 47:  // /
+			case 48:  // 0
+			case 49:  // 1
+			case 50:  // 2
+			case 51:  // 3
+			case 52:  // 4
+			case 53:  // 5
+			case 54:  // 6
+			case 55:  // 7
+			case 56:  // 8
+			case 57:  // 9
+				return true;
+		}
+		console.log("which=" + e.which + ", keyCode=" + e.keyCode + ", charCode=" + e.charCode);
 		return false;
 	};
 }
