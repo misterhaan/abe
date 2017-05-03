@@ -20,6 +20,8 @@ $html->Open('Spending');
 ?>
 			<h1>Spending</h1>
 
+			<svg id=monthtrend viewBox="0 0 800 400"></svg>
+
 			<table id=spendmonthcat>
 				<thead><tr>
 					<td></td>

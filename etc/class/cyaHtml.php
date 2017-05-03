@@ -80,6 +80,13 @@ class cyaHtml {
 		<link rel=stylesheet href="<?php echo INSTALL_PATH; ?>/theme/cya.css">
 		<script src="<?php echo INSTALL_PATH; ?>/jquery-3.1.1.min.js" type="text/javascript"></script>
 		<script src="<?php echo INSTALL_PATH; ?>/knockout-3.4.1.js" type="text/javascript"></script>
+<?php
+		if(basename($_SERVER['SCRIPT_NAME']) == 'spending.php') {
+?>
+		<script src="<?php echo INSTALL_PATH; ?>/d3.min.js" type="text/javascript"></script>
+<?php
+		}
+?>
 		<script src="<?php echo INSTALL_PATH; ?>/cya.js" type="text/javascript"></script>
 <?php
 		if(file_exists(str_replace('.php', '.js', $_SERVER['SCRIPT_FILENAME']))) {

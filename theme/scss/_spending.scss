@@ -1,3 +1,28 @@
+svg {
+	display: block;
+	margin: .75em auto;
+	max-width: calc(100% - .5em);
+	@media (min-width: 820px) {
+		max-width: 800px;
+	}
+	* {
+		shape-rendering: crispEdges;
+	}
+}
+#monthtrend {
+	.grid line {
+		stroke: $darkgreyblue;
+	}
+	rect.made, rect.spent {
+		fill: $blue;
+	}
+	rect.net.gain {
+		fill: $green;
+	}
+	rect.net.loss {
+		fill: $orange;
+	}
+}
 #spendmonthcat {
 	font-size: .8em;
 	border-spacing: 0;
@@ -16,10 +41,13 @@
 		color: #000;
 		text-align: right;
 	}
-	tbody tr:nth-child(odd) {
-		background-color: $lightgreyblue;
-	}
-	tbody tr.total {
-		background-color: #fff;
+	tbody {
+		box-shadow: 0 0 5px $blue;
+		tr:nth-child(odd) {
+			background-color: $lightgreyblue;
+		}
+		tr.total {
+			background-color: #fff;
+		}
 	}
 }
