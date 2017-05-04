@@ -7,9 +7,9 @@ function MonthsViewModel() {
 	this.cats = ko.observableArray([]);
 	this.months = ko.observableArray([]);
 	this.months.subscribe(function() {
-		var data = MonthsVM.months();
 		var svg = $("#monthtrend");
 		if(!svg[0].initialized) {
+			var data = MonthsVM.months();
 			var viewbox = svg[0].viewBox.baseVal;
 			// amount scale for bar height.  goes from the furthest negative spending to the largest income, with zero somewhere in the middle
 			var amount = d3.scaleLinear().domain([d3.min(data.map(function(m) {return m.spent;})), d3.max(data.map(function(m) {return m.made;}))]).range([viewbox.height, 0]);
@@ -39,6 +39,38 @@ function MonthsViewModel() {
 			chart.append("g").attr("class", "x axis").attr("transform", "translate(0," + amount(0) + ")").call(d3.axisBottom(month));
 			svg[0].initialized = true;
 		}
+		// fix table top and left headers
+		setTimeout(function() {
+			var div = $("#spendmonthcat > div");
+			var width = div.find("thead tr td")[0].getBoundingClientRect().width + "px";
+			var height = div.find("thead tr td")[0].getBoundingClientRect().height + "px";
+			var top = $("<header class=top>")
+				.css({left: width, height: height});
+			var left = $("<header class=left>")
+				.css({top: height, width: width});
+			var corner = $("<header class=corner>")
+				.css({width: width, height: height});
+			div.append(top);
+			div.append(left);
+			div.append(corner);
+			div.scroll(function() {
+				var s = {top: $(this).scrollTop(), left: $(this).scrollLeft()};
+				top.css("top", s.top);
+				left.css("left", s.left);
+				corner.css(s);
+			});
+			div.find("thead th").each(function() {
+				top.append($("<div class=h>").text($(this).text()).css("width", $(this).width() + "px"));
+			});
+			div.find("tbody th").each(function() {
+				var h = $("<div class=h>").text($(this).text());
+				if($(this).parent().hasClass("total"))
+					h.addClass("total");
+				left.append(h);
+			});
+			// scroll table to right
+			div.animate({scrollLeft: div.find("table").width()}, 250);
+		}, 100);
 	});
 
 	this.Load = function() {

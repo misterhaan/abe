@@ -24,30 +24,74 @@ svg {
 	}
 }
 #spendmonthcat {
-	font-size: .8em;
-	border-spacing: 0;
-	margin: .75em auto;
-	th, td {
-		font-weight: normal;
-		margin: 0;
-		padding: .25em .5em;
-	}
-	tbody th {
+	text-align: center;
+	& > div {
 		text-align: left;
+		display: inline-block;
+		font-size: .8em;
+		width: auto;
+		max-width: 100%;
+		max-height: calc(100vh - 4.5em);
+		overflow: auto;
+		margin: .75em auto;
+		position: relative;
 	}
-	a {
-		display: block;
-		text-decoration: none;
-		color: #000;
-		text-align: right;
-	}
-	tbody {
-		box-shadow: 0 0 5px $blue;
-		tr:nth-child(odd) {
-			background-color: $lightgreyblue;
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+		table-layout: fixed;
+		th, td {
+			font-weight: normal;
+			margin: 0;
+			padding: .25em .5em;
+			white-space: nowrap;
 		}
-		tr.total {
-			background-color: #fff;
+		thead th {
+			text-align: right;
+		}
+		a {
+			display: block;
+			text-decoration: none;
+			color: #000;
+			text-align: right;
+		}
+		tbody {
+			tr:nth-child(odd) {
+				background-color: $lightgreyblue;
+			}
+			tr.total {
+				background-color: #fff;
+			}
+			th {
+				text-align: left;
+			}
+		}
+	}
+	header {
+		background-color: $medgreyblue;
+		position: absolute;
+		top: 0;
+		left: 0;
+		&.top {
+			white-space: nowrap;
+			.h {
+				display: inline-block;
+				padding: .25em .5em;
+				white-space: nowrap;
+				text-align: right;
+			}
+		}
+		&.left {
+			.h {
+				padding: .25em .5em;
+				white-space: nowrap;
+				&:nth-child(odd) {
+					background-color: $lightgreyblue;
+				}
+				&.total {
+					background-color: #fff;
+				}
+			}
 		}
 	}
 }

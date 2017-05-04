@@ -22,13 +22,13 @@ $html->Open('Spending');
 
 			<svg id=monthtrend viewBox="0 0 800 400"></svg>
 
-			<table id=spendmonthcat>
+			<div id=spendmonthcat><div><table>
 				<thead><tr>
 					<td></td>
 					<!-- ko foreach: months -->
 					<th data-bind="text: name"></th>
 					<!-- /ko -->
-				<tr></thead>
+				</tr></thead>
 				<tbody>
 					<tr class=total>
 						<th>Total</th>
@@ -45,7 +45,7 @@ $html->Open('Spending');
 					</tr>
 					<!-- /ko -->
 				</tbody>
-			</table>
+			</table></div></div>
 <?php
 $html->Close();
 
