@@ -5,6 +5,7 @@ $(function() {
 function MonthsViewModel() {
 	var self = this;
 	this.cats = ko.observableArray([]);
+	this.expandedCats = ko.observableArray([]);
 	this.months = ko.observableArray([]);
 	this.months.subscribe(function() {
 		var svg = $("#monthtrend");
@@ -39,38 +40,7 @@ function MonthsViewModel() {
 			chart.append("g").attr("class", "x axis").attr("transform", "translate(0," + amount(0) + ")").call(d3.axisBottom(month));
 			svg[0].initialized = true;
 		}
-		// fix table top and left headers
-		setTimeout(function() {
-			var div = $("#spendmonthcat > div");
-			var width = div.find("thead tr td")[0].getBoundingClientRect().width + "px";
-			var height = div.find("thead tr td")[0].getBoundingClientRect().height + "px";
-			var top = $("<header class=top>")
-				.css({left: width, height: height});
-			var left = $("<header class=left>")
-				.css({top: height, width: width});
-			var corner = $("<header class=corner>")
-				.css({width: width, height: height});
-			div.append(top);
-			div.append(left);
-			div.append(corner);
-			div.scroll(function() {
-				var s = {top: $(this).scrollTop(), left: $(this).scrollLeft()};
-				top.css("top", s.top);
-				left.css("left", s.left);
-				corner.css(s);
-			});
-			div.find("thead th").each(function() {
-				top.append($("<div class=h>").text($(this).text()).css("width", $(this).width() + "px"));
-			});
-			div.find("tbody th").each(function() {
-				var h = $("<div class=h>").text($(this).text());
-				if($(this).parent().hasClass("total"))
-					h.addClass("total");
-				left.append(h);
-			});
-			// scroll table to right
-			div.animate({scrollLeft: div.find("table").width()}, 250);
-		}, 100);
+		FixedTable();
 	});
 
 	this.Load = function() {
@@ -84,4 +54,82 @@ function MonthsViewModel() {
 		}, "json");
 	};
 	this.Load();
+
+	this.findParentAmount = function(m, parent) {
+		var subcats = false;
+		for(var p = 0; p < self.cats().length && !subcats; p++)
+			if(self.cats()[p].id == parent)
+				subcats = self.cats()[p].subcats;
+		if(subcats) {
+			var amount = 0;
+			for(var s = 0; s < subcats.length; s++)
+				if(self.months()[m].cats[subcats[s].id])
+					amount += +self.months()[m].cats[subcats[s].id];
+			return amount ? amount.toFixed(2) : "";
+		}
+		return "";
+	};
+
+	this.ToggleCategory = function(category) {
+		var i = self.expandedCats().indexOf(category.id);
+		if(i > -1)
+			self.expandedCats.splice(i, 1);
+		else
+			self.expandedCats.push(category.id);
+		FixedTable();
+	};
+}
+
+/**
+ * Freeze first row and column of the table
+ */
+function FixedTable() {
+	// fix table top and left headers
+	setTimeout(function() {
+		var div = $("#spendmonthcat > div");
+		div.animate({scrollLeft: 0}, 250);
+		var width = div.find("thead tr td")[0].getBoundingClientRect().width + "px";
+		var height = div.find("thead tr td")[0].getBoundingClientRect().height + "px";
+		div.find("header").remove();
+		var scroll = {top: div.scrollTop(), left: div.scrollLeft()};
+		var top = $("<header class=top>")
+			.css({top: scroll.top, left: width, height: height});
+		var left = $("<header class=left>")
+			.css({top: height, left: scroll.left, width: width});
+		var corner = $("<header class=corner>")
+			.css({top: scroll.top, left: scroll.left, width: width, height: height});
+		div.append(top);
+		div.append(left);
+		div.append(corner);
+		div.find("thead th").each(function() {
+			top.append($("<div class=h>").text($(this).text()).css("width", $(this).width() + "px"));
+		});
+		div.find("tbody th").each(function() {
+			var h = $("<div class=h>").text($(this).text());
+			if($(this).parent().hasClass("total"))
+				h.addClass("total");
+			if($(this).parent().hasClass("group"))
+				h.addClass("group");
+			if($(this).parent().hasClass("subcat"))
+				h.addClass("subcat");
+			left.append(h);
+		});
+		// scroll table to right on first load
+		if(!div[0].initialized) {
+			div.scroll(TableScroll);
+			div.animate({scrollLeft: div.find("table").width()}, 250);
+			div[0].initialized = true;
+		} else
+			// when the contents change it scrolls all the way left, so scroll back to where it was
+			setTimeout(function() {
+				div.scrollLeft(scroll.left);
+			}, 250);
+	}, 100);
+}
+
+function TableScroll() {
+	var s = {top: $(this).scrollTop(), left: $(this).scrollLeft()};
+	$(this).find("header.top").css("top", s.top);
+	$(this).find("header.left").css("left", s.left);
+	$(this).find("header.corner").css(s);
 }

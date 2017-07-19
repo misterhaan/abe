@@ -53,7 +53,6 @@ svg {
 			display: block;
 			text-decoration: none;
 			color: #000;
-			text-align: right;
 		}
 		tbody {
 			tr:nth-child(odd) {
@@ -61,9 +60,31 @@ svg {
 			}
 			tr.total {
 				background-color: #fff;
+				th, td {
+					font-weight: bold;
+				}
+			}
+			tr.group {
+				th, td {
+					font-weight: bold;
+				}
+			}
+			tr.expand {
+				cursor: zoom-in;
+			}
+			tr.collapse {
+				cursor: zoom-out;
+			}
+			tr.subcat {
+				th, td {
+					font-style: italic;
+				}
 			}
 			th {
 				text-align: left;
+			}
+			td {
+				text-align: right;
 			}
 		}
 	}
@@ -90,6 +111,13 @@ svg {
 				}
 				&.total {
 					background-color: #fff;
+					font-weight: bold;
+				}
+				&.group {
+					font-weight: bold;
+				}
+				&.subcat {
+					font-style: italic;
 				}
 			}
 		}
