@@ -16,9 +16,6 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new cyaHtml();
-// if we're viewing transactions for one account, back should go to the account list.  otherwise to the main menu
-if(isset($_GET['acct']))
-	$html->SetBack('accounts.php');
 $html->AddAction('#showFilters', 'filter', 'Filter', 'Filter transactions');
 $html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');

@@ -22,11 +22,6 @@ class cyaHtml {
 	private $isclosed = false;
 
 	/**
-	 * URL for the back link in the header.
-	 * @var string
-	 */
-	private $back = '/';
-	/**
 	 * Action links to put in the header.
 	 * @var array
 	 */
@@ -37,14 +32,6 @@ class cyaHtml {
 	 */
 	public function cyaHtml() {
 		$this->back = INSTALL_PATH . '/';
-	}
-
-	/**
-	 * Set the URL for the header's back link.  Must be called before Open().
-	 * @param string $url Relative URL for the header's back link.
-	 */
-	public function SetBack($url) {
-		$this->back = $url;
 	}
 
 	/**
@@ -102,7 +89,7 @@ class cyaHtml {
 <?php
 		if($_SERVER['PHP_SELF'] != INSTALL_PATH . '/index.php') {
 ?>
-				<a href="<?php echo $this->back; ?>"><span>back</span></a>
+				<a href="<?php echo INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
 <?php
 		}
 ?>

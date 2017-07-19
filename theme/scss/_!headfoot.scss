@@ -19,9 +19,8 @@ body > header {
 			@extend %fa-replaced;
 
 			&:before {
-				font-size: 1.5em;
 				color: #fff;
-				content: "\f104";
+				content: "\f00a";
 			}
 		}
 	}

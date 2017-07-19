@@ -12,8 +12,6 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new cyaHtml();
-// Import can be accessed from the transactions page or the accounts page.
-$html->SetBack(isset($_GET['acct']) && +$_GET['acct'] ? "accounts.php" : "transactions.php");
 $html->Open('Import Transactions');
 ?>
 			<h1>Import Transactions</h1>
