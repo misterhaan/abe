@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/etc/class/cya.php';
+require_once __DIR__ . '/etc/class/abe.php';
 
 define('MAX_TRANS', 50);  // how many transactions to load at a time (should probably move to a setting)
 
 // ajax requests come in as ?ajax=function, so run the appropriate function
 if(isset($_GET['ajax'])) {
-	$ajax = new cyaAjax();
+	$ajax = new abeAjax();
 	switch($_GET['ajax']) {
 		case 'get': GetTransactions(); break;
 		case 'save': SaveTransactions(); break;
@@ -15,7 +15,7 @@ if(isset($_GET['ajax'])) {
 	die;  // skip HTML output
 }
 
-$html = new cyaHtml();
+$html = new abeHtml();
 $html->AddAction('#showFilters', 'filter', 'Filter', 'Filter transactions');
 $html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');

@@ -3,7 +3,7 @@
  * Bank functions specific to BMO Harris Bank.
  * @author misterhaan
  */
-class BmoHarris extends cyaBank {
+class BmoHarris extends abeBank {
 	/**
 	 * Import transactions from an OFX file into an account from BMO Harris Bank.
 	 * @param string $filename Full path to the OFX file on the server.
@@ -110,10 +110,11 @@ class BmoHarris extends cyaBank {
 
 	/**
 	 * Import transactions from a CSV file into an account from BMO Harris Bank.
+	 * Currently leaves out data Abe needs to know.
 	 * @param string $filename Full path to the CSV file on the server.
 	 * @param integer $account ID of the account the transactions belong to.
 	 */
-	public function ImportCsvTransactions($filename, $account) {
+	public function ImportCsvTransactionsBroken($filename, $account) {
 		global $ajax, $db;
 
 		if(false !== $fh = fopen($filename, 'r')) {
@@ -136,7 +137,7 @@ class BmoHarris extends cyaBank {
 						$name = $line[7] == 'Check' ? 'Check ' . $line[5] : self::TitleCase($line[2]);
 						$amount = $line[8] == 'Debit' ? -$line[3] : +$line[3];
 						$net += $amount;
-						
+
 						if($ins->execute())
 							$ajax->Data->count++;
 						else

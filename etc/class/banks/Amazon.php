@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-class Amazon extends cyaBank {
+class Amazon extends abeBank {
 	/**
 	 * Import transactions from a CSV file into a credit card account from Amazon.
 	 * @param string $filename Full path to the CSV file on the server.

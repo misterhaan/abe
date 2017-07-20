@@ -3,7 +3,7 @@
  * Bank functions specific to State Farm.
  * @author misterhaan
  */
-class StateFarm extends cyaBank {
+class StateFarm extends abeBank {
 	/**
 	 * Import transactions from a CSV file into a credit card account from State
 	 * Farm.

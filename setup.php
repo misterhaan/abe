@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/etc/class/cya.php';
+require_once __DIR__ . '/etc/class/abe.php';
 
 // ajax requests come in as ?ajax=function, so run the appropriate function
 if(isset($_GET['ajax'])) {
-	$ajax = new cyaAjax();
+	$ajax = new abeAjax();
 	switch($_GET['ajax']) {
 		case 'savedbsetup': CreateDatabaseKeys(); break;
 		case 'createdb':    CreateDatabaseMysql(); break;
@@ -13,19 +13,19 @@ if(isset($_GET['ajax'])) {
 	$ajax->Send();
 	die;
 }
-$html = new cyaHtml();
+$html = new abeHtml();
 $html->Open('Setup');
 ?>
-			<h1><?php echo cyaHtml::SITE_NAME_FULL; ?> Setup</h1>
+			<h1><?php echo abeHtml::SITE_NAME_FULL; ?> Setup</h1>
 <?php
 // figure out which step we need to do next
-if(!file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . '/.cyaKeys.php'))
+if(!file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php'))
 	DatabaseForm();
 elseif(!$db || $db->connect_errno)
 	DatabaseCreateForm();
 elseif(!isset($config) || !$config)
 	DatabaseInstallForm();
-elseif($config->structureVersion < cyaVersion::Structure || $config->dataVersion < cyaVersion::Data)
+elseif($config->structureVersion < abeVersion::Structure || $config->dataVersion < abeVersion::Data)
 	DatabaseUpgradeForm();
 else
 	AllGoodMessage();
@@ -38,7 +38,7 @@ function DatabaseForm() {
 ?>
 			<h2>Database</h2>
 			<p>
-				<?php echo cyaHtml::SITE_NAME_SHORT; ?> stores data in a MySQL database.
+				<?php echo abeHtml::SITE_NAME_SHORT; ?> stores data in a MySQL database.
 				Set up the connection below:
 			</p>
 			<form id=dbsetup>
@@ -46,15 +46,15 @@ function DatabaseForm() {
 					<span class=label>Host:</span>
 					<span class=field><input name=host value=localhost required></span>
 				</label>
-				<label title="Enter the name of the database <?php echo cyaHtml::SITE_NAME_SHORT; ?> should use">
+				<label title="Enter the name of the database <?php echo abeHtml::SITE_NAME_SHORT; ?> should use">
 					<span class=label>Database:</span>
 					<span class=field><input name=name required></span>
 				</label>
-				<label title="Enter the username that owns the <?php echo cyaHtml::SITE_NAME_SHORT; ?> database">
+				<label title="Enter the username that owns the <?php echo abeHtml::SITE_NAME_SHORT; ?> database">
 					<span class=label>Username:</span>
 					<span class=field><input name=user required></span>
 				</label>
-				<label title="Enter the password for the user that owns the <?php echo cyaHtml::SITE_NAME_SHORT; ?> database">
+				<label title="Enter the password for the user that owns the <?php echo abeHtml::SITE_NAME_SHORT; ?> database">
 					<span class=label>Password:</span>
 					<span class=field><input type=password name=pass required></span>
 				</label>
@@ -88,9 +88,9 @@ function CreateDatabaseKeys() {
 	if(count($ajax->Data->fieldIssues))
 		$ajax->Fail(count($ajax->Data->fieldIssues) . ' fields have problems');
 	else
-		if($fh = fopen(dirname($_SERVER['DOCUMENT_ROOT']) . '/.cyaKeys.php', 'w')) {
+		if($fh = fopen(dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php', 'w')) {
 			fwrite($fh, '<?php
-class cyaKeysDB {
+class abeKeysDB {
 	const HOST = \'' . addslashes($_POST['host']) . '\';
 	const NAME = \'' . addslashes($_POST['name']) . '\';
 	const USER = \'' . addslashes($_POST['user']) . '\';
@@ -108,7 +108,7 @@ function DatabaseCreateForm() {
 ?>
 			<h2>Create Database</h2>
 			<p>
-				<?php echo cyaHtml::SITE_NAME_SHORT; ?> can’t connect to the database.
+				<?php echo abeHtml::SITE_NAME_SHORT; ?> can’t connect to the database.
 				Usually this is because it hasn’t been created yet.  Enter the password
 				for the MySQL root user below to create the database and grant access to
 				the configured user:
@@ -131,14 +131,14 @@ function CreateDatabaseMysql() {
 	if(!isset($_POST['rootpw']) || !($_POST['rootpw'] = trim($_POST['rootpw'])))
 		$ajax->Fail('Password is required');
 	else {
-		$rdb = @new mysqli(cyaKeysDB::HOST, 'root', $_POST['rootpw']);
+		$rdb = @new mysqli(abeKeysDB::HOST, 'root', $_POST['rootpw']);
 		if($rdb->errno)
 			$ajax->Fail('Unable to connect to database as root.  Is the password correct?');
 		else {
 			$rdb->real_query('set names \'utf8mb4\'');
 			$rdb->set_charset('utf8mb4');
-			if($rdb->real_query('create database if not exists `' . cyaKeysDB::NAME . '` character set utf8mb4 collate utf8mb4_unicode_ci'))
-				if($rdb->real_query('grant all on `' . cyaKeysDB::NAME . '`.* to \'' . $rdb->escape_string(cyaKeysDB::USER) . '\'@\'localhost\' identified by \'' . $rdb->escape_string(cyaKeysDB::PASS) . '\''))
+			if($rdb->real_query('create database if not exists `' . abeKeysDB::NAME . '` character set utf8mb4 collate utf8mb4_unicode_ci'))
+				if($rdb->real_query('grant all on `' . abeKeysDB::NAME . '`.* to \'' . $rdb->escape_string(abeKeysDB::USER) . '\'@\'localhost\' identified by \'' . $rdb->escape_string(abeKeysDB::PASS) . '\''))
 					;  // done here!
 				else
 					$ajax->Fail('Error granting database priveleges.');
@@ -155,7 +155,7 @@ function DatabaseInstallForm() {
 ?>
 			<h2>Install Database</h2>
 			<p>
-				It looks like the <?php echo cyaHtml::SITE_NAME_SHORT; ?> database
+				It looks like the <?php echo abeHtml::SITE_NAME_SHORT; ?> database
 				hasn’t been installed.
 			</p>
 			<nav class=calltoaction><a href="?ajax=installdb">Install Database</a></nav>
@@ -191,10 +191,10 @@ function InstallDatabase() {
 		}
 		if(count($ajax->Data->routineErrors))
 			$ajax->Fail('Error creating ' . count($ajax->Data->routineErrors) . ' of ' . count($routines) . ' routines.');
-		elseif($db->real_query('insert into config (structureVersion) values (' . +cyaVersion::Structure . ')')) {
+		elseif($db->real_query('insert into config (structureVersion) values (' . +abeVersion::Structure . ')')) {
 			ImportBanks();
 			ImportAccountTypes();
-			if($db->real_query('update config set dataVersion=' . +cyaVersion::Data . ' limit 1'))
+			if($db->real_query('update config set dataVersion=' . +abeVersion::Data . ' limit 1'))
 				;  // done here!
 			else
 				$ajax->Fail('Error configuring data version.');
@@ -254,7 +254,7 @@ function DatabaseUpgradeForm() {
 ?>
 			<h2>Upgrade Database</h2>
 			<p>
-				There have been some additions to <?php echo cyaHtml::SITE_NAME_SHORT; ?>
+				There have been some additions to <?php echo abeHtml::SITE_NAME_SHORT; ?>
 				since this database was last set up.  An upgrade is needed to activate
 				them and keep everything else running smoothly.
 			</p>
@@ -277,7 +277,7 @@ function UpgradeDatabase() {
 function AllGoodMessage() {
 ?>
 			<p>
-				The <?php echo cyaHtml::SITE_NAME_SHORT; ?> database is fully up-to-date!
+				The <?php echo abeHtml::SITE_NAME_SHORT; ?> database is fully up-to-date!
 			</p>
 			<nav class=calltoaction><a href="<?php echo INSTALL_PATH; ?>/">Let’s Go!</a></nav>
 <?php

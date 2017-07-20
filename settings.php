@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__ . '/etc/class/cya.php';
+require_once __DIR__ . '/etc/class/abe.php';
 
 // ajax requests come in as ?ajax=function, so run the appropriate function
 if(isset($_GET['ajax'])) {
-	$ajax = new cyaAjax();
+	$ajax = new abeAjax();
 	switch($_GET['ajax']) {
 		case 'savename':    UpdateCategoryName(); break;
 		case 'movecat':     MoveCategory(); break;
@@ -13,7 +13,7 @@ if(isset($_GET['ajax'])) {
 	die;  // skip HTML output
 }
 
-$html = new cyaHtml();
+$html = new abeHtml();
 $html->Open('Settings');
 // TODO:  support touch-based drag-and-drop
 ?>

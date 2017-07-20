@@ -3,7 +3,7 @@
  * Bank functions specific to Target.
  * @author misterhaan
  */
-class Target extends cyaBank {
+class Target extends abeBank {
 	/**
 	 * Import transactions from a CSV file into a credit card account from Target.
 	 * @param string $filename Full path to the CSV file on the server.

@@ -1,10 +1,10 @@
 <?php
 /**
- * access keys template for cya classes.  copy one directory level up from
- * document root, name .cyaKeys.php, and fill in with access values.  this
+ * access keys template for abe classes.  copy one directory level up from
+ * document root, name .abeKeys.php, and fill in with access values.  this
  * obviously needs to be left blank on github to avoid sharing secrets.
  */
-class cyaKeysDB {
+class abeKeysDB {
 	/**
 	 * hostname for database (often this is localhost)
 	 * @var string

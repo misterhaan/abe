@@ -4,7 +4,7 @@
  * @author misterhaan
  *
  */
-abstract class cyaBank {
+abstract class abeBank {
 	/**
 	 * Import transactions from a file into an account.
 	 * @param string $origname Original filename, used to infer file format from extension.
@@ -20,7 +20,7 @@ abstract class cyaBank {
 		if(method_exists(static::class, $import))
 			static::$import($filename, $account);
 		else
-			$ajax->Fail('C-YA does not support ' . $ext . ' file transaction import for this bank.');
+			$ajax->Fail('Abe does not support ' . $ext . ' file transaction import for this bank.');
 	}
 
 	/**

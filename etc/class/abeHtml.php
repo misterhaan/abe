@@ -1,14 +1,14 @@
 <?php
 /**
- * HTML layout for Collect Your Assets
+ * HTML layout for Abe Personal Finance
  *
  * Each script should create and use an object from this class when it's not
  * responding to an ajax request.
  * @author misterhaan
  */
-class cyaHtml {
-	const SITE_NAME_FULL = 'Collect Your Assets';
-	const SITE_NAME_SHORT = 'C-YA';
+class abeHtml {
+	const SITE_NAME_FULL = 'Abe Personal Finance';
+	const SITE_NAME_SHORT = 'Abe';
 
 	/**
 	 * Whether the HTML has been opened.
@@ -28,9 +28,9 @@ class cyaHtml {
 	private $actions = [];
 
 	/**
-	 * Creates a new cyaHtml object.
+	 * Creates a new abeHtml object.
 	 */
-	public function cyaHtml() {
+	public function abeHtml() {
 		$this->back = INSTALL_PATH . '/';
 	}
 
@@ -64,9 +64,9 @@ class cyaHtml {
 		<meta charset=utf-8>
 		<meta name=viewport content="width=device-width, initial-scale=1">
 		<title><?php echo $title; ?></title>
-		<link rel=stylesheet href="<?php echo INSTALL_PATH; ?>/theme/cya.css">
-		<script src="<?php echo INSTALL_PATH; ?>/jquery-3.1.1.min.js" type="text/javascript"></script>
-		<script src="<?php echo INSTALL_PATH; ?>/knockout-3.4.1.js" type="text/javascript"></script>
+		<link rel=stylesheet href="<?php echo INSTALL_PATH; ?>/theme/abe.css">
+		<script src="<?php echo INSTALL_PATH; ?>/jquery-3.2.1.min.js" type="text/javascript"></script>
+		<script src="<?php echo INSTALL_PATH; ?>/knockout-3.4.2.js" type="text/javascript"></script>
 <?php
 		if(basename($_SERVER['SCRIPT_NAME']) == 'spending.php') {
 ?>
@@ -74,7 +74,7 @@ class cyaHtml {
 <?php
 		}
 ?>
-		<script src="<?php echo INSTALL_PATH; ?>/cya.js" type="text/javascript"></script>
+		<script src="<?php echo INSTALL_PATH; ?>/abe.js" type="text/javascript"></script>
 <?php
 		if(file_exists(str_replace('.php', '.js', $_SERVER['SCRIPT_FILENAME']))) {
 ?>
@@ -82,6 +82,22 @@ class cyaHtml {
 <?php
 		}
 ?>
+		<link rel="apple-touch-icon" sizes="57x57" href="<?php echo INSTALL_PATH; ?>/apple-icon-57x57.png">
+		<link rel="apple-touch-icon" sizes="60x60" href="<?php echo INSTALL_PATH; ?>/apple-icon-60x60.png">
+		<link rel="apple-touch-icon" sizes="72x72" href="<?php echo INSTALL_PATH; ?>/apple-icon-72x72.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="<?php echo INSTALL_PATH; ?>/apple-icon-76x76.png">
+		<link rel="apple-touch-icon" sizes="114x114" href="<?php echo INSTALL_PATH; ?>/apple-icon-114x114.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="<?php echo INSTALL_PATH; ?>/apple-icon-120x120.png">
+		<link rel="apple-touch-icon" sizes="144x144" href="<?php echo INSTALL_PATH; ?>/apple-icon-144x144.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="<?php echo INSTALL_PATH; ?>/apple-icon-152x152.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="<?php echo INSTALL_PATH; ?>/apple-icon-180x180.png">
+		<link rel="icon" type="image/png" sizes="192x192"  href="<?php echo INSTALL_PATH; ?>/android-icon-192x192.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="<?php echo INSTALL_PATH; ?>/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="96x96" href="<?php echo INSTALL_PATH; ?>/favicon-96x96.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="<?php echo INSTALL_PATH; ?>/favicon-16x16.png">
+		<meta name="msapplication-TileColor" content="#593">
+		<meta name="msapplication-TileImage" content="<?php echo INSTALL_PATH; ?>/ms-icon-144x144.png">
+		<meta name="theme-color" content="#593">
 	</head>
 	<body>
 		<header>

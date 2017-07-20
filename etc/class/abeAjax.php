@@ -5,7 +5,7 @@
  * @author misterhaan
  *
  */
-class cyaAjax {
+class abeAjax {
 	// return data in this format.  can override via $_GET['format'] but only json works currently
 	private $format = 'json';
 
@@ -19,7 +19,7 @@ class cyaAjax {
 	 * sets the format based on $_GET['format'] (default json) and initializes
 	 * return data object.
 	 */
-	public function cyaAjax() {
+	public function abeAjax() {
 		$this->Data = new stdClass();
 		$this->Data->fail = false;
 		if(isset($_GET['format']))
@@ -52,7 +52,7 @@ class cyaAjax {
 			case 'json':
 				$this->SendJson();
 				break;
-			// TODO:  add XML and TXT
+			// this is where txt, xml, etc. would be added
 		}
 	}
 

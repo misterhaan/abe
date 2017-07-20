@@ -14,14 +14,14 @@ ini_set('default_charset', 'UTF-8');
 mb_internal_encoding('UTF-8');
 
 // connect to the database and read the configuration, or redirect to the setup script
-if(@include_once dirname($_SERVER['DOCUMENT_ROOT']) . '/.cyaKeys.php') {
-	$db = @new mysqli(cyaKeysDB::HOST, cyaKeysDB::USER, cyaKeysDB::PASS, cyaKeysDB::NAME);
+if(@include_once dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php') {
+	$db = @new mysqli(abeKeysDB::HOST, abeKeysDB::USER, abeKeysDB::PASS, abeKeysDB::NAME);
 	if(!$db->connect_errno) {
 		$db->real_query('set names \'utf8mb4\'');
 		$db->set_charset('utf8mb4');
 		if($config = $db->query('select * from config limit 1')) {
 			if($config = $config->fetch_object()) {
-				if(!IsSetup() && ($config->structureVersion < cyaVersion::Structure || $config->dataVersion < cyaVersion::Data))
+				if(!IsSetup() && ($config->structureVersion < abeVersion::Structure || $config->dataVersion < abeVersion::Data))
 					GoSetup();
 			} elseif(!IsSetup())
 				GoSetup();
@@ -58,20 +58,20 @@ function GoSetup() {
  */
 function __autoload($class) {
 	switch($class) {
-		case 'cyaAjax':
-			require_once 'cyaAjax.php';
+		case 'abeAjax':
+			require_once 'abeAjax.php';
 			break;
-		case 'cyaBank':
-			require_once 'cyaBank.php';
+		case 'abeBank':
+			require_once 'abeBank.php';
 			break;
-		case 'cyaFormat':
-			require_once 'cyaFormat.php';
+		case 'abeFormat':
+			require_once 'abeFormat.php';
 			break;
-		case 'cyaHtml':
-			require_once 'cyaHtml.php';
+		case 'abeHtml':
+			require_once 'abeHtml.php';
 			break;
-		case 'cyaVersion':
-			require_once 'cyaVersion.php';
+		case 'abeVersion':
+			require_once 'abeVersion.php';
 			break;
 	}
 }

@@ -1,9 +1,9 @@
 <?php
 /**
- * Version information for Collect Your Assets.
+ * Version information for Abe Personal Finance.
  * @author misterhaan
  */
-class cyaVersion {
+class abeVersion {
 	/**
 	 * The release number is not currently used.
 	 * @var string
