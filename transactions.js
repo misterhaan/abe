@@ -107,10 +107,11 @@ var TransactionsModel = new function() {
 			for(var pc = 0; pc < self.categories().length; pc++) {
 				var cat = self.categories()[pc];
 				var subs = [];
+				var parentChosen = cat.name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(ipc) {return ipc.name() != self.activeCategory().name() && ipc.name() == cat.name; });
 				for(var sc = 0; sc < cat.subs.length; sc++)
-					if(cat.subs[sc].name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(isc) { return isc.name() != self.activeCategory().name() && isc.name() == cat.subs[sc].name; }))
+					if(parentChosen || cat.subs[sc].name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(isc) { return isc.name() != self.activeCategory().name() && isc.name() == cat.subs[sc].name; }))
 						subs.push(cat.subs[sc]);
-				if(subs.length || cat.name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(ipc) {return ipc.name() != self.activeCategory().name() && ipc.name() == cat.name; }))
+				if(subs.length || parentChosen)
 					cats.push({id: cat.id, name: cat.name, subs: subs});
 			}
 		return cats;
@@ -197,10 +198,11 @@ var TransactionsModel = new function() {
 		for(var pc = 0; pc < self.categories().length; pc++) {
 			var cat = self.categories()[pc];
 			var subs = [];
+			var parentChosen = cat.name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat) < 0;
 			for(var sc = 0; sc < cat.subs.length; sc++)
-				if(cat.subs[sc].name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat.subs[sc]) < 0)
+				if(parentChosen || cat.subs[sc].name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat.subs[sc]) < 0)
 					subs.push(cat.subs[sc]);
-			if(subs.length || cat.name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat) < 0)
+			if(subs.length || parentChosen)
 				cats.push({id: cat.id, name: cat.name, subs: subs});
 		}
 		return cats;
@@ -527,6 +529,7 @@ var TransactionsModel = new function() {
 	self.HideSuggestions = function(category) {
 		window.setTimeout(function() {
 			category.suggesting(false);
+			self.catCursor(false);
 		}, hideSuggestDelay);  // need to delay this so tap / click events on the suggestion items fire
 	};
 
@@ -555,6 +558,7 @@ var TransactionsModel = new function() {
 	self.ChooseCategory = function(category) {
 		self.activeCategory().name(category.name);
 		self.activeCategory().suggesting(false);
+		self.catCursor(false);
 	};
 
 	/**
@@ -624,14 +628,16 @@ var TransactionsModel = new function() {
 							}
 							return false;
 						} else {
-							prevcat = TransactionsModel.categoriesForTransaction()[c];
-							if(TransactionsModel.categoriesForTransaction()[c].subs)
-								for(var sc = 0; sc < TransactionsModel.categoriesForTransaction()[c].subs.length; sc++)
-									if(TransactionsModel.catCursor() == TransactionsModel.categoriesForTransaction()[c].subs[sc]) {
+							var parentcat = TransactionsModel.categoriesForTransaction()[c];
+							if(parentcat.subs.length)
+								for(var sc = 0; sc < parentcat.subs.length; sc++)
+									if(TransactionsModel.catCursor() == parentcat.subs[sc]) {
 										TransactionsModel.catCursor(prevcat);
 										return false;
 									} else
-										prevcat = TransactionsModel.categoriesForTransaction()[c].subs[sc];
+										prevcat = parentcat.subs[sc];
+							else
+								prevcat = parentcat;
 						}
 				} else {
 					prevcat = self.categoriesForTransaction().last();
@@ -645,31 +651,38 @@ var TransactionsModel = new function() {
 				if(TransactionsModel.catCursor() && (TransactionsModel.catCursor().name.containsAnyCase(category.name()) || TransactionsModel.catCursor().subs && TransactionsModel.catCursor().subs.nameContainsAnyCase(category.name()))) {
 					var nextcat = false;
 					for(var c = TransactionsModel.categoriesForTransaction().length - 1; c >=  0; c--) {
-						if(TransactionsModel.categoriesForTransaction()[c].subs)
-							for(var sc = TransactionsModel.categoriesForTransaction()[c].subs.length - 1; sc >= 0 ; sc--)
-								if(TransactionsModel.catCursor() == TransactionsModel.categoriesForTransaction()[c].subs[sc]) {
+						var parentcat = TransactionsModel.categoriesForTransaction()[c];
+						if(parentcat.subs.length)
+							for(var sc = parentcat.subs.length - 1; sc >= 0 ; sc--)
+								if(TransactionsModel.catCursor() == parentcat.subs[sc]) {
 									if(nextcat)
 										TransactionsModel.catCursor(nextcat);
+									else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
+										TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
 									else
 										TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
 									return false;
 								} else
-									nextcat = TransactionsModel.categoriesForTransaction()[c].subs[sc];
-						if(TransactionsModel.catCursor() == TransactionsModel.categoriesForTransaction()[c]) {
+									nextcat = parentcat.subs[sc];
+						else if(TransactionsModel.catCursor() == parentcat)
 							if(nextcat)
 								TransactionsModel.catCursor(nextcat);
+							else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
+								TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
 							else
 								TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
-							return false;
-						} else
-							nextcat = TransactionsModel.categoriesForTransaction()[c];
+						else
+							nextcat = parentcat;
 					}
-				} else
+				} else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
+					TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
+				else
 					TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
 				return false;
 			case 13:  // enter key
 				if(TransactionsModel.catCursor()) {
 					category.name(TransactionsModel.catCursor().name);
+					TransactionsModel.catCursor(false);
 					category.suggesting(false);
 					return false;
 				}
@@ -677,6 +690,7 @@ var TransactionsModel = new function() {
 			case 9:  // tab key
 				if(TransactionsModel.catCursor()) {
 					category.name(TransactionsModel.catCursor().name);
+					TransactionsModel.catCursor(false);
 					category.suggesting(false);
 				}
 				break;

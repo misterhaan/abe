@@ -48,8 +48,11 @@ $html->Open('Transactions');
 					</label>
 					<ol class=suggestions data-bind="visible: suggestingFilterCategories, foreach: categoriesForFilter">
 						<li>
+							<!-- ko ifnot: subs.length -->
 							<div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
+							<!-- /ko -->
 							<!-- ko if: subs.length -->
+							<div class=parentcat data-bind="text: name"></div>
 							<ol data-bind="foreach: subs">
 								<li><div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
 							</ol>
@@ -108,10 +111,15 @@ $html->Open('Transactions');
 												</label>
 												<ol class=suggestions data-bind="visible: suggesting, foreach: $root.categoriesForTransaction">
 													<li>
+														<!-- ko ifnot: subs.length -->
 														<div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div>
+														<!-- /ko -->
+														<!-- ko if: subs.length -->
+														<div class=parentcat data-bind="text: name"></div>
 														<ol data-bind="foreach: subs">
 															<li><div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div></li>
 														</ol>
+														<!-- /ko -->
 													</li>
 												</ol>
 											<!-- /ko -->

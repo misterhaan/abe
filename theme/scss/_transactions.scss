@@ -187,6 +187,15 @@
 				background-color: $green;
 				color: #fff;
 			}
+			&.parentcat {
+				font-style: italic;
+				color: $darkgrey;
+			}
+			&.parentcat:hover {
+				cursor: default;
+				background-color: #fff;
+				color: $darkgrey;
+			}
 		}
 	}
 	.suggestions > li:last-child > div:last-child,
