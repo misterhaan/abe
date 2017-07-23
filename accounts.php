@@ -23,7 +23,7 @@ $html->Open('Accounts');
 				<div class=account data-bind="css: typeclass">
 					<h2 data-bind="text: name"></h2>
 					<div class=detail>
-						<time class=lastupdate data-bind="text: 'Updated ' + updated"></time>
+						<time class=lastupdate data-bind="text: 'As of ' + newest"></time>
 						<span class=balance data-bind="text: balance"></span>
 					</div>
 					<div class=actions>
@@ -42,7 +42,15 @@ $html->Close();
  */
 function GetAccountList() {
 	global $ajax, $db;
-	if($accts = $db->query('select a.id, a.name, at.class as typeclass, a.updated, b.url as bankurl, a.balance from accounts as a left join banks as b on b.id=a.bank left join account_types as at on at.id=a.account_type where not a.closed order by a.updated desc')) {
+	$accts = <<<ACCTS
+		select a.id, a.name, at.class as typeclass, a.updated, b.url as bankurl, a.balance, date_format(max(t.posted), '%b %D') as newest
+		from accounts as a
+			left join banks as b on b.id=a.bank
+			left join account_types as at on at.id=a.account_type
+			left join transactions as t on t.account=a.id
+		where not a.closed group by a.id order by a.updated desc
+ACCTS;
+	if($accts = $db->query($accts)) {
 		$ajax->Data->accounts = [];
 		while($acct = $accts->fetch_object()) {
 			$acct->balance = number_format($acct->balance, 2);
