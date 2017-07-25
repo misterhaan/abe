@@ -21,7 +21,7 @@ $html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');
 ?>
 			<h1>Transactions</h1>
-			<div id=transactions>
+			<div id=transactions class=transactions>
 				<div id=filters data-bind="visible: showFilters">
 					<label title="Show transactions from these accounts">
 						Accounts:

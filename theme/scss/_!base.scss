@@ -121,6 +121,6 @@ $gentlecorner: .25em;
 
 %ellipsis {
 	white-space: nowrap;
-	overflow-y: hidden;
+	overflow: hidden;
 	text-overflow: ellipsis;
 }

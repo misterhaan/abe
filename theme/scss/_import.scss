@@ -1,0 +1,37 @@
+.transactions.preview {
+	header {
+		@extend %flex-container;
+		align-items: baseline;
+		h2 {
+			margin: 0 1.25em 0 0;
+		}
+		span {
+			margin: 0 1.25em 0 0;
+		}
+		button {
+			margin: .25em 0 .25em auto;
+		}
+		.status {
+			margin-left: auto;
+		}
+		.count:before {
+			@extend %fa-label;
+			content: "\f0ae";
+		}
+		.amount:before {
+			@extend %fa-label;
+			content: "\f24e";
+		}
+		.status:before {
+			@extend %fa-label;
+			content: "\f00c";
+		}
+	}
+	li.transaction {
+		display: block;
+	}
+	.quick {
+		@extend %flex-container;
+		margin-bottom: .25em;
+	}
+}

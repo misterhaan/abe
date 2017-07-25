@@ -22,6 +22,9 @@
 		&[href='accounts.php']:before {
 			content: "\f19c";
 		}
+		&[href='import.php']:before {
+			content: "\f093";
+		}
 		&[href='settings.php']:before {
 			content: "\f085";
 		}

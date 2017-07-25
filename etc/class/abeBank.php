@@ -6,21 +6,24 @@
  */
 abstract class abeBank {
 	/**
-	 * Import transactions from a file into an account.
+	 * Read transactions from a file into an array of objects that match the
+	 * transactions table in the database.
 	 * @param string $origname Original filename, used to infer file format from extension.
 	 * @param string $filename Full path to the file on the server.
-	 * @param integer $account ID of the account the transactions belong to.
-	 * @return boolean True if successful.
+	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ImportTransactions($origname, $filename, $account) {
+	public function ParseTransactions($origname, $filename) {
 		global $ajax;
 		$ext = explode('.', $origname);
 		$ext = $ext[count($ext) - 1];
-		$import = 'Import' . ucfirst(strtolower($ext)) . 'Transactions';
-		if(method_exists(static::class, $import))
-			static::$import($filename, $account);
-		else
+		$parse = 'Parse' . ucfirst(strtolower($ext)) . 'Transactions';
+		if(method_exists(static::class, $parse)) {
+			$return = static::$parse($filename);
+			$return->name = $origname;
+			return $return;
+		} else
 			$ajax->Fail('Abe does not support ' . $ext . ' file transaction import for this bank.');
+		return false;
 	}
 
 	/**
@@ -33,19 +36,4 @@ abstract class abeBank {
 			return $string;
 		return ucwords(strtolower($string));
 	}
-
-	/**
-	 * Update the account after importing transactions.
-	 * @param number $account ID of the account to update.
-	 * @param number $date Unix timestamp for the last updated time for the account, or false for now.
-	 * @param number $amount Amount the balance changed by.
-	 */
-	protected function UpdateAccount($account, $date = false, $amount = 0) {
-		global $ajax, $db;
-		if(!$date)
-			$date = time();
-		if(!$db->real_query('update accounts set updated=\'' . +$date . '\', balance=balance+\'' . +$amount . '\' where id=\'' . +$account .'\' limit 1'))
-			$ajax->Fail('Error updating account:  ' . $db->error);
-	}
 }
-?>

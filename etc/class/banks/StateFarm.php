@@ -5,69 +5,44 @@
  */
 class StateFarm extends abeBank {
 	/**
-	 * Import transactions from a CSV file into a credit card account from State
+	 * Parse transactions from a CSV for into a credit card account from State
 	 * Farm.
 	 * @param string $filename Full path to the CSV file on the server.
-	 * @param integer $account ID of the account the transactions belong to.
-	 * @return boolean True if successful.
+	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ImportCsvTransactions($filename, $account) {
-		global $ajax, $db;
-
+	public static function ParseCsvTransactions($filename) {
 		if(false !== $fh = fopen($filename, 'r')) {
-			// first lines is headers
+			// first line is headers
 			fgets($fh);
 
-			// transaction makes all these inserts much faster
-			$db->real_query('start transaction');
+			$preview = new stdClass();
+			$preview->transactions = [];
+			$preview->net = 0;
 
-			// prepare and bind a statement
-			if(false !== $ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip) values (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-				if($ins->bind_param('issssdsss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip)) {
-					$ajax->Data->count = 0;
-					$net = 0;
-					while($line = fgetcsv($fh)) {
-						// translate the data
-						$extid = $line[7];
-						$transdate = date('Y-m-d', strtotime($line[0]));
-						$posted = date('Y-m-d', strtotime($line[1]));
-						$name = self::TitleCase($line[3]);
-						$amount = -str_replace([
-								'$',
-								'(',
-								')'
-						], [
-								'',
-								'-',
-								''
-						], $line[2]);
-						$city = self::TitleCase($line[4]);
-						$state = $line[5];
-						$zip = $line[6];
-						$net += $amount;
+			while($line = fgetcsv($fh)) {
+				$tran = new stdClass();
+				// translate the data
+				$tran->extid = $line[7];
+				$tran->transdate = date('Y-m-d', strtotime($line[0]));
+				$tran->posted = date('Y-m-d', strtotime($line[1]));
+				$tran->name = self::TitleCase($line[3]);
+				$tran->amount = -str_replace(['$', '(', ')'], ['', '-', ''], $line[2]);
+				$tran->city = self::TitleCase($line[4]);
+				$tran->state = $line[5];
+				$tran->zip = $line[6];
+				$tran->notes = '';  // not provided
 
-						// sometimes they use the city as a continuation of the name
-						if($city == 'You' && substr($name, -5) == 'Thank' || $city == 'Fee' && $name == 'International Transaction') {
-							$name .= ' ' . $city;
-							$city = '';
-						}
+				// sometimes they use the city as a continuation of the name
+				if($tran->city == 'You' && substr($tran->name, -5) == 'Thank' || $tran->city == 'Fee' && $tran->name == 'International Transaction') {
+					$tran->name .= ' ' . $tran->city;
+					$tran->city = '';
+				}
 
-						if($ins->execute())
-							$ajax->Data->count++;
-						else
-							$ajax->Fail('Error executing transaction import:  ' . $ins->error);
-					}
-					// close the statement
-					$ins->close();
-					self::UpdateAccount($account, false, $net);
-				} else
-					$ajax->Fail('Error binding import parameters:  ' . $ins->error);
-			else
-				$ajax->Fail('Database error preparing to import transactions:  ' . $db->error);
-			$db->real_query('commit');
-		} else
-			$ajax->Fail('Unable to open file.');
+				$preview->net += $tran->amount;
+				$preview->transactions[] = $tran;
+			}
+			return $preview;
+		}
 		return false;
 	}
 }
-?>

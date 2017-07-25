@@ -18,6 +18,19 @@ function ImportModel() {
 	 * List of accounts for the account select field.
 	 */
 	self.accountlist = ko.observableArray([]);
+	/**
+	 * Full object of the selected account.
+	 */
+	self.selectedAccount = ko.computed(function() {
+		for(var a = 0; a < self.accountlist().length; a++)
+			if(self.accountlist()[a].id == self.account())
+				return self.accountlist()[a];
+		return false;
+	});
+	/**
+	 * Previews from transactions ready to import.
+	 */
+	self.previews = ko.observableArray([]);
 
 	// Load the list of accounts.
 	$.get("accounts.php?ajax=accountlist", {}, function(result) {
@@ -31,17 +44,41 @@ function ImportModel() {
 	}, "json");
 
 	/**
-	 * Upload the transactions file and import it into the database.
+	 * Upload the transactions file and get back a preview of the transactions it
+	 * contains.
 	 */
-	self.Import = function() {
+	self.Preview = function() {
 		$("#importtrans button").prop("disabled", true).addClass("waiting");
-		$.post({url: "?ajax=import", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
+		var acctid = $("select").val();
+		var acctname = $("select option[value='" + acctid + "']").text();
+		//var acctname = self.accountlist()[
+		$.post({url: "?ajax=preview", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
 			$("#importtrans button").prop("disabled", false).removeClass("waiting");
-			if(!result.fail)
-				alert("Imported " + result.count + " transactions.");
-			else
+			if(result.fail)
 				alert(result.message);
+			else {
+				result.preview.acctid = acctid;
+				result.preview.acctname = acctname;
+				result.preview.saved = ko.observable(false);
+				result.preview.working = ko.observable(false);
+				self.previews.unshift(result.preview);
+			}
 		}, dataType: "json"});
+	};
+
+	/**
+	 * Save previewed transactions to the database.
+	 * @param object Preview data from self.previews().
+	 */
+	self.Save = function(preview) {
+		preview.working(true);
+		$.post("?ajax=save", {acctid: preview.acctid, transactions: preview.transactions, net: preview.net}, function(result) {
+			if(result.fail)
+				alert(result.message);
+			else
+				preview.saved(true);
+			preview.working(false);
+		}, "json");
 	};
 }
 

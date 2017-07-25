@@ -5,107 +5,96 @@
  */
 class BmoHarris extends abeBank {
 	/**
-	 * Import transactions from an OFX file into an account from BMO Harris Bank.
+	 * Parse transactions from an OFX file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the OFX file on the server.
-	 * @param integer $account ID of the account the transactions belong to.
+	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ImportOfxTransactions($filename, $account) {
-		global $ajax, $db;
-
+	public static function ParseOfxTransactions($filename) {
 		if(false !== $fh = fopen($filename, 'r')) {
-			// transaction makes all these inserts much faster
-			$db->real_query('start transaction');
-			if($ins = $db->prepare('insert into transactions (account, extid, posted, name, amount, notes) values (?, ?, ?, ?, ?, ?)'))
-				if($ins->bind_param('isssds', $account, $extid, $posted, $name, $amount, $notes)) {
-					$ajax->Data->count = 0;
-					$ajax->Data->extradata = [];
-					$net = 0;
-					$intrans = false;
-					while(false !== $line = fgets($fh)) {
-						$line = trim($line);
-						if($intrans) {
-							if($line == '</STMTTRN>') {
-								$intrans = false;
-								if($checknum)
-									$name .= ' ' . $checknum;
-								if($ins->execute()) {
-									$ajax->Data->count++;
-									$net += $amount;
-								}
-								else
-									$ajax->Fail('Error executing transaction import:  ' . $ins->error);
-							} else {
-								list($tag, $data) = explode('>', $line, 2);
-								switch($tag) {
-									case '<TRNTYPE':
-									case '<MEMO':
-										// not using these
-										break;
-									case '<DTPOSTED':
-										$posted = substr($data, 0, 4) . '-' . substr($data, 4, 2) . '-' . substr($data, 6, 2);
-										break;
-									case '<TRNAMT':
-										$amount = +$data;
-										break;
-									case '<FITID':
-										$extid = $data;
-										break;
-									case '<CHECKNUM':
-										$checknum = $data;
-										break;
-									case '<NAME':
-										$name = self::TitleCase(str_replace('&amp;', '&', $data));
-										break;
-									default:
-										// log unexpected tags
-										$ajax->Data->extradata[] = [
-												'extid' => $extid,
-												'tag' => $tag
-										];
-										break;
-								}
-							}
-						} else if($line == '<STMTTRN>') {
-							$intrans = true;
-							$checknum = false;
-							$extid = '';
-							$posted = '';
-							$name = '';
-							$amount = 0;
-							$notes = '';
+			$preview = new stdClass();
+			$preview->transactions = [];
+			$preview->net = 0;
+
+			$intrans = false;
+			while(false !== $line = fgets($fh)) {
+				$line = trim($line);
+				if($intrans) {
+					if($line == '</STMTTRN>') {
+						$intrans = false;
+						if($checknum)
+							$trans->name .= ' ' . $checknum;
+
+						$preview->net += $tran->amount;
+						$preview->transactions[] = $tran;
+					} else {
+						list($tag, $data) = explode('>', $line, 2);
+						switch($tag) {
+							case '<TRNTYPE':
+							case '<MEMO':
+								// not using these
+								break;
+							case '<DTPOSTED':
+								$tran->posted = substr($data, 0, 4) . '-' . substr($data, 4, 2) . '-' . substr($data, 6, 2);
+								break;
+							case '<TRNAMT':
+								$tran->amount = +$data;
+								break;
+							case '<FITID':
+								$tran->extid = $data;
+								break;
+							case '<CHECKNUM':
+								$tran->checknum = $data;
+								break;
+							case '<NAME':
+								$tran->name = self::TitleCase(str_replace('&amp;', '&', $data));
+								break;
+							default:
+								// log unexpected tags
+								$ajax->Data->extradata[] = [
+										'extid' => $extid,
+										'tag' => $tag
+								];
+								break;
 						}
 					}
-					// close the statement
-					$ins->close();
-					self::UpdateAccount($account, false, $net);
-				} else
-					$ajax->Fail('Error binding import parameters:  ' . $ins->error);
-			else
-				$ajax->Fail('Database error preparing to import transactions:  ' . $db->error);
-			$db->real_query('commit');
-			fclose($fh);
-		} else
-			$ajax->Fail('Unable to open file.');
+				} else if($line == '<STMTTRN>') {
+					$intrans = true;
+					$checknum = false;
+					$tran = new stdClass();
+					$tran->extid = null;
+					$tran->transdate = null;
+					$tran->posted = '';
+					$tran->name = '';
+					$tran->amount = 0;
+					$tran->city = null;
+					$tran->state = null;
+					$tran->zip = null;
+					$tran->notes = '';
+				}
+			}
+			return $preview;
+		}
+		return false;
 	}
 
 	/**
-	 * Import transactions from a QBO file into an account from BMO Harris Bank.
+	 * Parse transactions from a QBO file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the QBO file on the server.
-	 * @param integer $account ID of the account the transactions belong to.
+	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ImportQboTransactions($filename, $account) {
+	public static function ParseQboTransactions($filename) {
 		// The qbo file is basically the same as ofx, just with some extra stuff we will ignore anyway.
-		self::ImportOfxTransactions($filename, $account);
+		self::ParseOfxTransactions($filename);
 	}
 
 	/**
-	 * Import transactions from a QFX file into an account from BMO Harris Bank.
+	 * Parse transactions from a QFX file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the QFX file on the server.
-	 * @param integer $account ID of the account the transactions belong to.
+	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ImportQfxTransactions($filename, $account) {
+	public static function ParseQfxTransactions($filename) {
 		// The qfx file is basically the same as ofx, just with some extra stuff we will ignore anyway.
-		self::ImportOfxTransactions($filename, $account);
+		self::ParseOfxTransactions($filename, $account);
 	}
 
 	/**
@@ -115,6 +104,7 @@ class BmoHarris extends abeBank {
 	 * @param integer $account ID of the account the transactions belong to.
 	 */
 	public function ImportCsvTransactionsBroken($filename, $account) {
+		// can's use CSV because it leaves out important data
 		global $ajax, $db;
 
 		if(false !== $fh = fopen($filename, 'r')) {

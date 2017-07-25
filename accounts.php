@@ -43,7 +43,7 @@ $html->Close();
 function GetAccountList() {
 	global $ajax, $db;
 	$accts = <<<ACCTS
-		select a.id, a.name, at.class as typeclass, a.updated, b.url as bankurl, a.balance, date_format(max(t.posted), '%b %D') as newest
+		select a.id, a.name, at.class as typeclass, a.updated, b.name as bankname, b.url as bankurl, a.balance, date_format(max(t.posted), '%b %D') as newest
 		from accounts as a
 			left join banks as b on b.id=a.bank
 			left join account_types as at on at.id=a.account_type
