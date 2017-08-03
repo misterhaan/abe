@@ -73,11 +73,88 @@ button.add:before {
 	text-decoration: none;
 }
 
+@media (min-width: 35em) {
+	.tabbed {
+		display: -webkit-flex;
+		display: flex;
+		padding-right: .5em;
+		.tabs {
+			margin: 0 .5em 0 0;
+			padding: .75em 0 0 .5em;
+			-webkit-flex: 0 0 auto;
+			flex: 0 0 auto;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-flex-direction: column;
+			flex-direction: column;
+			background-color: $green;
+			border-radius: 0 0 $gentlecorner;
+			span {
+				border-radius: $gentlecorner 0 0 $gentlecorner;
+				transform: translateX(.25em);
+				margin-bottom: .5em;
+				background-color: $medgreyblue;
+				color: #000;
+				&.accounts:before,
+				&.categories:before {
+					color: $darkgrey;
+				}
+			}
+			a {
+				transform: translateX(-.25em);
+				margin-bottom: .5em;
+			}
+		}
+		section {
+			-webkit-flex: 1 1 auto;
+			flex: 1 1 auto;
+		}
+	}
+}
+.tabs {
+	margin: 1em;
+	.accounts,
+	.categories {
+		&:before {
+			@extend %fa-label;
+			margin-left: .25em;
+		}
+	}
+	.accounts:before {
+		content: "\f19c";
+	}
+	.categories:before {
+		content: "\f02c";
+	}
+	a {
+		background-color: $lightgreyblue;
+		margin: .125em;
+		padding: .125em .25em;
+		-webkit-border-radius: $gentlecorner;
+		border-radius: $gentlecorner;
+		box-shadow: 2px 2px 1px #999;
+		text-decoration: none;
+	}
+	span {
+		background-color: $green;
+		color: #fff;
+		font-weight: bold;
+		margin: .125em;
+		padding: .125em .25em;
+		-webkit-border-radius: $gentlecorner;
+		border-radius: $gentlecorner;
+		&.accounts:before,
+		&.categories:before {
+			color: $medgreyblue;
+		}
+	}
+}
+
 @import "!forms";
 @import "!headfoot";
 @import "index";
 @import "accounts";
+@import "categories";
 @import "import";
-@import "settings";
 @import "spending";
 @import "transactions";

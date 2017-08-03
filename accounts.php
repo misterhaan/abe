@@ -15,25 +15,34 @@ $html = new abeHtml();
 $html->AddAction('account.php', 'add', '+', 'Add another account');
 $html->Open('Accounts');
 ?>
-			<h1>Accounts</h1>
-			<p data-bind="visible: !loading() && !accounts().length">
-				No active accounts.  Maybe you should <a href="account.php">add one</a>?
-			</p>
-			<section id=accountlist data-bind="foreach: accounts">
-				<div class=account data-bind="css: typeclass">
-					<h2 data-bind="text: name"></h2>
-					<div class=detail>
-						<time class=lastupdate data-bind="text: 'As of ' + newest"></time>
-						<span class=balance data-bind="text: balance"></span>
+			<h1>Settings</h1>
+
+			<div class=tabbed>
+				<nav class=tabs>
+					<span class=accounts>Accounts</span>
+					<a class=categories href="categories.php">Categories</a>
+				</nav>
+				<section id=accountlist>
+					<p data-bind="visible: !loading() && !accounts().length">
+						No active accounts.  Maybe you should <a href="account.php">add one</a>?
+					</p>
+					<!-- ko foreach: accounts -->
+					<div class=account data-bind="css: typeclass">
+						<h2 data-bind="text: name"></h2>
+						<div class=detail>
+							<time class=lastupdate data-bind="text: 'As of ' + newest"></time>
+							<span class=balance data-bind="text: balance"></span>
+						</div>
+						<div class=actions>
+							<a class=transactions data-bind="attr: {href: 'transactions.php#!accts=' + id}" title="See transactions from this account"><span>transactions</span></a>
+							<a class=bank data-bind="attr: {href: bankurl}" title="Visit this account’s bank website"><span>bank</span></a>
+							<a class=import data-bind="attr: {href: 'import.php?acct=' + id}" title="Import transactions to this account"><span>import</span></a>
+							<a class=edit data-bind="attr: {href: 'account.php?id=' + id}"><span>edit</span></a>
+						</div>
 					</div>
-					<div class=actions>
-						<a class=transactions data-bind="attr: {href: 'transactions.php#!accts=' + id}" title="See transactions from this account"><span>transactions</span></a>
-						<a class=bank data-bind="attr: {href: bankurl}" title="Visit this account’s bank website"><span>bank</span></a>
-						<a class=import data-bind="attr: {href: 'import.php?acct=' + id}" title="Import transactions to this account"><span>import</span></a>
-						<a class=edit data-bind="attr: {href: 'account.php?id=' + id}"><span>edit</span></a>
-					</div>
-				</div>
-			</section>
+					<!-- /ko -->
+				</section>
+			</div>
 <?php
 $html->Close();
 

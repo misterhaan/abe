@@ -6,14 +6,14 @@
 		background-color: $lightgreyblue;
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 1px $darkgrey;
-	}
-	h2 {
-		color: #fff;
-		background-color: $orange;
-		padding: .25em .5em;
-		margin: 0;
-		border-radius: $gentlecorner $gentlecorner 0 0;
-		@extend %ellipsis;
+		h2 {
+			color: #fff;
+			background-color: $orange;
+			padding: .25em .5em;
+			margin: 0;
+			border-radius: $gentlecorner $gentlecorner 0 0;
+			@extend %ellipsis;
+		}
 	}
 	.lastupdate {
 		font-style: italic;

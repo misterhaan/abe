@@ -1,5 +1,5 @@
 $(function() {
-	ko.applyBindings(vm, $("#categories")[0]);
+	ko.applyBindings(vm);
 });
 
 var vm = new (function() {

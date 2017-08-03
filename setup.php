@@ -275,11 +275,27 @@ function UpgradeDatabase() {
  * Show the success message.
  */
 function AllGoodMessage() {
+	global $db;
+	$accountcount = 'select count(1) as num from accounts';
+	if($accountcount = $db->query($accountcount))
+		if($accountcount = $accountcount->fetch_object())
+			$accountcount = $accountcount->num;
+	if(!$accountcount) {
+?>
+			<p>
+				The <?php echo abeHtml::SITE_NAME_SHORT; ?> database is fully up-to-date!
+				Either this is your first time using <?php echo abeHtml::SITE_NAME_SHORT; ?>
+				or you haven’t gotten around to adding your account yet.  That’s
+				probably what you want to do next!
+			</p>
+			<nav class=calltoaction><a href="accounts.php">Add Your Accounts!</a></nav>
+<?php
+	} else {
 ?>
 			<p>
 				The <?php echo abeHtml::SITE_NAME_SHORT; ?> database is fully up-to-date!
 			</p>
-			<nav class=calltoaction><a href="<?php echo INSTALL_PATH; ?>/">Let’s Go!</a></nav>
+			<nav class=calltoaction><a href="<?php echo INSTALL_PATH; ?>/">To the Main Menu!</a></nav>
 <?php
+	}
 }
-?>
