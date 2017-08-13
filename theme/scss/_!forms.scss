@@ -11,7 +11,7 @@ label {
 		display: block;
 	}
 	span.field {
-		@extend %flex-container-center;
+		@extend %flex-container-baseline;
 		input:not([type="checkbox"]),
 		select {
 			@extend %flex-item-fill;

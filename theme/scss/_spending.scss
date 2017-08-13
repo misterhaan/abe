@@ -9,10 +9,10 @@ svg {
 		shape-rendering: crispEdges;
 	}
 }
+.grid line {
+	stroke: $darkgreyblue;
+}
 #monthtrend {
-	.grid line {
-		stroke: $darkgreyblue;
-	}
 	rect.made, rect.spent {
 		fill: $blue;
 	}
@@ -22,6 +22,20 @@ svg {
 	rect.net.loss {
 		fill: $orange;
 	}
+}
+#monthcattrend {
+	.catline path {
+		shape-rendering: auto;
+	}
+}
+.legend rect {
+	fill: $lightgreyblue;
+}
+.legend text {
+	cursor: pointer;
+}
+.legend .deselected {
+	text-decoration: line-through;
 }
 #spendmonthcat {
 	text-align: center;

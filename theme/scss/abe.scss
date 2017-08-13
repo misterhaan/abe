@@ -103,6 +103,7 @@ button.add:before {
 			a {
 				transform: translateX(-.25em);
 				margin-bottom: .5em;
+				box-shadow: 2px 2px 1px $darkdarkgrey;
 			}
 		}
 		section {
@@ -132,7 +133,7 @@ button.add:before {
 		padding: .125em .25em;
 		-webkit-border-radius: $gentlecorner;
 		border-radius: $gentlecorner;
-		box-shadow: 2px 2px 1px #999;
+		box-shadow: 2px 2px 1px $darkgrey;
 		text-decoration: none;
 	}
 	span {

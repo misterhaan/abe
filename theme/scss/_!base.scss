@@ -4,6 +4,7 @@ $green: #593;
 $orange: #e73;
 $blue: #89a;
 $darkgrey: #999;
+$darkdarkgrey: #666;
 $red: #a33;
 
 $lightgreyblue: #eef;
@@ -68,6 +69,11 @@ $gentlecorner: .25em;
 	@extend %flex-container;
 	-webkit-align-items: center;
 	align-items: center;
+}
+%flex-container-baseline {
+	@extend %flex-container;
+	-webkit-align-items: baseline;
+	align-items: baseline;
 }
 
 %flex-item-fixed {
