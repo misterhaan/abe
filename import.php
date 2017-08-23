@@ -26,6 +26,10 @@ $html->Open('Import Transactions');
 					<span class=label>Bank:</span>
 					<span class=field><a data-bind="text: selectedAccount().bankname + ' login', attr: {href: selectedAccount().bankurl}">bankname</a></span>
 				</label>
+				<label data-bind="visible: selectedAccount()">
+					<span class=label>Latest:</span>
+					<span class=field data-bind="text: selectedAccount().newest"></span>
+				</label>
 				<label>
 					<span class=label>Transactions:</span>
 					<span class=field><input name=transfile type=file></span>

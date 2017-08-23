@@ -22,7 +22,7 @@ class BmoHarris extends abeBank {
 					if($line == '</STMTTRN>') {
 						$intrans = false;
 						if($checknum)
-							$trans->name .= ' ' . $checknum;
+							$tran->name .= ' ' . $checknum;
 
 						$preview->net += $tran->amount;
 						$preview->transactions[] = $tran;
@@ -43,7 +43,7 @@ class BmoHarris extends abeBank {
 								$tran->extid = $data;
 								break;
 							case '<CHECKNUM':
-								$tran->checknum = $data;
+								$checknum = $data;
 								break;
 							case '<NAME':
 								$tran->name = self::TitleCase(str_replace('&amp;', '&', $data));
