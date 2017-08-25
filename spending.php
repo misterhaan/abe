@@ -108,7 +108,7 @@ AMTS;
 			$ajax->Data->months[$m]['cats'][+$amt->catid] = $amt->amount;
 		}
 		usort($ajax->Data->cats, 'AlphabetizeNamed');
-		foreach($ajax->Data->cats as $parent)
+		foreach($ajax->Data->cats as &$parent)
 			if(is_array($parent['subcats']))
 				usort($parent['subcats'], 'AlphabetizeNamed');
 	} else
