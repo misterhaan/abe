@@ -20,6 +20,7 @@ class Amazon extends abeBank {
 			$preview->net = 0;
 
 			while($line = fgetcsv($fh)) {
+				$l4len = strlen($line[4]);
 				$tran = new stdClass();
 				// translate the data
 				$tran->extid = trim($line[2]) ? $line[2] : null;
@@ -27,10 +28,10 @@ class Amazon extends abeBank {
 				$tran->posted = date('Y-m-d', strtotime($line[1]));
 				$tran->name = self::TitleCase(trim(substr($line[4], 0, 25)));
 				$tran->amount = +$line[3];
-				$tran->city = self::TitleCase(trim(substr($line[4], 25, 13)));
-				$tran->state = substr($line[4], 38, 2);
+				$tran->city = $l4len > 25 ? self::TitleCase(trim(substr($line[4], 25, 13))) : null;
+				$tran->state = $l4len > 38 ? substr($line[4], 38, 2) : null;
 				$tran->zip = null;  // not provided
-				$tran->notes = substr($line[4], 41);
+				$tran->notes = $l4len > 41 ? substr($line[4], 41) : '';
 
 				// sometimes they use the city as a continuation of the name
 				if($tran->city == 'You' && substr($tran->name, -5) == 'Thank') {
