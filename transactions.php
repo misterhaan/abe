@@ -182,7 +182,7 @@ function GetTransactions() {
 						}
 						$ajax->Data->more = false;
 						$maxcount = 1;
-						$select->free_result();
+						//$select->free_result();
 						$db->next_result();  // get past the extra stored procedure result
 						if($select->execute())
 							if($select->store_result())
