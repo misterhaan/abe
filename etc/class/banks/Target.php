@@ -16,6 +16,7 @@ class Target extends abeBank {
 			$preview->net = 0;
 
 			while($line = fgetcsv($fh)) {
+				$l2len = strlen($line[2]);
 				$tran = new stdClass();
 				// translate the data
 				$tran->extid = null;  // not provided
@@ -23,8 +24,8 @@ class Target extends abeBank {
 				$tran->posted = date('Y-m-d', strtotime($line[1]));
 				$tran->name = self::TitleCase(trim(substr($line[2], 0, 25)));
 				$tran->amount = +$line[3];
-				$tran->city = self::TitleCase(trim(substr($line[2], 25, 13)));
-				$tran->state = substr($line[4], 38, 2);
+				$tran->city = $l2len > 25 ? self::TitleCase(trim(substr($line[2], 25, 13))) : null;
+				$tran->state = $l2len > 38 ? substr($line[2], 38, 2) : null;
 				$tran->zip = null;  // not provided
 				$tran->notes = '';  // not provided
 
