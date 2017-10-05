@@ -29,13 +29,16 @@ svg {
 	}
 }
 .legend rect {
+	shape-rendering: auto;
+}
+.legend > rect {
 	fill: $lightgreyblue;
 }
-.legend text {
+.legcat {
 	cursor: pointer;
 }
-.legend .deselected {
-	text-decoration: line-through;
+.legend .deselected rect {
+	fill-opacity: 0;
 }
 #spendmonthcat {
 	text-align: center;

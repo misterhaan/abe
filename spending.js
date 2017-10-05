@@ -154,25 +154,27 @@ function InitLineGraph() {
 	// legend with selection capabilities
 	var legend = chart.append("g").attr("class", "legend").attr("transform", "translate(3,3)");
 	var legbg = legend.append("rect").attr("rx", 5).attr("ry", 5).attr("opacity", .8);
-	legend.selectAll("g.legcat").data(data).enter()
-		.append("g").attr("class", "legcat").attr("transform", function(c, i) {return "translate(" + pad + "," + (14 * (i + 1)) + ")";})
-			.append("text").text(function(c) {return c.name;}).attr("font-size", "10").attr("fill", function(c) {return color(c.id);}).on("click", function(c) {
-				// toggle whether this category is hidden
-				c.hidden = !c.hidden;
-				$(this).toggleClass("deselected")
-					.find("title").text(c.hidden ? "Include " + c.name : "Remove " + c.name);
-				// update amount scale and redraw lines with it
-				amount.range([viewbox.height, 0]).domain([d3.min(data, function(c) {return c.hidden ? 0 : d3.min(c.values, function(v) {return v.amount;});}), d3.max(data, function(c) {return c.hidden ? 0: d3.max(c.values, function(v) {return v.amount;});})]);
-				amount.range([viewbox.height, Math.max(0, axisheight - amount(0))]);
-				chart.selectAll(".catlines path").data(data).transition().style("opacity", function(c) {return c.hidden ? 0 : 1;}).attr("d", function(c) {return line(c.values);});
-				// redraw axes
-				yaxis.transition().call(d3.axisRight(amount));
-				grid.transition().call(d3.axisLeft(amount).tickSize(right - viewbox.width));
-				grid.selectAll("text").remove();
-				grid.select(".domain").remove();
-				chart.select(".axis.x").transition().attr("transform", "translate(0," + amount(0) + ")");
-			}).append("title").text(function(c) {return "Remove " + c.name;});
-	legbg.attr("width", legend.node().getBBox().width + 2 * pad).attr("height", legend.node().getBBox().height + 2 * pad);
+	var legcats = legend.selectAll("g.legcat").data(data).enter()
+		.append("g").attr("class", "legcat").attr("transform", function(c, i) {return "translate(" + pad + "," + (14 * (i + 1)) + ")";}).on("click", function(c) {
+			// toggle whether this category is hidden
+			c.hidden = !c.hidden;
+			$(this).toggleClass("deselected")
+				.find("title").text(c.hidden ? "Include " + c.name : "Exclude " + c.name);
+			// update amount scale and redraw lines with it
+			amount.range([viewbox.height, 0]).domain([d3.min(data, function(c) {return c.hidden ? 0 : d3.min(c.values, function(v) {return v.amount;});}), d3.max(data, function(c) {return c.hidden ? 0: d3.max(c.values, function(v) {return v.amount;});})]);
+			amount.range([viewbox.height, Math.max(0, axisheight - amount(0))]);
+			chart.selectAll(".catlines path").data(data).transition().style("opacity", function(c) {return c.hidden ? 0 : 1;}).attr("d", function(c) {return line(c.values);});
+			// redraw axes
+			yaxis.transition().call(d3.axisRight(amount));
+			grid.transition().call(d3.axisLeft(amount).tickSize(right - viewbox.width));
+			grid.selectAll("text").remove();
+			grid.select(".domain").remove();
+			chart.select(".axis.x").transition().attr("transform", "translate(0," + amount(0) + ")");
+		});
+	legcats.append("rect").attr("y", -8.5).attr("width", 10).attr("height", 10).attr("rx", 2).attr("ry", 2).attr("stroke", function(c) {return color(c.id);}).attr("fill", function(c) {return color(c.id);});
+	legcats.append("text").text(function(c) {return c.name;}).attr("x", 15).attr("font-size", "10"); //.attr("fill", function(c) {return color(c.id);});
+	legcats.append("title").text(function(c) {return "Exclude " + c.name;});
+	legbg.attr("width", legend.node().getBBox().width + 2 * pad).attr("height", legend.node().getBBox().height + 1.5 * pad);
 }
 
 /**
