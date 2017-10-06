@@ -69,10 +69,10 @@ function MonthCats() {
 	// TODO:  accept $_GET['oldest'] for getting older data
 	$oldest = date('Y') - 1 . '-' . date('m') . '-00';
 	$amts = <<<AMTS
-		select a.displaymonth, concat(a.sortmonth, '-01') as monthstart, last_day(concat(a.sortmonth, '-01')) as monthend, sum(a.amount) as amount, c.id as catid, coalesce(c.name, '(uncategorized)') as catname, p.id as parentid, p.name as parentname
-		from (select date_format(posted, '%b %Y') as displaymonth, date_format(posted, '%Y-%m') as sortmonth, sum(amount) as amount, category
+		select min(a.displaymonth) as displaymonth, concat(a.sortmonth, '-01') as monthstart, last_day(concat(a.sortmonth, '-01')) as monthend, sum(a.amount) as amount, c.id as catid, coalesce(c.name, '(uncategorized)') as catname, p.id as parentid, p.name as parentname
+		from (select min(date_format(posted, '%b %Y')) as displaymonth, min(date_format(posted, '%Y-%m')) as sortmonth, sum(amount) as amount, category
 			from transactions where splitcat=0 and posted>'$oldest' group by year(posted), month(posted), category
-		union select date_format(t.posted, '%b %Y') as displaymonth, date_format(t.posted, '%Y-%m') as sortmonth, sum(s.amount) as amount, s.category
+		union select min(date_format(t.posted, '%b %Y')) as displaymonth, min(date_format(t.posted, '%Y-%m')) as sortmonth, sum(s.amount) as amount, s.category
 			from splitcats as s left join transactions as t on t.id=s.transaction where t.posted>'$oldest' group by year(t.posted), month(t.posted), category) as a
 		left join categories as c on c.id=a.category
 		left join categories as p on p.id=c.parent
