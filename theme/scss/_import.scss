@@ -34,4 +34,9 @@
 		@extend %flex-container;
 		margin-bottom: .25em;
 	}
+	.dismiss:before {
+		@extend %fa-label;
+		content: "\f00d";
+		margin-left: 1em;
+	}
 }

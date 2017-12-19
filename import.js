@@ -48,12 +48,11 @@ function ImportModel() {
 	 * contains.
 	 */
 	self.Preview = function() {
-		$("#importtrans button").prop("disabled", true).addClass("waiting");
+		$("#importtrans label:last-child .label").prop("disabled", true).addClass("waiting");
 		var acctid = $("select").val();
 		var acctname = $("select option[value='" + acctid + "']").text();
-		//var acctname = self.accountlist()[
 		$.post({url: "?ajax=preview", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
-			$("#importtrans button").prop("disabled", false).removeClass("waiting");
+			$("#importtrans label:last-child .label").prop("disabled", false).removeClass("waiting");
 			if(result.fail)
 				alert(result.message);
 			else {
@@ -62,8 +61,10 @@ function ImportModel() {
 				result.preview.saved = ko.observable(false);
 				result.preview.working = ko.observable(false);
 				self.previews.unshift(result.preview);
+				$(window).scrollTop($(".transactions.preview").first().offset().top);
 			}
 		}, dataType: "json"});
+		$("input[type='file']").val("");
 	};
 
 	/**
@@ -79,6 +80,14 @@ function ImportModel() {
 				preview.saved(true);
 			preview.working(false);
 		}, "json");
+	};
+
+	/**
+	 * Remove previewed transactions from the page.
+	 * @param object Preview data from self.previews().
+	 */
+	self.Done = function(preview) {
+		self.previews.remove(preview);
 	};
 }
 

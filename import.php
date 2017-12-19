@@ -17,7 +17,7 @@ $html->Open('Import Transactions');
 // TODO:  when doing preview, check if transactions already exist
 ?>
 			<h1>Import Transactions</h1>
-			<form id=importtrans data-bind="submit: Preview">
+			<form id=importtrans>
 				<label>
 					<span class=label>Account:</span>
 					<span class=field><select name=acctid data-bind="value: account, options: accountlist, optionsText: 'name', optionsValue: 'id'"></select></span>
@@ -32,9 +32,8 @@ $html->Open('Import Transactions');
 				</label>
 				<label>
 					<span class=label>Transactions:</span>
-					<span class=field><input name=transfile type=file></span>
+					<span class=field><input name=transfile type=file data-bind="event: {change: Preview}"></span>
 				</label>
-				<button>Preview</button>
 
 				<!-- ko foreach: previews -->
 				<section class="transactions preview">
@@ -44,6 +43,7 @@ $html->Open('Import Transactions');
 						<span class=amount data-bind="text: net.toFixed(2) + ' net'"></span>
 						<span class=status data-bind="visible: saved">Imported</span>
 						<button data-bind="visible: !saved(), click: $root.Save, css: {working: working()}, enable: !working()">Save</button>
+						<a class=dismiss href="#done" data-bind="click: $root.Done" title="Remove this preview">Dismiss</a>
 					</header>
 					<ul data-bind="foreach: transactions">
 						<li class=transaction>
@@ -70,12 +70,14 @@ $html->Close();
  */
 function Preview() {
 	global $ajax;
-	// TODO:  make sure there's a file
-	if(isset($_POST['acctid']) && $_POST['acctid'] += 0) {
-		if($bankclass = LookupBank($_POST['acctid']))
-			if($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name']))
-				$ajax->Data->preview = $preview;
-	} else
+	if(isset($_POST['acctid']) && $_POST['acctid'] += 0)
+		if(file_exists($_FILES['transfile']['tmp_name']) && is_uploaded_file($_FILES['transfile']['tmp_name'])) {
+			if($bankclass = LookupBank($_POST['acctid']))
+				if($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name']))
+					$ajax->Data->preview = $preview;
+		} else
+			$ajax->Fail('Transaction file not provided.');
+	else
 		$ajax->Fail('Account not specified.');
 	unlink($_FILES['transfile']['tmp_name']);
 }
