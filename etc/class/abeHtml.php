@@ -22,6 +22,11 @@ class abeHtml {
 	private $isclosed = false;
 
 	/**
+	 * Page name for bookmarking, or false if not bookmarkable.
+	 * @var string|bool $bookmarkPage
+	 */
+	private $bookmarkPage = false;
+	/**
 	 * Action links to put in the header.
 	 * @var array
 	 */
@@ -31,7 +36,23 @@ class abeHtml {
 	 * Creates a new abeHtml object.
 	 */
 	public function abeHtml() {
-		$this->back = INSTALL_PATH . '/';
+	}
+
+	/**
+	 * Enables bookmarks for this page.  Adds an action, so control its position
+	 * by ordering this call with any AddAction() calls.
+	 * @param string $tooltip Tooltip value for add bookmark action link
+	 * @param string $page Page being bookmarked such as transactions or spending.  Skip to find from SCRIPT_NAME.
+	 */
+	public function EnableBookmark($tooltip, $page = false) {
+		if(!$page)
+			$page = $_SERVER['SCRIPT_NAME'];
+		$page = explode('/', $page);
+		$page = $page[count($page) - 1];
+		if(substr($page, -4) == '.php')
+			$page = substr($page, 0, -4);
+		$this->bookmarkPage = $page;
+		$this->AddAction('#addBookmark', 'bookmark', 'Bookmark', $tooltip);
 	}
 
 	/**
@@ -125,6 +146,29 @@ class abeHtml {
 	}
 
 	/**
+	 * Write out the form for adding a bookmark.
+	 */
+	public function FormAddBookmark() {
+		if($this->bookmarkPage) {
+?>
+			<div id=newBookmark>
+				<label>
+					<span>Title:</span>
+					<input id=bookmarkName required maxlength=60>
+				</label>
+				<label>
+					<span>Page:</span>
+					<input id=bookmarkUrl readonly data-page=<?=$this->bookmarkPage; ?> data-spec="" value="<?=$this->bookmarkPage; ?>.php">
+				</label>
+				<div class=calltoaction>
+					<button id=saveBookmark>Save</button><a href="#cancelBookmark" title="Go back to the transactions list">Cancel</a>
+				</div>
+			</div>
+<?php
+		}
+	}
+
+	/**
 	 * Ends the HTML and writes out the footer.  This should be called after all
 	 * other HTML output from the script.
 	 */
@@ -135,7 +179,7 @@ class abeHtml {
 ?>
 		</main>
 		<footer>
-			<div id=copyright>© 2017 <?php echo self::SITE_NAME_FULL; ?></div>
+			<div id=copyright>© 2017 - 2018 <?php echo self::SITE_NAME_FULL; ?></div>
 		</footer>
 	</body>
 </html>

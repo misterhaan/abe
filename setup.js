@@ -2,6 +2,7 @@ $(function() {
 	$("#dbsetup").submit(SaveDbSettings);
 	$("#dbcreate").submit(CreateDb);
 	$("a[href$='?ajax=installdb']").click(InstallDb);
+	$("a[href$='?ajax=upgradedb']").click(UpgradeDb);
 });
 
 /**
@@ -42,6 +43,23 @@ function CreateDb() {
  * Install the database.
  */
 function InstallDb() {
+	var link = this;
+	$(link).addClass("working");
+	$.post(link.href, {}, function(result) {
+		if(!result.fail)
+			window.location.reload(true);
+		else {
+			$(link).removeClass("working");
+			alert(result.message);
+		}
+	}, "json");
+	return false;
+}
+
+/**
+ * Upgrade the database.
+ */
+function UpgradeDb() {
 	var link = this;
 	$(link).addClass("working");
 	$.post(link.href, {}, function(result) {

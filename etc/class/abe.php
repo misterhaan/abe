@@ -61,6 +61,9 @@ function __autoload($class) {
 		case 'abeAjax':
 			require_once 'abeAjax.php';
 			break;
+		case 'abeApi':
+			require_once 'abeApi.php';
+			break;
 		case 'abeBank':
 			require_once 'abeBank.php';
 			break;

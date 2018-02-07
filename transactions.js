@@ -6,6 +6,7 @@ var hideSuggestDelay = 250;
 
 $(function() {
 	ko.applyBindings(TransactionsModel, $("#transactions")[0]);
+	SetBookmarkSpec(window.location.hash);
 	$("a[href='#showFilters']").click(function(e) {
 		TransactionsModel.showFilters(true);
 		return false;
@@ -890,8 +891,10 @@ var TransactionsModel = new function() {
 		if(self.searchName())
 			info.push("search=" + self.searchName());
 		info = info.length ? "#!" + info.join("/") : "";
-		if(info != window.location.hash)
+		if(info != window.location.hash) {
 			window.location.hash = info;
+			SetBookmarkSpec(info);
+		}
 	};
 
 	/**

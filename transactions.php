@@ -16,11 +16,15 @@ if(isset($_GET['ajax'])) {
 }
 
 $html = new abeHtml();
+$html->EnableBookmark('Bookmark these transactions on the main menu');
 $html->AddAction('#showFilters', 'filter', 'Filter', 'Filter transactions');
 $html->AddAction('import.php', 'import', 'Import', 'Import transactions');
 $html->Open('Transactions');
 ?>
 			<h1>Transactions</h1>
+<?php
+$html->FormAddBookmark();
+?>
 			<div id=transactions class=transactions>
 				<div id=filters data-bind="visible: showFilters">
 					<label title="Show transactions from these accounts">

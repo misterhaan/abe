@@ -1,4 +1,71 @@
-// styles for the Collect Your Assets main menu (/index.php)
+// styles for the Abe Personal Finance main menu (/index.php)
+
+#bookmarks {
+	margin: 1em .5em .5em;
+	text-align: center;
+	& > div {
+		display: inline-block;
+		text-align: left;
+		background-color: $lightgreyblue;
+		box-shadow: 2px 2px 1px $darkgrey;
+		border-radius: $gentlecorner;
+	}
+	header {
+		background-color: $darkgrey;
+		color: #fff;
+		padding: .0625em .5em .125em;
+		border-radius: $gentlecorner $gentlecorner 0 0;
+		&:before {
+			@extend %fontawesome;
+			display: inline-block;
+			padding-right: .5em;
+			font-size: .9em;
+			content: "\f02e";
+		}
+	}
+	div.bookmark {
+		@extend %flex-container;
+		padding: .25em .5em;
+	}
+	a {
+		@extend %flex-item-fixed;
+		text-decoration: none;
+		&:before {
+			@extend %fontawesome;
+			display: inline-block;
+			padding-left: .5em;
+			font-size: .9em;
+			color: $darkgrey;
+		}
+		&:hover:before {
+			color: #000;
+		}
+		&.transactions:before {
+			content: "\f0ae";
+		}
+		&:first-child {
+			@extend %flex-item-grow;
+			padding-right: .5em;
+		}
+		&:first-child:before {
+			padding-left: 0;
+			padding-right: .5em;
+			color: $green;
+		}
+		&.up:before {
+			content: "\f0d8";
+		}
+		&.down:before {
+			content: "\f0d7";
+		}
+		&.delete:before {
+			content: "\f014";
+		}
+		&.delete:hover:before {
+			color: $red;
+		}
+	}
+}
 
 #mainmenu {
 	text-align: center;

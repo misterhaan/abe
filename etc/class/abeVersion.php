@@ -14,12 +14,32 @@ class abeVersion {
 	 * the setup script in upgrade mode.
 	 * @var integer
 	 */
-	const Structure = 1;
+	const Structure = abeStructureVersion::Bookmarks;
 	/**
 	 * Database data (rows) version.  Changing this triggers the setup script in
 	 * update mode.
 	 * @var integer
 	 */
-	const Data = 1;
+	const Data = abeDataVersion::Initial;
 }
-?>
+
+/**
+ * List of structure versions for Abe Personal Finance.  New versions should be
+ * added at the top and use the next integer value.  Be sure to update
+ * InstallDatabase() and UpgradeDatabaseStructure() in setup.php.
+ * @author misterhaan
+ */
+class abeStructureVersion {
+	const Bookmarks = 2;
+	const Initial = 1;
+}
+
+/**
+ * List of data versions for Abe Personal Finance.  New versions should be
+ * added at the top and use the next integer value.  Be sure to update
+ * InstallDatabase() and UpgradeDatabaseData() in setup.php.
+ * @author misterhaan
+ */
+class abeDataVersion {
+	const Initial = 1;
+}

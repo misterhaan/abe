@@ -170,25 +170,19 @@ function InstallDatabase() {
 	$ajax->Data->tableErrors = [];
 	$tabledir = __DIR__ . '/etc/db/tables/';
 	// alphabetical except config comes last and tables with foreign keys must come after the tables they reference
-	$tables = ['account_types', 'banks', 'accounts', 'categories', 'transactions', 'splitcats', 'config'];
-	foreach($tables as $table) {
-		$sql = trim(file_get_contents($tabledir . $table . '.sql'));
-		if(substr($sql, -1) == ';')
-			$sql = substr($sql, 0, -1);
-		if(!$db->real_query($sql))
+	$tables = ['account_types', 'banks', 'bookmarks', 'accounts', 'categories', 'transactions', 'splitcats', 'config'];
+	foreach($tables as $table)
+		if(!RunQueryFile($tabledir . $table . ‘.sql’))
 			$ajax->Data->tableErrors[] = ['table' => $table, 'errno' => $db->errno, 'error' => $db->error];
-	}
 	if(count($ajax->Data->tableErrors))
 		$ajax->Fail('Error creating ' . count($ajax->Data->tableErrors) . ' of ' . count($tables) . ' tables.');
 	else {
 		$ajax->Data->routineErrors = [];
 		$routinedir = __DIR__ . '/etc/db/routines/';
 		$routines = ['GetCategoryID', 'GetTransactions'];
-		foreach($routines as $routine) {
-			$sql = trim(file_get_contents($routinedir . $routine . '.sql'));
-			if(!$db->real_query($sql))
+		foreach($routines as $routine)
+			if(!RunQueryFile($routinedir . $routine . ‘.sql’))
 				$ajax->Data->routineErrors[] = ['routine' => $routine, 'errno' => $db->errno, 'error' => $db->error];
-		}
 		if(count($ajax->Data->routineErrors))
 			$ajax->Fail('Error creating ' . count($ajax->Data->routineErrors) . ' of ' . count($routines) . ' routines.');
 		elseif($db->real_query('insert into config (structureVersion) values (' . +abeVersion::Structure . ')')) {
@@ -266,9 +260,49 @@ function DatabaseUpgradeForm() {
  * Upgrade the database.
  */
 function UpgradeDatabase() {
+	global $config;
+	if($config->structureVersion < abeVersion::Structure)
+		if(!UpgradeDatabaseStructure())
+			return;
+	if($config->dataVersion < abeVersion::Data)
+		UpgradeDatabaseData();
+}
+
+/**
+ * Upgrade database structure and update the structure version.
+ * @return boolean True if successful
+ */
+function UpgradeDatabaseStructure() {
 	global $ajax, $db, $config;
-	// TODO:  add upgrade code once there have been structure or data changes after a release.
-	$ajax->Fail('Not implemented.');
+	if($config->structureVersion < abeStructureVersion::Bookmarks)
+		if(!RunQueryFile(__DIR__ . '/etc/db/tables/bookmarks.sql') && SetStructureVersion(abeStructureVersion::Bookmarks)) {
+			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Bookmarks . ':  ' . $db->errno . ' ' . $db->error);
+			return false;
+		}
+	// add future structure upgrades here
+	return true;
+}
+
+/**
+ * Upgrade database data and update the data version.
+ */
+function UpgradeDatabaseData() {
+	// add future data upgrades here
+}
+
+/**
+ * Sets the structure version to the provided value.  Use this after making
+ * database structure upgrades.
+ * @param integer $ver Structure version to set (use a constant from abeStructureVersion)
+ * @return bool True if successful
+ */
+function SetStructureVersion($ver) {
+	global $ajax, $config, $db;
+	if($db->real_query('update config set structureVersion=' . +$ver . ' limit 1')) {
+		$config->structureVersion = +$ver;
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -298,4 +332,17 @@ function AllGoodMessage() {
 			<nav class=calltoaction><a href="<?php echo INSTALL_PATH; ?>/">To the Main Menu!</a></nav>
 <?php
 	}
+}
+
+/**
+ * Load a query from a file and run it.
+ * @param string $filepath Full path to the file that contains the query to run
+ * @return bool True if successful
+ */
+function RunQueryFile($filepath) {
+	global $db;
+	$sql = trim(file_get_contents($filepath));
+	if(substr($sql, -1) == ';')
+		$sql = substr($sql, 0, -1);
+	return $db->real_query($sql);
 }
