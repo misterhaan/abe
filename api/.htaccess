@@ -1,3 +1,4 @@
+AcceptPathInfo Default
 RewriteEngine On
 RewriteOptions inherit
 

@@ -2,8 +2,13 @@
 // include and require should find files in this directory and its banks subdirectory
 set_include_path(__DIR__ . ':' . __DIR__ . '/banks');
 
+// CONTEXT_DOCUMENT_ROOT is set when an alias or similar is used, which makes
+// DOCUMENT_ROOT incorrect for this purpose.  assume the presence of an alias
+// means we're one level deep.
+define('DOCROOT', isset($_SERVER['CONTEXT_DOCUMENT_ROOT']) ? dirname($_SERVER['CONTEXT_DOCUMENT_ROOT']) : $_SERVER['DOCUMENT_ROOT']);
+
 // find the application path on the webserver for absolute URLs
-$install_path = dirname(dirname(substr(__DIR__, strlen($_SERVER['DOCUMENT_ROOT']))));
+$install_path = dirname(dirname(substr(__DIR__, strlen(DOCROOT))));
 if($install_path == '/')
 	$install_path = '';
 define('INSTALL_PATH', $install_path);
@@ -14,7 +19,7 @@ ini_set('default_charset', 'UTF-8');
 mb_internal_encoding('UTF-8');
 
 // connect to the database and read the configuration, or redirect to the setup script
-if(@include_once dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php') {
+if(@include_once dirname(DOCROOT) . '/.abeKeys.php') {
 	$db = @new mysqli(abeKeysDB::HOST, abeKeysDB::USER, abeKeysDB::PASS, abeKeysDB::NAME);
 	if(!$db->connect_errno) {
 		$db->real_query('set names \'utf8mb4\'');

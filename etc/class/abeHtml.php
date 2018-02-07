@@ -124,7 +124,7 @@ class abeHtml {
 		<header>
 			<span class=back>
 <?php
-		if($_SERVER['PHP_SELF'] != INSTALL_PATH . '/index.php') {
+		if($_SERVER['SCRIPT_NAME'] != INSTALL_PATH . '/index.php') {
 ?>
 				<a href="<?php echo INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
 <?php

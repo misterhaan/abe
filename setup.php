@@ -19,7 +19,7 @@ $html->Open('Setup');
 			<h1><?php echo abeHtml::SITE_NAME_FULL; ?> Setup</h1>
 <?php
 // figure out which step we need to do next
-if(!file_exists(dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php'))
+if(!file_exists(dirname(DOCROOT) . '/.abeKeys.php'))
 	DatabaseForm();
 elseif(!$db || $db->connect_errno)
 	DatabaseCreateForm();
@@ -88,7 +88,7 @@ function CreateDatabaseKeys() {
 	if(count($ajax->Data->fieldIssues))
 		$ajax->Fail(count($ajax->Data->fieldIssues) . ' fields have problems');
 	else
-		if($fh = fopen(dirname($_SERVER['DOCUMENT_ROOT']) . '/.abeKeys.php', 'w')) {
+		if($fh = fopen(dirname(DOCROOT) . '/.abeKeys.php', 'w')) {
 			fwrite($fh, '<?php
 class abeKeysDB {
 	const HOST = \'' . addslashes($_POST['host']) . '\';
