@@ -5,7 +5,7 @@ set_include_path(__DIR__ . ':' . __DIR__ . '/banks');
 // CONTEXT_DOCUMENT_ROOT is set when an alias or similar is used, which makes
 // DOCUMENT_ROOT incorrect for this purpose.  assume the presence of an alias
 // means we're one level deep.
-define('DOCROOT', isset($_SERVER['CONTEXT_DOCUMENT_ROOT']) ? dirname($_SERVER['CONTEXT_DOCUMENT_ROOT']) : $_SERVER['DOCUMENT_ROOT']);
+define('DOCROOT', isset($_SERVER['CONTEXT_PREFIX']) && isset($_SERVER['CONTEXT_DOCUMENT_ROOT']) && $_SERVER['CONTEXT_PREFIX'] ? dirname($_SERVER['CONTEXT_DOCUMENT_ROOT']) : $_SERVER['DOCUMENT_ROOT']);
 
 // find the application path on the webserver for absolute URLs
 $install_path = dirname(dirname(substr(__DIR__, strlen(DOCROOT))));
