@@ -8,7 +8,7 @@ $(function() {
 	ko.applyBindings(TransactionsModel, $("#transactions")[0]);
 	SetBookmarkSpec(window.location.hash);
 	$("a[href='#showFilters']").click(function(e) {
-		TransactionsModel.showFilters(true);
+		TransactionsModel.showFilters(!TransactionsModel.showFilters());
 		return false;
 	});
 });

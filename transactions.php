@@ -26,7 +26,7 @@ $html->Open('Transactions');
 $html->FormAddBookmark();
 ?>
 			<div id=transactions class=transactions>
-				<div id=filters data-bind="visible: showFilters">
+				<div id=filters data-bind="slideVisible: showFilters">
 					<label title="Show transactions from these accounts">
 						Accounts:
 						<!-- ko ifnot: filterAccounts().length -->

@@ -1,6 +1,11 @@
 $(function() {
+	$("#toggleMenuPane").click(function() {
+		$("#menuPane").slideToggle();
+		return false;
+	});
 	$("a[href='#addBookmark']").click(function() {
-		$("#newBookmark").toggle();
+		$("#newBookmark").slideToggle();
+		$("#bookmarkName:visible").focus();
 		return false;
 	});
 	$("a[href='#cancelBookmark']").click(function() {
@@ -25,9 +30,8 @@ function SaveBookmark() {
 				$("#newBookmark").hide();
 			$("#saveBookmark").prop("disabled", false).removeClass("working");
 		}, "json");
-	} else {
+	} else
 		alert("Title is required.");
-	}
 	return false;
 }
 
@@ -61,3 +65,11 @@ function ParseHash() {
 	}
 	return info;
 }
+
+ko.bindingHandlers.slideVisible = {
+	init: function(element, valueAccessor) {
+	},
+	update: function(element, valueAccessor) {
+		ko.unwrap(valueAccessor()) ? $(element).slideDown() : $(element).slideUp();
+	}
+};

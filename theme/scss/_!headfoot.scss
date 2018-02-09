@@ -65,6 +65,18 @@ h1 {
 	line-height: 1.55em;
 }
 
+#menuPane {
+	display: none;
+	border-bottom: 2px solid $green;
+	@media (min-width: 35em) {
+		position: absolute;
+		width: 18em;
+		background-color: $medgreyblue;
+		border-right: 2px solid $green;
+		border-radius: 0 0 $gentlecorner 0;
+	}
+}
+
 #newBookmark {
 	display: none;
 	position: absolute;

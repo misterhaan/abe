@@ -124,9 +124,9 @@ class abeHtml {
 		<header>
 			<span class=back>
 <?php
-		if($_SERVER['SCRIPT_NAME'] != INSTALL_PATH . '/index.php') {
+		if($needsMenu = $_SERVER['SCRIPT_NAME'] != INSTALL_PATH . '/index.php') {
 ?>
-				<a href="<?php echo INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
+				<a id=toggleMenuPane href="<?php echo INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
 <?php
 		}
 ?>
@@ -141,7 +141,66 @@ class abeHtml {
 ?>
 			</span>
 		</header>
+<?php
+		if($needsMenu) {
+?>
+		<div id=menuPane>
+<?php
+			$this->MainMenu();
+?>
+		</div>
+<?php
+		}
+?>
 		<main role=main>
+<?php
+	}
+
+	/**
+	 * Write out the main menu.
+	 */
+	public function MainMenu() {
+		global $db;
+		$bookmarks = 'select id, page, concat(page, \'.php\', spec) as url, name from bookmarks order by sort';
+		if($bookmarks = $db->query($bookmarks))
+			if($bmcount = $bookmarks->num_rows) {
+?>
+			<nav id=bookmarks>
+				<div>
+					<header>Bookmarks</header>
+<?php
+				for($b = 0; $bookmark = $bookmarks->fetch_object(); $b++) {
+?>
+					<div class=bookmark data-id=<?=$bookmark->id; ?>>
+						<a class=<?=htmlspecialchars($bookmark->page); ?> href="<?=htmlspecialchars($bookmark->url); ?>"><?=htmlspecialchars($bookmark->name); ?></a>
+<?php
+					if($bmcount > 1 && $b + 1 < $bmcount) {
+?>
+						<a class=down href="api/bookmark/moveDown" title="Move this bookmark down"></a>
+<?php
+					}
+					if($bmcount > 1 && $b) {
+?>
+						<a class=up href="api/bookmark/moveUp" title="Move this bookmark up"></a>
+<?php
+					}
+?>
+						<a class=delete href="api/bookmark/delete" title="Delete this bookmark"></a>
+					</div>
+<?php
+				}
+?>
+				</div>
+			</nav>
+<?php
+			}
+?>
+			<nav id=mainmenu>
+				<a href=transactions.php>Transactions</a>
+				<a href=spending.php>Spending</a>
+				<a href=import.php>Import</a>
+				<a href=categories.php>Settings</a>
+			</nav>
 <?php
 	}
 
