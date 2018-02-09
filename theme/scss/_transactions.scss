@@ -198,6 +198,7 @@
 		border-radius: 0 0 $gentlecorner $gentlecorner;
 	}
 	#filters {
+		display: none;
 		position: absolute;
 		width: 14.25em;
 		z-index: 1;

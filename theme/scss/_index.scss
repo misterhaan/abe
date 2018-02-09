@@ -86,16 +86,16 @@
 			font-size: 2em;
 			padding: .25em 0;
 		}
-		&[href='import.php']:before {
+		&[href$='import.php']:before {
 			content: "\f093";
 		}
-		&[href='categories.php']:before {
+		&[href$='categories.php']:before {
 			content: "\f085";
 		}
-		&[href='spending.php']:before {
+		&[href$='spending.php']:before {
 			content: "\f200";
 		}
-		&[href='transactions.php']:before {
+		&[href$='transactions.php']:before {
 			content: "\f0ae";
 		}
 	}

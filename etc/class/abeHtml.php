@@ -126,7 +126,7 @@ class abeHtml {
 <?php
 		if($needsMenu = $_SERVER['SCRIPT_NAME'] != INSTALL_PATH . '/index.php') {
 ?>
-				<a id=toggleMenuPane href="<?php echo INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
+				<a id=toggleMenuPane href="<?=INSTALL_PATH; ?>/" title="Go to main menu"><span>home</span></a>
 <?php
 		}
 ?>
@@ -172,20 +172,20 @@ class abeHtml {
 				for($b = 0; $bookmark = $bookmarks->fetch_object(); $b++) {
 ?>
 					<div class=bookmark data-id=<?=$bookmark->id; ?>>
-						<a class=<?=htmlspecialchars($bookmark->page); ?> href="<?=htmlspecialchars($bookmark->url); ?>"><?=htmlspecialchars($bookmark->name); ?></a>
+						<a class=<?=htmlspecialchars($bookmark->page); ?> href="<?=INSTALL_PATH . '/' . htmlspecialchars($bookmark->url); ?>"><?=htmlspecialchars($bookmark->name); ?></a>
 <?php
 					if($bmcount > 1 && $b + 1 < $bmcount) {
 ?>
-						<a class=down href="api/bookmark/moveDown" title="Move this bookmark down"></a>
+						<a class=down href="<?=INSTALL_PATH; ?>/api/bookmark/moveDown" title="Move this bookmark down"></a>
 <?php
 					}
 					if($bmcount > 1 && $b) {
 ?>
-						<a class=up href="api/bookmark/moveUp" title="Move this bookmark up"></a>
+						<a class=up href="<?=INSTALL_PATH; ?>/api/bookmark/moveUp" title="Move this bookmark up"></a>
 <?php
 					}
 ?>
-						<a class=delete href="api/bookmark/delete" title="Delete this bookmark"></a>
+						<a class=delete href="<?=INSTALL_PATH; ?>/api/bookmark/delete" title="Delete this bookmark"></a>
 					</div>
 <?php
 				}
@@ -196,10 +196,10 @@ class abeHtml {
 			}
 ?>
 			<nav id=mainmenu>
-				<a href=transactions.php>Transactions</a>
-				<a href=spending.php>Spending</a>
-				<a href=import.php>Import</a>
-				<a href=categories.php>Settings</a>
+				<a href="<?=INSTALL_PATH; ?>/transactions.php">Transactions</a>
+				<a href="<?=INSTALL_PATH; ?>/spending.php">Spending</a>
+				<a href="<?=INSTALL_PATH; ?>/import.php">Import</a>
+				<a href="<?=INSTALL_PATH; ?>/categories.php">Settings</a>
 			</nav>
 <?php
 	}
