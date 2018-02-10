@@ -15,7 +15,8 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 1em;
 }
 h2,
-p {
+p,
+dl {
 	margin: 1em .5em;
 }
 *[draggable] {
@@ -147,6 +148,7 @@ button.add:before {
 		&.accounts:before,
 		&.categories:before {
 			color: $medgreyblue;
+			font-weight: normal;
 		}
 	}
 }
@@ -159,3 +161,4 @@ button.add:before {
 @import "import";
 @import "spending";
 @import "transactions";
+@import "api";

@@ -36,7 +36,7 @@ class BookmarkApi extends abeApi {
 			<p>Remove a bookmark.  All parameters are required.</p>
 			<dl class=parameters>
 				<dt>id</dt>
-				<dd> ID of the bookmark to remove.</dd>
+				<dd>ID of the bookmark to remove.</dd>
 			</dl>
 
 			<h2 id=POSTmoveDown>POST moveDown</h2>
@@ -46,7 +46,7 @@ class BookmarkApi extends abeApi {
 			</p>
 			<dl class=parameters>
 				<dt>id</dt>
-				<dd> ID of the bookmark to move down.</dd>
+				<dd>ID of the bookmark to move down.</dd>
 			</dl>
 
 			<h2 id=POSTmoveDown>POST moveUp</h2>
@@ -56,7 +56,7 @@ class BookmarkApi extends abeApi {
 			</p>
 			<dl class=parameters>
 				<dt>id</dt>
-				<dd> ID of the bookmark to move up.</dd>
+				<dd>ID of the bookmark to move up.</dd>
 			</dl>
 <?php
 	}

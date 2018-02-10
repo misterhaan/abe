@@ -51,7 +51,7 @@ function ImportModel() {
 		$("#importtrans label:last-child .label").prop("disabled", true).addClass("waiting");
 		var acctid = $("select").val();
 		var acctname = $("select option[value='" + acctid + "']").text();
-		$.post({url: "?ajax=preview", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
+		$.post({url: "api/transactions/parseFile", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
 			$("#importtrans label:last-child .label").prop("disabled", false).removeClass("waiting");
 			if(result.fail)
 				alert(result.message);
@@ -73,7 +73,7 @@ function ImportModel() {
 	 */
 	self.Save = function(preview) {
 		preview.working(true);
-		$.post("?ajax=save", {acctid: preview.acctid, transactions: preview.transactions, net: preview.net}, function(result) {
+		$.post("api/transactions/import", {acctid: preview.acctid, transactions: preview.transactions, net: preview.net}, function(result) {
 			if(result.fail)
 				alert(result.message);
 			else

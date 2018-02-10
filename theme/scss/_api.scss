@@ -1,0 +1,19 @@
+// Styles for Abe Personal Finance API documentation
+
+@font-face {
+	font-family: 'roboto mono';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('Roboto-Mono-Regular.woff');
+}
+
+h2.api,
+h2[id^='POST'],
+h2[id^='GET'],
+code,
+.parameters dt {
+	font-family: 'roboto mono';
+}
+dd {
+	margin-left: 1em;
+}

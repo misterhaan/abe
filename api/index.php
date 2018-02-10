@@ -5,7 +5,13 @@ $html->Open('API');
 ?>
 			<h1>Abe Personal Finance API</h1>
 
-			<h2><a href=bookmark>bookmark</a></h2>
+			<h2 class=api><a href=bookmark>bookmark</a></h2>
 			<p>The bookmark API manages bookmarks that appear with the main menu.</p>
+
+			<h2 class=api><a href=transactions>transactions</a></h2>
+			<p>
+				The transactions API manages transactions, including importing
+				transaction files.
+			</p>
 <?php
 $html->Close();
