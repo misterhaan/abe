@@ -179,7 +179,7 @@ function InstallDatabase() {
 	else {
 		$ajax->Data->routineErrors = [];
 		$routinedir = __DIR__ . '/etc/db/routines/';
-		$routines = ['GetCategoryID', 'GetTransactions'];
+		$routines = ['GetCategoryID', 'GetTransactions', 'IsDuplicateTransaction'];
 		foreach($routines as $routine)
 			if(!RunQueryFile($routinedir . $routine . ‘.sql’))
 				$ajax->Data->routineErrors[] = ['routine' => $routine, 'errno' => $db->errno, 'error' => $db->error];
@@ -275,8 +275,13 @@ function UpgradeDatabase() {
 function UpgradeDatabaseStructure() {
 	global $ajax, $db, $config;
 	if($config->structureVersion < abeStructureVersion::Bookmarks)
-		if(!RunQueryFile(__DIR__ . '/etc/db/tables/bookmarks.sql') && SetStructureVersion(abeStructureVersion::Bookmarks)) {
+		if(!(RunQueryFile(__DIR__ . '/etc/db/tables/bookmarks.sql') && SetStructureVersion(abeStructureVersion::Bookmarks))) {
 			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Bookmarks . ':  ' . $db->errno . ' ' . $db->error);
+			return false;
+		}
+	if($config->strucureVersion < abeStructureVersion::Duplicates)
+		if(!(RunQueryFile(__DIR__ . '/etc/db/routines/IsDuplicateTransaction.sql') && SetStructureVersion(abeStructureVersion::Duplicates))) {
+			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Duplicates . ':  ' . $db->errno . ' ' . $db->error);
 			return false;
 		}
 	// add future structure upgrades here

@@ -3,7 +3,6 @@ require_once __DIR__ . '/etc/class/abe.php';
 
 $html = new abeHtml();
 $html->Open('Import Transactions');
-// TODO:  when doing preview, check if transactions already exist
 ?>
 			<h1>Import Transactions</h1>
 			<form id=importtrans>
@@ -26,9 +25,10 @@ $html->Open('Import Transactions');
 
 				<!-- ko foreach: previews -->
 				<section class="transactions preview">
+					<h2 data-bind="text: name + ' → ' + acctname"></h2>
 					<header>
-						<h2 data-bind="text: name + ' → ' + acctname"></h2>
 						<span class=count data-bind="text: transactions.length + ' transactions'"></span>
+						<span class=duplicates data-bind="text: (dupeCount * 100 / transactions.length) + '% duplicates'"></span>
 						<span class=amount data-bind="text: net.toFixed(2) + ' net'"></span>
 						<span class=status data-bind="visible: saved">Imported</span>
 						<button data-bind="visible: !saved(), click: $root.Save, css: {working: working()}, enable: !working()">Save</button>
@@ -38,7 +38,7 @@ $html->Open('Import Transactions');
 						<li class=transaction>
 							<div class=quick>
 								<div class=name data-bind="text: name"></div>
-								<div class=amount data-bind="text: amount.toFixed(2)"></div>
+								<div class=amount data-bind="text: amount.toFixed(2), css: {duplicate: duplicate}, attr: {title: duplicate ? 'Abe already has this transaction' : null}"></div>
 							</div>
 							<div class=detail>
 								<div class="transdate" data-bind="visible: transdate">Transaction <time data-bind="text: transdate"></time></div>

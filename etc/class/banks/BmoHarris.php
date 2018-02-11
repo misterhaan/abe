@@ -7,72 +7,76 @@ class BmoHarris extends abeBank {
 	/**
 	 * Parse transactions from an OFX file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the OFX file on the server.
+	 * @param int $acctid Account ID for duplicate checking.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseOfxTransactions($filename) {
+	public static function ParseOfxTransactions($filename, $acctid) {
+		global $db;
 		if(false !== $fh = fopen($filename, 'r')) {
 			$preview = new stdClass();
 			$preview->transactions = [];
 			$preview->net = 0;
+			$preview->dupeCount = 0;
 
-			$intrans = false;
-			while(false !== $line = fgets($fh)) {
-				$line = trim($line);
-				if($intrans) {
-					if($line == '</STMTTRN>') {
-						$intrans = false;
-						if($checknum)
-							$tran->name .= ' ' . $checknum;
+			if($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
+				if($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
+					$intrans = false;
+					while(false !== $line = fgets($fh)) {
+						$line = trim($line);
+						if($intrans) {
+							if($line == '</STMTTRN>') {
+								$intrans = false;
+								if($checknum)
+									$tran->name .= ' ' . $checknum;
+								if($chkdupe->execute())
+									if($chkdupe->bind_result($dupe))
+										if($chkdupe->fetch())
+											if($tran->duplicate = $dupe)
+												$preview->dupeCount++;
 
-						$preview->net += $tran->amount;
-						$preview->transactions[] = $tran;
-					} else {
-						list($tag, $data) = explode('>', $line, 2);
-						switch($tag) {
-							case '<TRNTYPE':
-							case '<MEMO':
-								// not using these
-								break;
-							case '<DTPOSTED':
-								$tran->posted = substr($data, 0, 4) . '-' . substr($data, 4, 2) . '-' . substr($data, 6, 2);
-								break;
-							case '<TRNAMT':
-								$tran->amount = +$data;
-								break;
-							case '<FITID':
-								$tran->extid = $data;
-								break;
-							case '<CHECKNUM':
-								$checknum = $data;
-								break;
-							case '<NAME':
-								$tran->name = self::TitleCase(str_replace('&amp;', '&', $data));
-								break;
-							default:
-								// log unexpected tags
-								$ajax->Data->extradata[] = [
-										'extid' => $extid,
-										'tag' => $tag
-								];
-								break;
+								$preview->net += $tran->amount;
+								$preview->transactions[] = $tran;
+							} else {
+								list($tag, $data) = explode('>', $line, 2);
+								switch($tag) {
+									case '<TRNTYPE':
+									case '<MEMO':
+										// not using these
+										break;
+									case '<DTPOSTED':
+										$tran->posted = $posted = substr($data, 0, 4) . '-' . substr($data, 4, 2) . '-' . substr($data, 6, 2);
+										break;
+									case '<TRNAMT':
+										$tran->amount = $amount = +$data;
+										break;
+									case '<FITID':
+										$tran->extid = $extid = $data;
+										break;
+									case '<CHECKNUM':
+										$checknum = $data;
+										break;
+									case '<NAME':
+										$tran->name = self::TitleCase(str_replace('&amp;', '&', $data));
+										break;
+								}
+							}
+						} else if($line == '<STMTTRN>') {
+							$intrans = true;
+							$checknum = false;
+							$tran = new stdClass();
+							$tran->extid = $extid = null;
+							$tran->transdate = null;
+							$tran->posted = $posted = '';
+							$tran->name = '';
+							$tran->amount = $amount = 0;
+							$tran->city = null;
+							$tran->state = null;
+							$tran->zip = null;
+							$tran->notes = '';
 						}
 					}
-				} else if($line == '<STMTTRN>') {
-					$intrans = true;
-					$checknum = false;
-					$tran = new stdClass();
-					$tran->extid = null;
-					$tran->transdate = null;
-					$tran->posted = '';
-					$tran->name = '';
-					$tran->amount = 0;
-					$tran->city = null;
-					$tran->state = null;
-					$tran->zip = null;
-					$tran->notes = '';
+					return $preview;
 				}
-			}
-			return $preview;
 		}
 		return false;
 	}
