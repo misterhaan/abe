@@ -8,6 +8,9 @@ $html->Open('API');
 			<h2 class=api><a href=bookmark>bookmark</a></h2>
 			<p>The bookmark API manages bookmarks that appear with the main menu.</p>
 
+			<h2 class=api><a href=summary>summary</a></h2>
+			<p>The summary API summarizes transactions by month and year.</p>
+
 			<h2 class=api><a href=transactions>transactions</a></h2>
 			<p>
 				The transactions API manages transactions, including importing

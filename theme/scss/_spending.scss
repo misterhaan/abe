@@ -1,3 +1,48 @@
+#pagesettings {
+	background: $green;
+	padding: .125em .5em;
+	text-align: center;
+	display: flex;
+	justify-content: space-around;
+	div {
+		display: flex;
+	}
+	label {
+		margin: 0;
+		display: inline;
+	}
+	input {
+		display: none;
+	}
+	span {
+		color: #fff;
+		padding: .125em .5em;
+		cursor: pointer;
+	}
+	input[value='net'] + span:before {
+		font-family: fontawesome;
+		content: "\f080";
+	}
+	input[value='cat'] + span:before {
+		font-family: fontawesome;
+		content: "\f201";
+	}
+	input[value='det'] + span:before {
+		font-family: fontawesome;
+		content: "\f0ce";
+	}
+	input:checked + span {
+		background-color: $medgreyblue;
+		color: #000;
+		font-weight: bold;
+		border-radius: $gentlecorner $gentlecorner 0 0;
+		cursor: auto;
+	}
+	input:checked + span:before {
+		font-weight: normal;
+	}
+}
+
 svg {
 	display: block;
 	margin: .75em auto;

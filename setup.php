@@ -179,7 +179,7 @@ function InstallDatabase() {
 	else {
 		$ajax->Data->routineErrors = [];
 		$routinedir = __DIR__ . '/etc/db/routines/';
-		$routines = ['GetCategoryID', 'GetTransactions', 'IsDuplicateTransaction'];
+		$routines = ['GetCategoryID', 'GetMonthlyCategorySpending', 'GetTransactions', 'GetYearlyCategorySpending', 'IsDuplicateTransaction'];
 		foreach($routines as $routine)
 			if(!RunQueryFile($routinedir . $routine . ‘.sql’))
 				$ajax->Data->routineErrors[] = ['routine' => $routine, 'errno' => $db->errno, 'error' => $db->error];
@@ -279,9 +279,14 @@ function UpgradeDatabaseStructure() {
 			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Bookmarks . ':  ' . $db->errno . ' ' . $db->error);
 			return false;
 		}
-	if($config->strucureVersion < abeStructureVersion::Duplicates)
+	if($config->structureVersion < abeStructureVersion::Duplicates)
 		if(!(RunQueryFile(__DIR__ . '/etc/db/routines/IsDuplicateTransaction.sql') && SetStructureVersion(abeStructureVersion::Duplicates))) {
 			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Duplicates . ':  ' . $db->errno . ' ' . $db->error);
+			return false;
+		}
+	if($config->structureVersion < abeStructureVersion::SummaryProcedures)
+		if(!(RunQueryFile(__DIR__ . '/etc/db/routines/GetMonthlyCategorySpending.sql') && RunQueryFile(__DIR__ . '/etc/db/routines/GetYearlyCategorySpending.sql') && SetStructureVersion(abeStructureVersion::SummaryProcedures))) {
+			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::SummaryProcedures . ':  ' . $db->errno . ' ' . $db->error);
 			return false;
 		}
 	// add future structure upgrades here
@@ -292,6 +297,7 @@ function UpgradeDatabaseStructure() {
  * Upgrade database data and update the data version.
  */
 function UpgradeDatabaseData() {
+	global $ajax, $db, $config;
 	// add future data upgrades here
 }
 

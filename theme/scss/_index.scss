@@ -40,6 +40,9 @@
 		&:hover:before {
 			color: #000;
 		}
+		&.spending:before {
+			content: "\f200";
+		}
 		&.transactions:before {
 			content: "\f0ae";
 		}
