@@ -102,9 +102,8 @@ button.add:before {
 				}
 			}
 			a {
-				transform: translateX(-.25em);
+				color: #fff;
 				margin-bottom: .5em;
-				box-shadow: 2px 2px 1px $darkdarkgrey;
 			}
 		}
 		section {
@@ -129,12 +128,8 @@ button.add:before {
 		content: "\f02c";
 	}
 	a {
-		background-color: $lightgreyblue;
 		margin: .125em;
 		padding: .125em .25em;
-		-webkit-border-radius: $gentlecorner;
-		border-radius: $gentlecorner;
-		box-shadow: 2px 2px 1px $darkgrey;
 		text-decoration: none;
 	}
 	span {
