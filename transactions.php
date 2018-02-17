@@ -51,17 +51,10 @@ $html->FormAddBookmark();
 						<input data-bind="textInput: filterCat, event: { dblclick: ShowFilterCatSuggestions, keydown: $root.CategoryFilterKey, blur: HideFilterCatSuggestions }" maxlength=24 placeholder="Find a category">
 					</label>
 					<ol class=suggestions data-bind="visible: suggestingFilterCategories, foreach: categoriesForFilter">
-						<li>
-							<!-- ko ifnot: subs.length -->
-							<div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div>
-							<!-- /ko -->
-							<!-- ko if: subs.length -->
-							<div class=parentcat data-bind="text: name"></div>
-							<ol data-bind="foreach: subs">
-								<li><div data-bind="text: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></div></li>
-							</ol>
-							<!-- /ko -->
-						</li>
+						<!-- ko if: groupname && ($index() == 0 || $root.categoriesForFilter()[$index() - 1].groupname != groupname) -->
+						<li class=grouper data-bind="html: groupname"></li>
+						<!-- /ko -->
+						<li class=choice data-bind="html: name, click: $root.ChooseFilterCategory, css: {kbcursor: $data == $root.catCursor()}"></li>
 					</ol>
 					<label class=date title="Show transactions posted on or after this date">
 						<span>Since:</span>
@@ -114,17 +107,10 @@ $html->FormAddBookmark();
 													<input class=catamount data-bind="value: amount, event: {keypress: AmountKey}, enable: name">
 												</label>
 												<ol class=suggestions data-bind="visible: suggesting, foreach: $root.categoriesForTransaction">
-													<li>
-														<!-- ko ifnot: subs.length -->
-														<div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div>
-														<!-- /ko -->
-														<!-- ko if: subs.length -->
-														<div class=parentcat data-bind="text: name"></div>
-														<ol data-bind="foreach: subs">
-															<li><div data-bind="text: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></div></li>
-														</ol>
-														<!-- /ko -->
-													</li>
+													<!-- ko if: $index() == 0 || $root.categoriesForTransaction()[$index() - 1].groupname != groupname -->
+													<li class=grouper data-bind="html: groupname"></li>
+													<!-- /ko -->
+													<li class=choice data-bind="html: name, css: {kbcursor: $data == $root.catCursor()}, click: $root.ChooseCategory"></li>
 												</ol>
 											<!-- /ko -->
 											<div class=account data-bind="css: acctclass, text: acctname"></div>

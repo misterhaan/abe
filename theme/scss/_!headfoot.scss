@@ -6,11 +6,6 @@ body > header {
 	@extend %flex-container-center;
 	padding: 0 .5em;
 	height: 1.55em;
-	//position: fixed;
-	//top: 0;
-	//left: 0;
-	//right: 0;
-	//z-index: 1;
 
 	.back {
 		@extend %flex-item-grow;
@@ -67,11 +62,12 @@ h1 {
 
 #menuPane {
 	display: none;
+	position: absolute;
+	z-index: 1;  // stay on top of translated elements
+	background-color: $medgreyblue;
 	border-bottom: 2px solid $green;
 	@media (min-width: 35em) {
-		position: absolute;
 		width: 18em;
-		background-color: $medgreyblue;
 		border-right: 2px solid $green;
 		border-radius: 0 0 $gentlecorner 0;
 	}

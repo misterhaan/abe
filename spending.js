@@ -63,12 +63,13 @@ function MonthsViewModel() {
 		if(self.summarytype() != "net")
 			info.push("type=" + self.summarytype());
 		info = info.length ? "#!" + info.join("/") : "";
-		if(info != window.location.hash)
-			if(info) {
+		if(info != window.location.hash) {
+			if(info)
 				window.location.hash = info;
-				SetBookmarkSpec(info);
-			} else
+			else
 				history.pushState("", document.title, window.location.pathname);
+			SetBookmarkSpec(info);
+		}
 	};
 
 	this.findParentAmount = function(m, parent) {

@@ -8,6 +8,16 @@ $html->Open('API');
 			<h2 class=api><a href=bookmark>bookmark</a></h2>
 			<p>The bookmark API manages bookmarks that appear with the main menu.</p>
 
+			<h2 class=api><a href=category>category</a></h2>
+			<p>
+				The category API manages the categories that are used for transactions.
+			</p>
+
+			<h2 class=api><a href=categoryGroup>categoryGroup</a></h2>
+			<p>
+				The category API manages the groups that categories are organized into.
+			</p>
+
 			<h2 class=api><a href=summary>summary</a></h2>
 			<p>The summary API summarizes transactions by month and year.</p>
 

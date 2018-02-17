@@ -101,20 +101,17 @@ var TransactionsModel = new function() {
 	 * Does not include categories already chosen or that do not match what's been
 	 * typed into the field.
 	 */
-	self.categoriesForTransaction = ko.computed(function() {
+	self.categoriesForTransaction = ko.pureComputed(function() {
 		self = self || TransactionsModel;
 		var cats = [];
-		if(self.selection() && self.activeCategory())
-			for(var pc = 0; pc < self.categories().length; pc++) {
-				var cat = self.categories()[pc];
-				var subs = [];
-				var parentChosen = cat.name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(ipc) {return ipc.name() != self.activeCategory().name() && ipc.name() == cat.name; });
-				for(var sc = 0; sc < cat.subs.length; sc++)
-					if(parentChosen || cat.subs[sc].name.containsAnyCase(self.activeCategory().name()) && !self.selection().categories().find(function(isc) { return isc.name() != self.activeCategory().name() && isc.name() == cat.subs[sc].name; }))
-						subs.push(cat.subs[sc]);
-				if(subs.length || parentChosen)
-					cats.push({id: cat.id, name: cat.name, subs: subs});
+		if(self.selection() && self.activeCategory()) {
+			var search = self.activeCategory().name();
+			for(var c = 0; c < self.categories().length; c++) {
+				var cat = self.categories()[c];
+				if((!search || cat.groupname.containsAnyCase(search) || cat.name.containsAnyCase(search)) && !self.selection().categories().find(function(ipc) { return ipc.name() != search && ipc.name() == cat.name; }))
+					cats.push(HighlightCategory(cat, search));
 			}
+		}
 		return cats;
 	});
 	/**
@@ -158,7 +155,7 @@ var TransactionsModel = new function() {
 	/**
 	 * Options for the dropdown of the account field in the filter menu.
 	 */
-	self.accountsForFilter = ko.computed(function() {
+	self.accountsForFilter = ko.pureComputed(function() {
 		self = self || TransactionsModel;
 		var accts = [];
 		for(var a = 0; a < self.accounts().length; a++)
@@ -193,18 +190,14 @@ var TransactionsModel = new function() {
 	self.categoriesForFilter = ko.computed(function() {
 		self = self || TransactionsModel;
 		var cats = [];
-		var uncat = {id: 0, name: "(uncategorized)", subs: []};
-		if((!self.filterCat() || uncat.name.containsAnyCase(self.filterCat())) && !self.filterCategories().find(function(chosen) {return chosen.id == 0;}))
-			cats.push(uncat);
-		for(var pc = 0; pc < self.categories().length; pc++) {
-			var cat = self.categories()[pc];
-			var subs = [];
-			var parentChosen = cat.name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat) < 0;
-			for(var sc = 0; sc < cat.subs.length; sc++)
-				if(parentChosen || cat.subs[sc].name.containsAnyCase(self.filterCat()) && self.filterCategories().indexOf(cat.subs[sc]) < 0)
-					subs.push(cat.subs[sc]);
-			if(subs.length || parentChosen)
-				cats.push({id: cat.id, name: cat.name, subs: subs});
+		var uncat = {id: 0, name: "(uncategorized)", groupname: ""};
+		var search = self.filterCat();
+		if((!search || uncat.name.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) {return chosen.id == 0;}))
+			cats.push(HighlightCategory(uncat, search));
+		for(var c = 0; c < self.categories().length; c++) {
+			var cat = self.categories()[c];
+			if((!search || cat.name.containsAnyCase(search) || cat.groupname.containsAnyCase(search)) && self.filterCategories().indexOf(cat) < 0)
+				cats.push(HighlightCategory(cat, search));
 		}
 		return cats;
 	});
@@ -309,6 +302,7 @@ var TransactionsModel = new function() {
 		self.loading(true);
 		if(checkHash)
 			self.InitializeFilters();
+		// TODO:  move to API
 		$.get("?ajax=get", GetParams(self.dates()), function(result) {
 			if(!result.fail) {
 				for(var d = 0; d < result.dates.length; d++)
@@ -328,20 +322,19 @@ var TransactionsModel = new function() {
 	 * Load categories from the server.  Also loads the first set of transactions
 	 * if accounts have been loaded.
 	 */
-	(self.GetCategories = function() {
+	(self.GetCategories = function(firstTime) {
 		self.loading(true);
-		$.get("?ajax=categories", null, function(result) {
-			if(!result.fail) {
+		$.get("api/category/list", null, function(result) {
+			if(result.fail)
+				alert(result.message);
+			else {
 				self.categories(result.categories);
-				if(self.accountsLoaded)
+				if(firstTime && self.accountsLoaded)
 					self.GetTransactions(true);
 				self.categoriesLoaded = true;
-			} else {
-				self.loading(false);
-				alert(result.message);
 			}
 		}, "json");
-	})();
+	})(true);
 
 	/**
 	 * Load accounts from the server.  Also loads the first set of transactions if
@@ -474,9 +467,10 @@ var TransactionsModel = new function() {
 				$.post("?ajax=save", {transactions: data}, function(result) {
 					self.saving(false);
 					if(!result.fail) {
+						self.GetCategories(false);
 						if(close)
 							self.SelectNone();
-						self.categories(result.categories);  // may have added categories, so reset category list.
+						//self.categories(result.categories);  // may have added categories, so reset category list.
 						for(t = 0; t < transactions.length; t++)
 							transactions[t].changed = false;
 						self.changed = false;
@@ -557,7 +551,7 @@ var TransactionsModel = new function() {
 	 * @param category Category being chosen.
 	 */
 	self.ChooseCategory = function(category) {
-		self.activeCategory().name(category.name);
+		self.activeCategory().name(category.plainName);
 		self.activeCategory().suggesting(false);
 		self.catCursor(false);
 	};
@@ -615,74 +609,33 @@ var TransactionsModel = new function() {
 				break;  // if it's not hiding the suggestions it should hide the full transaction view
 			case 38:  // up arrow
 				category.suggesting(true);
-				if(TransactionsModel.catCursor() && (TransactionsModel.catCursor().name.containsAnyCase(category.name()) || TransactionsModel.catCursor().subs && TransactionsModel.catCursor().subs.nameContainsAnyCase(category.name()))) {
-					var prevcat = false;
-					for(var c = 0; c < TransactionsModel.categoriesForTransaction().length; c++)
-						if(TransactionsModel.catCursor() == TransactionsModel.categoriesForTransaction()[c]) {
-							if(prevcat)
-								TransactionsModel.catCursor(prevcat);
-							else {
-								prevcat = self.categoriesForTransaction().last();
-								if(prevcat.subs && prevcat.subs.length)
-									prevcat = prevcat.subs.last();
-								TransactionsModel.catCursor(prevcat);
-							}
-							return false;
-						} else {
-							var parentcat = TransactionsModel.categoriesForTransaction()[c];
-							if(parentcat.subs.length)
-								for(var sc = 0; sc < parentcat.subs.length; sc++)
-									if(TransactionsModel.catCursor() == parentcat.subs[sc]) {
-										TransactionsModel.catCursor(prevcat);
-										return false;
-									} else
-										prevcat = parentcat.subs[sc];
-							else
-								prevcat = parentcat;
-						}
-				} else {
-					prevcat = self.categoriesForTransaction().last();
-					if(prevcat.subs && prevcat.subs.length)
-						prevcat = prevcat.subs.last();
-					TransactionsModel.catCursor(prevcat);
-				}
+				if(TransactionsModel.catCursor()) {
+					var i = TransactionsModel.categoriesForTransaction().indexOf(TransactionsModel.catCursor());
+					if(i < 0)
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction().last());
+					else if(i)
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[i - 1]);
+					else
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction().last());
+				} else
+					TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction().last());
 				return false;
 			case 40:  // down arrow
 				category.suggesting(true);
-				if(TransactionsModel.catCursor() && (TransactionsModel.catCursor().name.containsAnyCase(category.name()) || TransactionsModel.catCursor().subs && TransactionsModel.catCursor().subs.nameContainsAnyCase(category.name()))) {
-					var nextcat = false;
-					for(var c = TransactionsModel.categoriesForTransaction().length - 1; c >=  0; c--) {
-						var parentcat = TransactionsModel.categoriesForTransaction()[c];
-						if(parentcat.subs.length)
-							for(var sc = parentcat.subs.length - 1; sc >= 0 ; sc--)
-								if(TransactionsModel.catCursor() == parentcat.subs[sc]) {
-									if(nextcat)
-										TransactionsModel.catCursor(nextcat);
-									else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
-										TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
-									else
-										TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
-									return false;
-								} else
-									nextcat = parentcat.subs[sc];
-						else if(TransactionsModel.catCursor() == parentcat)
-							if(nextcat)
-								TransactionsModel.catCursor(nextcat);
-							else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
-								TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
-							else
-								TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
-						else
-							nextcat = parentcat;
-					}
-				} else if(TransactionsModel.categoriesForTransaction()[0].subs.length)
-					TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0].subs[0]);
-				else
+				if(TransactionsModel.catCursor()) {
+					var i = TransactionsModel.categoriesForTransaction().indexOf(TransactionsModel.catCursor());
+					if(i < 0)
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
+					else if(i + 1 < TransactionsModel.categoriesForTransaction().length)
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[i + 1]);
+					else
+						TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
+				} else
 					TransactionsModel.catCursor(TransactionsModel.categoriesForTransaction()[0]);
 				return false;
 			case 13:  // enter key
 				if(TransactionsModel.catCursor()) {
-					category.name(TransactionsModel.catCursor().name);
+					category.name(TransactionsModel.catCursor().plainName);
 					TransactionsModel.catCursor(false);
 					category.suggesting(false);
 					return false;
@@ -892,7 +845,10 @@ var TransactionsModel = new function() {
 			info.push("search=" + self.searchName());
 		info = info.length ? "#!" + info.join("/") : "";
 		if(info != window.location.hash) {
-			window.location.hash = info;
+			if(info)
+				window.location.hash = info;
+			else
+				history.pushState("", document.title, window.location.pathname);
 			SetBookmarkSpec(info);
 		}
 	};
@@ -1008,10 +964,6 @@ function ObserveCategory(category) {
 		for(var c = 0; c < TransactionsModel.categories().length; c++)
 			if(TransactionsModel.categories()[c].name == category.name())
 				return false;
-			else
-				for(var sc = 0; sc < TransactionsModel.categories()[c].subs.length; sc++)
-					if(TransactionsModel.categories()[c].subs[sc].name == category.name())
-						return false;
 		return true;
 	});
 	// only accept digits, decimal point, parentheses, and basic math symbols
@@ -1094,6 +1046,19 @@ ko.bindingHandlers.scrollTo = {
 		}
 	}
 };
+
+function HighlightCategory(cat, search) {
+	return {id: cat.id, plainName: cat.name, name: HighlightString(cat.name, search), groupname: HighlightString(cat.groupname, search)};
+}
+
+function HighlightString(str, search) {
+	var html = $("<div/>").text(str).html();
+	return search ? html.replace(new RegExp("(" + EscapeRegExp(search) + ")", "ig"), "<em>$1</em>") : html;
+}
+
+function EscapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
 
 /**
  * Returns the last item in the array.

@@ -131,3 +131,50 @@ ko.bindingHandlers.slideVisible = {
 		ko.unwrap(valueAccessor()) ? $(element).slideDown() : $(element).slideUp();
 	}
 };
+
+ko.abe = ko.abe || {};
+ko.bindingHandlers.draggable = {
+	init: function(element, valueAccessor) {
+		var data = valueAccessor();
+		$(element).attr("draggable", true);
+		$(element).on("dragstart", function(event) {
+			$(element).addClass("dragging");
+			ko.abe.dragdata = ko.unwrap(data.data);
+			event.originalEvent.dataTransfer.effectAllowed = ko.unwrap(data.effect) || "move";
+			event.originalEvent.dataTransfer.setData("text/plain", ko.unwrap(data.name) || "");
+		});
+		$(element).on("dragend", function() {
+			$(element).removeClass("dragging");
+			delete ko.abe.dragdata;
+		});
+	},
+	update: function(element, valueAccessor) {
+	}
+};
+ko.bindingHandlers.droppable = {
+	init: function(element, valueAccessor) {
+		var data = valueAccessor();
+		element.draglevel = 0;
+		$(element).on("dragover", function(event) {
+			event.preventDefault();
+			event.originalEvent.dataTransfer.dropEffect = ko.unwrap(data.effect) || "move";
+		});
+		$(element).on("dragenter", function() {
+			element.draglevel++;
+			$(element).addClass("droptarget");
+		});
+		$(element).on("dragleave", function() {
+			if(!--element.draglevel)
+				$(element).removeClass("droptarget");
+		});
+		$(element).on("drop", function(event) {
+			element.draglevel = 0;
+			$(element).removeClass("droptarget");
+			event.stopPropagation();
+			data.drop(ko.abe.dragdata);
+			delete ko.abe.dragdata;
+		});
+	},
+	update: function(element, valueAccessor) {
+	}
+};

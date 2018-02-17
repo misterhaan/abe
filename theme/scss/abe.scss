@@ -29,6 +29,7 @@ a:visited {
 }
 a.edit,
 a.save,
+a.delete,
 button.add {
 	@extend %fa-replaced;
 	span {
@@ -44,6 +45,12 @@ a.edit:before {
 }
 a.save:before {
 	content: "\f0c7";
+}
+a.delete:before {
+	content: "\f1f8";
+}
+a.delete:hover:before {
+	color: $red;
 }
 button.add:before {
 	content: "\f067";
@@ -78,7 +85,6 @@ button.add:before {
 	.tabbed {
 		display: -webkit-flex;
 		display: flex;
-		padding-right: .5em;
 		.tabs {
 			margin: 0 .5em 0 0;
 			padding: .75em 0 0 .5em;
@@ -92,8 +98,9 @@ button.add:before {
 			border-radius: 0 0 $gentlecorner;
 			span {
 				border-radius: $gentlecorner 0 0 $gentlecorner;
-				transform: translateX(.25em);
 				margin-bottom: .5em;
+				margin-right: 0;
+				padding-right: .5em;
 				background-color: $medgreyblue;
 				color: #000;
 				&.accounts:before,
@@ -104,9 +111,12 @@ button.add:before {
 			a {
 				color: #fff;
 				margin-bottom: .5em;
+				&:before {
+					color: $medgreyblue;
+				}
 			}
 		}
-		section {
+		section:last-child {
 			-webkit-flex: 1 1 auto;
 			flex: 1 1 auto;
 		}
@@ -135,7 +145,6 @@ button.add:before {
 	span {
 		background-color: $green;
 		color: #fff;
-		font-weight: bold;
 		margin: .125em;
 		padding: .125em .25em;
 		-webkit-border-radius: $gentlecorner;
@@ -152,8 +161,8 @@ button.add:before {
 @import "!headfoot";
 @import "index";
 @import "accounts";
+@import "api";
 @import "categories";
 @import "import";
 @import "spending";
 @import "transactions";
-@import "api";

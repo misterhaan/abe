@@ -86,12 +86,12 @@ class SummaryApi extends abeApi {
 				$lastdate = $amt->displaydate;
 			}
 			if(!in_array($amt->catid, $ctrack)) {
-				if($amt->parentid) {
-					if(!array_key_exists($amt->parentid, $parentmap)) {
-						$parentmap[+$amt->parentid] = count($ajax->Data->cats);
-						$ajax->Data->cats[] = ['id' => +$amt->parentid, 'name' => $amt->parentname, 'subcats' => []];
+				if($amt->groupid) {
+					if(!array_key_exists($amt->groupid, $parentmap)) {
+						$parentmap[+$amt->groupid] = count($ajax->Data->cats);
+						$ajax->Data->cats[] = ['id' => +$amt->groupid, 'name' => $amt->groupname, 'subcats' => []];
 					}
-					$ajax->Data->cats[$parentmap[+$amt->parentid]]['subcats'][] = ['id' => +$amt->catid, 'name' => $amt->catname];
+					$ajax->Data->cats[$parentmap[+$amt->groupid]]['subcats'][] = ['id' => +$amt->catid, 'name' => $amt->catname];
 				} else
 					$ajax->Data->cats[] = ['id' => +$amt->catid, 'name' => $amt->catname, 'subcats' => false];
 					$ctrack[] = $amt->catid;

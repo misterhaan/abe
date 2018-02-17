@@ -1,36 +1,54 @@
+section#categorygroups,
 section#categories {
-	.droptarget {
-		background-color: $lightgreyblue;
-	}
-	.dragging {
-		opacity: .4;
-	}
-	margin: 0 .5em;
-	h2 {
-		margin: 1em 0;
-	}
+	padding: 0 .5em;
 	ol {
 		list-style-type: none;
 		padding: 0;
-		ol {
-			padding-left: 1em;
+		margin: 1em 0 .25em;
+	}
+	li {
+		padding: .125em .5em .125em .25em;
+		display: -webkit-flex;
+		display: flex;
+	}
+	div.add {
+		display: -webkit-flex;
+		display: flex;
+		margin: .25em 0 .5em;
+		input {
+			-webkit-flex: 1 1 auto;
+			flex: 1 1 auto;
+			width: 5.5em;
+		}
+		button {
+			margin: 0 .5em;
 		}
 	}
-	> ol {
-		@media (min-width: 40em) { column-count: 2; }
-		@media (min-width: 55em) { column-count: 3; }
-		@media (min-width: 70em) { column-count: 4; }
-		@media (min-width: 85em) { column-count: 5; }
-		@media (min-width: 100em) { column-count: 6; }
-		@media (min-width: 115em) { column-count: 7; }
-		@media (min-width: 130em) { column-count: 8; }
+}
+section#categorygroups {
+	padding-right: 0;
+	-webkit-flex: 0 0 auto;
+	flex: 0 0 auto;
+	li {
+		cursor: pointer;
+		border-radius: $gentlecorner 0 0 $gentlecorner;
+		&.selected {
+			background-color: $lightgreyblue;
+		}
+		&.droptarget {
+			background-color: #fff;
+		}
+		input {
+			@extend %flex-item-fill;
+			width: 5.5em;
+		}
 	}
-	li > span {
-		display: -webkit-inline-flex;
-		display: inline-flex;
-	}
-	li input {
-		@extend %flex-item-fill;
-		width: 100%;  // don't understand why, but this fixes it to not overflow
+}
+section#categories {
+	background-color: $lightgreyblue;
+	padding-left: 1em;
+	border-radius: 0 0 0 $gentlecorner;
+	.dragging {
+		opacity: .4;
 	}
 }
