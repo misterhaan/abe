@@ -323,7 +323,8 @@ var TransactionsModel = new function() {
 	 * if accounts have been loaded.
 	 */
 	(self.GetCategories = function(firstTime) {
-		self.loading(true);
+		if(firstTime)
+			self.loading(true);
 		$.get("api/category/list", null, function(result) {
 			if(result.fail)
 				alert(result.message);
