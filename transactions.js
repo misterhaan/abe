@@ -196,7 +196,7 @@ var TransactionsModel = new function() {
 			cats.push(HighlightCategory(uncat, search));
 		for(var c = 0; c < self.categories().length; c++) {
 			var cat = self.categories()[c];
-			if((!search || cat.name.containsAnyCase(search) || cat.groupname.containsAnyCase(search)) && self.filterCategories().indexOf(cat) < 0)
+			if((!search || cat.name.containsAnyCase(search) || cat.groupname.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) {return chosen.id == cat.id;}))
 				cats.push(HighlightCategory(cat, search));
 		}
 		return cats;
@@ -281,18 +281,13 @@ var TransactionsModel = new function() {
 		cats = cats.split(",");
 		for(var fc = 0; fc < cats.length; fc++)
 			if(cats[fc] === "0")  // category zero isn't in the category list
-				self.filterCategories.push({id: 0, name: "(uncategorized)", subs: []});
+				self.filterCategories.push({id: 0, name: "(uncategorized)"});
 			else if(cats[fc])  // skip blank values
-				findcat: for(var pc = 0; pc < self.categories().length; pc++)
+				for(var pc = 0; pc < self.categories().length; pc++)
 					if(self.categories()[pc].id == +cats[fc]) {
 						self.filterCategories.push(self.categories()[pc]);
 						break;
-					} else
-						for(var sc = 0; sc < self.categories()[pc].subs.length; sc++)
-							if(self.categories()[pc].subs[sc].id == +cats[fc]) {
-								self.filterCategories.push(self.categories()[pc].subs[sc]);
-								break findcat;
-							}
+					}
 	};
 
 	/**
@@ -562,7 +557,7 @@ var TransactionsModel = new function() {
 	 * @param category Category being included.
 	 */
 	self.ChooseFilterCategory = function(category) {
-		self.filterCategories.push(category);
+		self.filterCategories.push({id: category.id, name: category.plainName || category.name});
 		self.suggestingFilterCategories(false);
 	};
 
