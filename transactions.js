@@ -643,7 +643,7 @@ var TransactionsModel = new function() {
 				break;
 			case 9:  // tab key
 				if(TransactionsModel.catCursor()) {
-					category.name(TransactionsModel.catCursor().name);
+					category.name(TransactionsModel.catCursor().plainName);
 					TransactionsModel.catCursor(false);
 					category.suggesting(false);
 				}
