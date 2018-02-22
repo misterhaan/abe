@@ -32,9 +32,9 @@ $html->Open('Saving');
 						<span data-bind="text: targetDisplay"></span>
 					<!-- /ko -->
 					<!-- ko if: isEditing -->
-						<input data-bind="value: balance" type=number step=.01>
+						<input data-bind="value: balance, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01>
 						of
-						<input data-bind="value: target" type=number step=.01>
+						<input data-bind="value: target, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01>
 					<!-- /ko -->
 				</div>
 			</div>
@@ -57,9 +57,9 @@ $html->Open('Saving');
 				</h2>
 				<!-- ko if: isEditing -->
 					<div class=values>
-						<input data-bind="value: newBalance" type=number step=.01>
+						<input data-bind="value: newBalance, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01>
 						of
-						<input data-bind="value: newTarget" type=number step=.01>
+						<input data-bind="value: newTarget, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01>
 					</div>
 				<!-- /ko -->
 			</div>
@@ -73,9 +73,9 @@ $html->Open('Saving');
 			<div id=addFund class=fund data-bind="ifnot: isEditing">
 				<h2><input data-bind="textInput: newName" placeholder="New name" maxlength=32 required></h2>
 				<div class=values>
-					<input data-bind="value: newBalance" type=number step=.01 placeholder=Current>
+					<input data-bind="value: newBalance, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01 placeholder=Current>
 					of
-					<input data-bind="value: newTarget" type=number step=.01 required placeholder=Target>
+					<input data-bind="value: newTarget, event: {keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01 required placeholder=Target>
 				</div>
 				<button class=add title="Add a new saving fund with the specified information" data-bind="enable: newIsValid(), click: AddFund"> Add</button>
 			</div>

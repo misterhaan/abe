@@ -124,6 +124,36 @@ function ParseHash() {
 	return info;
 }
 
+ko.nonVmHandlers = ko.nonVmHandlers || {};
+/**
+ * Limit keys that can be entered into an amount field to digits, minus sign,
+ * and decimal point.  Attach to KeyPress event.
+ * @param vm View model object.  Not used.
+ * @param e Event object used to check which key was pressed.
+ * @returns {Boolean} True if key is allowed.
+ */
+ko.nonVmHandlers.AmountKey = function(vm, e) {
+	switch(e.which) {
+		case 0:  // control keys
+		case 8:  // backspace (firefox only)
+		case 13:  // enter
+		case 45:  // -
+		case 46:  // .
+		case 48:  // 0
+		case 49:  // 1
+		case 50:  // 2
+		case 51:  // 3
+		case 52:  // 4
+		case 53:  // 5
+		case 54:  // 6
+		case 55:  // 7
+		case 56:  // 8
+		case 57:  // 9
+			return true;
+	}
+	return false;
+}
+
 ko.bindingHandlers.slideVisible = {
 	init: function(element, valueAccessor) {
 	},
