@@ -14,7 +14,7 @@ class abeVersion {
 	 * the setup script in upgrade mode.
 	 * @var integer
 	 */
-	const Structure = abeStructureVersion::CategoryGroups;
+	const Structure = abeStructureVersion::Funds;
 	/**
 	 * Database data (rows) version.  Changing this triggers the setup script in
 	 * update mode.
@@ -30,6 +30,7 @@ class abeVersion {
  * @author misterhaan
  */
 class abeStructureVersion {
+	const Funds = 6;
 	const CategoryGroups = 5;
 	const SummaryProcedures = 4;
 	const Duplicates = 3;

@@ -170,7 +170,7 @@ function InstallDatabase() {
 	$ajax->Data->tableErrors = [];
 	$tabledir = __DIR__ . '/etc/db/tables/';
 	// alphabetical except config comes last and tables with foreign keys must come after the tables they reference
-	$tables = ['account_types', 'banks', 'bookmarks', 'accounts', 'category_groups', 'categories', 'transactions', 'splitcats', 'config'];
+	$tables = ['account_types', 'banks', 'accounts', 'bookmarks', 'category_groups', 'categories', 'funds', 'transactions', 'splitcats', 'config'];
 	foreach($tables as $table)
 		if(!RunQueryFile($tabledir . $table . ‘.sql’))
 			$ajax->Data->tableErrors[] = ['table' => $table, 'errno' => $db->errno, 'error' => $db->error];
@@ -298,6 +298,11 @@ function UpgradeDatabaseStructure() {
 				&& SetStructureVersion(abeStructureVersion::CategoryGroups)
 				)) {
 			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::CategoryGroups . ':  ' . $db->errno . ' ' . $db->error);
+			return false;
+		}
+	if($config->structureVersion < abeStructureVersion::Funds)
+		if(!(RunQueryFile(__DIR__ . '/etc/db/tables/funds.sql') && SetStructureVersion(abeStructureVersion::Funds))) {
+			$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Funds . ':  ' . $db->errno . ' ' . $db->error);
 			return false;
 		}
 	// add future structure upgrades here

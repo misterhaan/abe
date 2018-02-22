@@ -30,11 +30,9 @@ a:visited {
 a.edit,
 a.save,
 a.delete,
+a.remove,
 button.add {
 	@extend %fa-replaced;
-	span {
-		display: none;
-	}
 	&:before {
 		font-size: .9em;
 		margin-left: .5em;
@@ -49,7 +47,11 @@ a.save:before {
 a.delete:before {
 	content: "\f1f8";
 }
-a.delete:hover:before {
+a.remove:before {
+	content: "\f057";
+}
+a.delete:hover:before,
+a.remove:hover:before {
 	color: $red;
 }
 button.add:before {
@@ -164,5 +166,6 @@ button.add:before {
 @import "api";
 @import "categories";
 @import "import";
+@import "saving";
 @import "spending";
 @import "transactions";

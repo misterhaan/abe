@@ -18,6 +18,9 @@ $html->Open('API');
 				The category API manages the groups that categories are organized into.
 			</p>
 
+			<h2 class=api><a href=fund>fund</a></h2>
+			<p>The fund API manages the funds used to allocate savings.</p>
+
 			<h2 class=api><a href=summary>summary</a></h2>
 			<p>The summary API summarizes transactions by month and year.</p>
 

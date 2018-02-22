@@ -92,6 +92,7 @@ $gentlecorner: .25em;
 %fontawesome {
 	font-family: fontawesome;
 	display: inline-block;
+	font-weight: normal;
 }
 %fa-label {
 	@extend %fontawesome;

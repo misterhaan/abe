@@ -95,6 +95,9 @@
 		&[href$='categories.php']:before {
 			content: "\f085";
 		}
+		&[href$='saving.php']:before {
+			content: "\f024";
+		}
 		&[href$='spending.php']:before {
 			content: "\f200";
 		}

@@ -1,0 +1,52 @@
+.fund {
+	background-color: $lightgreyblue;
+	margin-top: 1px;
+	h2 {
+		@extend %flex-container;
+		justify-content: center;
+		margin: 0;
+		padding: .125em 0;
+		text-align: center;
+		a {
+			@extend %flex-item-fixed;
+			&:before {
+				margin: 0 .75em;
+			}
+		}
+		.name {
+			@extend %flex-item-fill;
+			margin: 0 .5em;
+		}
+		input {
+			width: 13.5em;
+			text-align: center;
+		}
+		input.name {
+			margin-right: 0;
+		}
+	}
+	.percentfield {
+		margin: .125em 1em;
+		background-color: $medgreyblue;
+		border-radius: $gentlecorner;
+		.percentvalue {
+			height: .5em;
+			background-color: $blue;
+			border-radius: $gentlecorner;
+		}
+	}
+	.values {
+		padding: .125em 0 .25em;
+		margin: 0 .5em;
+		text-align: center;
+		input {
+			width: 5.75em;
+			text-align: right;
+		}
+	}
+	&#addFund {
+		background-color: transparent;
+		padding-top: 1em;
+		text-align: center;
+	}
+}

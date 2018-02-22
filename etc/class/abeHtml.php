@@ -199,6 +199,7 @@ class abeHtml {
 				<a href="<?=INSTALL_PATH; ?>/transactions.php">Transactions</a>
 				<a href="<?=INSTALL_PATH; ?>/spending.php">Spending</a>
 				<a href="<?=INSTALL_PATH; ?>/import.php">Import</a>
+				<a href="<?=INSTALL_PATH; ?>/saving.php">Saving</a>
 				<a href="<?=INSTALL_PATH; ?>/categories.php">Settings</a>
 			</nav>
 <?php
