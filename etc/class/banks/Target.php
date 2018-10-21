@@ -13,6 +13,11 @@ class Target extends abeBank {
 	public static function ParseCsvTransactions($filename, $acctid) {
 		global $db;
 		if(false !== $fh = fopen($filename, 'r')) {
+			// first line is headers
+			fgets($fh);
+			// second line is blank
+			fgets($fh);
+
 			$preview = new stdClass();
 			$preview->transactions = [];
 			$preview->net = 0;
@@ -24,13 +29,13 @@ class Target extends abeBank {
 						$l2len = strlen($line[2]);
 						$tran = new stdClass();
 						// translate the data
-						$tran->extid = null;  // not provided
-						$tran->transdate = date('Y-m-d', strtotime($line[0]));
+						$tran->extid = $line[11];  // not provided
+						$tran->transdate = date('Y-m-d', strtotime($line[2]));
 						$tran->posted = $posted = date('Y-m-d', strtotime($line[1]));
-						$tran->name = self::TitleCase(trim(substr($line[2], 0, 25)));
-						$tran->amount = $amount = +$line[3];
-						$tran->city = $l2len > 25 ? self::TitleCase(trim(substr($line[2], 25, 13))) : null;
-						$tran->state = $l2len > 38 ? substr($line[2], 38, 2) : null;
+						$tran->name = self::TitleCase(trim($line[5]));
+						$tran->amount = $amount = -str_replace(['$', '(', ')'], ['', '-', ''], $line[10]);
+						$tran->city = self::TitleCase(trim($line[6]));
+						$tran->state = trim($line[7]);
 						$tran->zip = null;  // not provided
 						$tran->notes = '';  // not provided
 
