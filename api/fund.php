@@ -7,7 +7,7 @@ require_once dirname(__DIR__) . '/etc/class/abe.php';
  */
 class FundApi extends abeApi {
 	/**
-	 * Write out the documentation for the category API controller.  The page is
+	 * Write out the documentation for the fund API controller.  The page is
 	 * already opened with an h1 header, and will be closed after the call
 	 * completes.
 	 */

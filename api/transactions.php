@@ -98,9 +98,9 @@ class TransactionsApi extends abeApi {
 						$ajax->Data->preview = $preview;
 			} else
 				$ajax->Fail('Transaction file not provided.');
-				else
-					$ajax->Fail('Account not specified.');
-					unlink($_FILES['transfile']['tmp_name']);
+		else
+			$ajax->Fail('Account not specified.');
+		unlink($_FILES['transfile']['tmp_name']);
 	}
 
 	/**

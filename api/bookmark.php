@@ -145,18 +145,18 @@ class BookmarkApi extends abeApi {
 							if($swap->bind_param('i', $id))
 								if($swap->execute())
 									$db->commit();
-									else
-										$ajax->Fail('Database error moving bookmark down:  ' . $db->errno . ' ' . $db->error);
-										else
-											$ajax->Fail('Database error binding parameter to move bookmark down:  ' . $db->errno . ' ' . $db->error);
-											else
-												$ajax->Fail('Database error preparing to move bookmark down:  ' . $db->errno . ' ' . $db->error);
-												else
-													$ajax->Fail('Database error moving next bookmark up:  ' . $db->errno . ' ' . $db->error);
-													else
-														$ajax->Fail('Database error binding parameter to move next bookmark up:  ' . $db->errno . ' ' . $db->error);
-														else
-															$ajax->Fail('Database error preparing to move next bookmark up:  ' . $db->errno . ' ' . $db->error);
+								else
+									$ajax->Fail('Database error moving bookmark down:  ' . $db->errno . ' ' . $db->error);
+							else
+								$ajax->Fail('Database error binding parameter to move bookmark down:  ' . $db->errno . ' ' . $db->error);
+						else
+							$ajax->Fail('Database error preparing to move bookmark down:  ' . $db->errno . ' ' . $db->error);
+					else
+						$ajax->Fail('Database error moving next bookmark up:  ' . $db->errno . ' ' . $db->error);
+				else
+					$ajax->Fail('Database error binding parameter to move next bookmark up:  ' . $db->errno . ' ' . $db->error);
+			else
+				$ajax->Fail('Database error preparing to move next bookmark up:  ' . $db->errno . ' ' . $db->error);
 		} else
 			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to delete.');
 	}

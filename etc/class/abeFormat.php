@@ -3,7 +3,7 @@ class abeFormat {
 	/**
 	 * Format an amount for display with two decimal places and thousands
 	 * separators, unless the value is less than 10k.
-	 * @param unknown $amt
+	 * @param float $amt Amount to format.
 	 */
 	public static function Amount($amt) {
 		if(+$amt >= 10000 || +$amt <= -10000)
