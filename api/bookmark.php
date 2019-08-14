@@ -177,7 +177,7 @@ class BookmarkApi extends abeApi {
 			else
 				$ajax->Fail('Database error preparing to move next bookmark up:  ' . $db->errno . ' ' . $db->error);
 		} else
-			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to delete.');
+			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to move.');
 	}
 
 	/**
@@ -202,13 +202,13 @@ class BookmarkApi extends abeApi {
 						else
 							$ajax->Fail('Database error preparing to move bookmark up:  ' . $db->errno . ' ' . $db->error);
 					else
-						$ajax->Fail('Database error moving next bookmark down:  ' . $db->errno . ' ' . $db->error);
+						$ajax->Fail('Database error moving previous bookmark down:  ' . $db->errno . ' ' . $db->error);
 				else
-					$ajax->Fail('Database error binding parameter to move next bookmark down:  ' . $db->errno . ' ' . $db->error);
+					$ajax->Fail('Database error binding parameter to move previous bookmark down:  ' . $db->errno . ' ' . $db->error);
 			else
-				$ajax->Fail('Database error preparing to move next bookmark down:  ' . $db->errno . ' ' . $db->error);
+				$ajax->Fail('Database error preparing to move previous bookmark down:  ' . $db->errno . ' ' . $db->error);
 		} else
-			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to delete.');
+			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to move.');
 	}
 }
 BookmarkApi::Respond();
