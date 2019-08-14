@@ -8,7 +8,7 @@ export default {
 	created() {
 		this.homeView = Views.Home;
 	},
-	template: `
+	template: /*html*/ `
 		<header>
 			<span class=back>
 				<a v-if=!isHome id=toggleMenuPane href="#" title="Go to main menu" @click="$emit('change-view', homeView)"><span>home</span></a>

@@ -11,7 +11,7 @@ export default {
 		bookmarks: Bookmarks,
 		mainmenu: MainMenu
 	},
-	template: `
+	template: /*html*/ `
 		<main role=main>
 			<bookmarks @error="Error($event)"></bookmarks>
 			<mainmenu @change-view="$emit('change-view', $event)"></mainmenu>
