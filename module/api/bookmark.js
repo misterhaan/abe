@@ -3,7 +3,7 @@ import $ from "../../external/jquery-3.4.1.min.js";
 const urlbase = "api/bookmark/";
 
 export default {
-	list() {
+	List() {
 		const url = urlbase + "list";
 		return $.ajax({
 			method: "GET",
@@ -18,7 +18,7 @@ export default {
 			throw new Error(request.status + " " + request.statusText + " from " + url);
 		});
 	},
-	moveDown(id) {
+	MoveDown(id) {
 		const url = urlbase + "moveDown";
 		return $.ajax({
 			method: "POST",
@@ -34,7 +34,7 @@ export default {
 			throw new Error(request.status + " " + request.statusText + " from " + url);
 		});
 	},
-	moveUp(id) {
+	MoveUp(id) {
 		const url = urlbase + "moveUp";
 		return $.ajax({
 			method: "POST",
@@ -50,7 +50,7 @@ export default {
 			throw new Error(request.status + " " + request.statusText + " from " + url);
 		});
 	},
-	remove(id) {
+	Delete(id) {
 		const url = urlbase + "delete";
 		return $.ajax({
 			method: "POST",
