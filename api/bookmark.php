@@ -52,7 +52,7 @@ class BookmarkApi extends abeApi {
 				<dd>ID of the bookmark to move down.</dd>
 			</dl>
 
-			<h2 id=POSTmoveDown>POST moveUp</h2>
+			<h2 id=POSTmoveUp>POST moveUp</h2>
 			<p>
 				Move a bookmark up in the sort order, switching with the bookmark
 				before it.  All parameters are required.
