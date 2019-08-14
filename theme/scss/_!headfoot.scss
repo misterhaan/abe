@@ -1,11 +1,18 @@
-// Header and footer styles for Collect Your Assets
+// Header and footer styles for Abe Personal Finance
 
-body > header {
+#abe {
+	@extend %flex-container-vertical;
+	min-height: 100vh;
+}
+
+body > header,
+#abe > header {
 	background-color: $green;
 	color: #fff;
 	@extend %flex-container-center;
 	padding: 0 .5em;
 	height: 1.55em;
+	flex: 0 0 auto;
 
 	.back {
 		@extend %flex-item-grow;
@@ -44,6 +51,10 @@ body > header {
 			content: "\f093";
 		}
 	}
+}
+
+#abe > footer {
+	margin-top: auto;
 }
 
 h1 {

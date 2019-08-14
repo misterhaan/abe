@@ -39,6 +39,9 @@ class BookmarkApi extends abeApi {
 				<dd>ID of the bookmark to remove.</dd>
 			</dl>
 
+			<h2 id=GETlist>GET list</h2>
+			<p>Get all bookmarks in order.</p>
+
 			<h2 id=POSTmoveDown>POST moveDown</h2>
 			<p>
 				Move a bookmark down in the sort order, switching with the bookmark
@@ -128,6 +131,22 @@ class BookmarkApi extends abeApi {
 				$ajax->Fail('Database error preparing to adjust sorting:  ' . $db->errno . ' ' . $db->error);
 		} else
 			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to delete.');
+	}
+
+	/**
+	 * Action to get the complete list of bookmarks in the correct sort order.
+	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
+	 */
+	protected static function listAction($ajax) {
+		global $db;
+		$bookmarks = 'select id, page, concat(\'#/\', page, trim(leading \'#\' from spec)) as url, name from bookmarks order by sort';
+		if($bookmarks = $db->query($bookmarks)) {
+			$list = [];
+			while($bookmark = $bookmarks->fetch_object())
+				$list[] = $bookmark;
+			$ajax->Data->bookmarks = $list;
+		} else
+			$ajax->Fail('Error looking up bookmarks:  ' . $db->errno . ' ' . $db->error);
 	}
 
 	/**

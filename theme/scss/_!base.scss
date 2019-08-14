@@ -1,4 +1,4 @@
-// variables, extensions, mixins, font definitions, and keyframes for Collect Your Assets
+// variables, extensions, mixins, font definitions, and keyframes for Abe Personal Finance
 
 $green: #593;
 $orange: #e73;
@@ -44,8 +44,7 @@ $gentlecorner: .25em;
 		-webkit-transform: rotate(0deg);
 		transform: rotate(0deg);
 	}
-	100%
-	{
+	100% {
 		-webkit-transform: rotate(359deg);
 		transform: rotate(359deg);
 	}
@@ -74,6 +73,11 @@ $gentlecorner: .25em;
 	@extend %flex-container;
 	-webkit-align-items: baseline;
 	align-items: baseline;
+}
+%flex-container-vertical {
+	@extend %flex-container;
+	-webkit-flex-direction: column;
+	flex-direction: column;
 }
 
 %flex-item-fixed {

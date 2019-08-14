@@ -1,4 +1,4 @@
-// styles for form elements common to all of Collect Your Assets
+// styles for form elements common to all of Abe
 
 input, select, textarea, button {
 	font-family: inherit;
@@ -20,6 +20,7 @@ label {
 }
 input, select, textarea {
 	background-color: #fff;
+	color: #000;
 	border: none;
 	border-radius: $gentlecorner;
 	padding: .125em .25em;
