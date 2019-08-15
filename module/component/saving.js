@@ -1,5 +1,6 @@
 import FundApi from "../api/fund.js";
 import $ from "../../external/jquery-3.4.1.min.js";
+import ReportErrors from "../reportErrors.js";
 
 export default {
 	data() {
@@ -21,6 +22,7 @@ export default {
 		};
 		this.$emit("add-action", this.actionAddFund);
 	},
+	mixins: [ReportErrors],
 	methods: {
 		IsActive(fund) {
 			return fund.balance > 0 || fund.target > 0;
@@ -152,9 +154,6 @@ export default {
 					this.Error("Attempted to move active fund below an inactive fund.");
 			else
 				this.Error("Attempted to move fund down when it is already last.");
-		},
-		Error(error) {
-			this.$emit("error", error);
 		}
 	},
 	// TODO:  show savings allocation donut

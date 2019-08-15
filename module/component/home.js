@@ -1,12 +1,9 @@
 import Bookmarks from "./bookmarks.js";
 import MainMenu from "./mainmenu.js";
+import ReportErrors from "../reportErrors.js";
 
 export default {
-	methods: {
-		Error(error) {
-			this.$emit('error', error);
-		}
-	},
+	mixins: [ReportErrors],
 	components: {
 		bookmarks: Bookmarks,
 		mainmenu: MainMenu
@@ -14,7 +11,7 @@ export default {
 	template: /*html*/ `
 		<main role=main>
 			<bookmarks @error="Error($event)"></bookmarks>
-			<mainmenu @change-view="$emit('change-view', $event)"></mainmenu>
+			<mainmenu></mainmenu>
 		</main>
 	`
 };

@@ -1,4 +1,5 @@
 import BookmarkApi from "../api/bookmark.js";
+import ReportErrors from "../reportErrors.js";
 
 export default {
 	data() {
@@ -7,14 +8,11 @@ export default {
 		};
 	},
 	created() {
-		this.Error = error => {
-			this.$emit('error', error);
-		};
-
 		BookmarkApi.List().done(bookmarks => {
 			this.bookmarks = bookmarks;
 		}).fail(this.Error);
 	},
+	mixins: [ReportErrors],
 	methods: {
 		MoveDown(bookmark, index) {
 			BookmarkApi.MoveDown(bookmark.id).done(() => {
