@@ -13,14 +13,13 @@ export default {
 		FundApi.List().done(funds => {
 			this.funds = funds;
 		}).fail(this.Error);
-		this.actionAddFund = {
+		this.$emit("add-action", {
 			action: this.Add,
 			url: "#saving!add",
 			class: "add",
 			text: "+",
 			tooltip: "Add a new savings fund"
-		};
-		this.$emit("add-action", this.actionAddFund);
+		});
 	},
 	mixins: [ReportErrors],
 	methods: {

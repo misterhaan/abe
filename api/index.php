@@ -5,6 +5,9 @@ $html->Open('API');
 ?>
 			<h1>Abe Personal Finance API</h1>
 
+			<h2 class=api><a href=account>account</a></h2>
+			<p>The account API manages the accounts Abe works with.</p>
+
 			<h2 class=api><a href=bookmark>bookmark</a></h2>
 			<p>The bookmark API manages bookmarks that appear with the main menu.</p>
 

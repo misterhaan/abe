@@ -5,5 +5,7 @@ RewriteEngine on
 RewriteBase /
 RewriteRule \.git/ - [F]
 RewriteRule etc/ - [F]
-RewriteCond %{REQUEST_URI} ^(.*)(saving)\.php
+RewriteCond %{REQUEST_URI} ^(.*)saving\.php
 RewriteRule saving.php %1#saving [R,NE]
+RewriteCond %{REQUEST_URI} ^(.*)accounts\.php
+RewriteRule accounts.php %1#settings/accounts [R,NE]

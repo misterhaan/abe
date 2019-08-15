@@ -6,6 +6,17 @@
 		background-color: $lightgreyblue;
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 1px $darkgrey;
+		@media (min-width: 55.5em) {
+			display: inline-block;
+			width: calc(50% - 1.25em);
+			margin-bottom: .0625em;
+		}
+		@media (min-width: 78em) {
+			width: calc(33.33% - 1.1875em);
+		}
+		@media (min-width: 102em) {
+			width: calc(25% - 1.125em);
+		}
 		h2 {
 			color: #fff;
 			background-color: $blue;
@@ -13,6 +24,15 @@
 			margin: 0;
 			border-radius: $gentlecorner $gentlecorner 0 0;
 			@extend %ellipsis;
+		}
+		&.closed {
+			box-shadow: none;
+			color: $darkgrey;
+			background-color: transparent;
+			h2 {
+				color: $blue;
+				background-color: transparent;
+			}
 		}
 	}
 	.lastupdate {
