@@ -12,7 +12,7 @@ export default {
 			<a href="transactions.php">Transactions</a>
 			<a href="spending.php">Spending</a>
 			<a href="import.php">Import</a>
-			<a href="saving.php">Saving</a>
+			<a href="#${Views.Saving.Name}" @click="$emit('change-view', views.Saving)">${Views.Saving.Title}</a>
 			<a href="categories.php">Settings</a>
 		</nav>
 	`

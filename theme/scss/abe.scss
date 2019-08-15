@@ -29,17 +29,26 @@ a:visited {
 }
 a.edit,
 a.save,
+a.undo,
 a.delete,
 a.remove,
-button.add {
+a.up,
+a.down {
 	@extend %fa-replaced;
 	&:before {
 		font-size: .9em;
 		margin-left: .5em;
+		color: $darkgrey;
+	}
+	&:hover:before {
+		color: #000;
 	}
 }
 a.edit:before {
 	content: "\f044";
+}
+a.undo:before {
+	content: "\f0e2";
 }
 a.save:before {
 	content: "\f0c7";
@@ -50,13 +59,23 @@ a.delete:before {
 a.remove:before {
 	content: "\f057";
 }
+a.up:before {
+	content: "\f0d8";
+}
+a.down:before {
+	content: "\f0d7";
+}
 a.delete:hover:before,
 a.remove:hover:before {
 	color: $red;
 }
-button.add:before {
-	content: "\f067";
-	margin: 0;
+button.add {
+	@extend %fa-replaced;
+	&:before {
+		content: "\f067";
+		font-size: .9em;
+		margin: 0;
+	}
 }
 .loading:before,
 .working:after {
@@ -81,6 +100,17 @@ button.add:before {
 	display: inline-block;
 	white-space: nowrap;
 	text-decoration: none;
+}
+
+.percentfield {
+	margin: .125em 1em;
+	background-color: $medgreyblue;
+	border-radius: $gentlecorner;
+	.percentvalue {
+		height: .5em;
+		background-color: $blue;
+		border-radius: $gentlecorner;
+	}
 }
 
 @media (min-width: 35em) {

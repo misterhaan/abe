@@ -3,12 +3,14 @@ import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
 import Home from "./component/home.js";
+import Saving from "./component/saving.js";
 
 new Vue({
 	el: "#abe",
 	data: {
 		view: Views.Home,
-		params: false
+		params: false,
+		actions: []
 	},
 	computed: {
 		isHome() {
@@ -25,8 +27,12 @@ new Vue({
 	},
 	methods: {
 		ChangeView(view, params = false) {
+			this.actions = [];
 			this.params = params;
 			this.view = view;
+		},
+		OnAddAction(action) {
+			this.actions.push(action);
 		},
 		OnError(error) {
 			// TODO:  put errors into the status bar
@@ -36,7 +42,8 @@ new Vue({
 	components: {
 		titlebar: TitleBar,
 		statusbar: StatusBar,
-		[Views.Home.Name]: Home
+		[Views.Home.Name]: Home,
+		[Views.Saving.Name]: Saving
 	}
 });
 

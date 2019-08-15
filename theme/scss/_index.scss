@@ -35,10 +35,6 @@
 			display: inline-block;
 			padding-left: .5em;
 			font-size: .9em;
-			color: $darkgrey;
-		}
-		&:hover:before {
-			color: #000;
 		}
 		&.spending:before {
 			content: "\f200";
@@ -54,18 +50,6 @@
 			padding-left: 0;
 			padding-right: .5em;
 			color: $green;
-		}
-		&.up:before {
-			content: "\f0d8";
-		}
-		&.down:before {
-			content: "\f0d7";
-		}
-		&.delete:before {
-			content: "\f1f8";
-		}
-		&.delete:hover:before {
-			color: $red;
 		}
 	}
 }
@@ -95,7 +79,8 @@
 		&[href$='categories.php']:before {
 			content: "\f085";
 		}
-		&[href$='saving.php']:before {
+		&[href$='saving.php']:before,
+		&[href^='#saving']:before {
 			content: "\f024";
 		}
 		&[href$='spending.php']:before {

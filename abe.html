@@ -30,13 +30,8 @@
 	</head>
 	<body>
 		<div id=abe>
-			<titlebar :is-home=isHome :title=view.Title @change-view="ChangeView($event)"></titlebar>
-			<component :is=view.Name @change-view="ChangeView($event)" @error="OnError($event)">
-				<p>
-					Abe Personal Finance requires <a href="https://browsehappy.com/">a modern web browser</a>.
-					The latest version of anything other than Internet Explorer should work.
-				</p>
-			</component>
+			<titlebar :is-home=isHome :title=view.Title :actions=actions @change-view="ChangeView($event)"></titlebar>
+			<component :is=view.Name @change-view="ChangeView($event)" @add-action="OnAddAction($event)" @error="OnError($event)"></component>
 			<statusbar></statusbar>
 		</div>
 	</body>

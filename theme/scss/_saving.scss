@@ -1,52 +1,55 @@
-.fund {
-	background-color: $lightgreyblue;
+.fundview {
+	@extend %flex-container;
 	margin-top: 1px;
-	h2 {
-		@extend %flex-container;
-		justify-content: center;
-		margin: 0;
-		padding: .125em 0;
-		text-align: center;
-		a {
-			@extend %flex-item-fixed;
-			&:before {
-				margin: 0 .75em;
+	&.active,
+	&:hover {
+		background-color: $lightgreyblue;
+		.fund {
+			color: #000;
+		}
+	}
+	.fund {
+		@extend %flex-item-fill;
+		color: $darkgrey;
+		h2 {
+			@extend %flex-container;
+			justify-content: center;
+			margin: .125em 0 0;
+			padding: .125em 0;
+			text-align: center;
+			a {
+				@extend %flex-item-fixed;
+				&:before {
+					margin: 0 .75em;
+				}
+			}
+			.name {
+				@extend %flex-item-fill;
+				margin: 0 .5em;
+			}
+			input {
+				width: 13.5em;
+				text-align: center;
 			}
 		}
-		.name {
-			@extend %flex-item-fill;
+		.values {
+			padding: .125em 0 .25em;
 			margin: 0 .5em;
-		}
-		input {
-			width: 13.5em;
 			text-align: center;
-		}
-		input.name {
-			margin-right: 0;
-		}
-	}
-	.percentfield {
-		margin: .125em 1em;
-		background-color: $medgreyblue;
-		border-radius: $gentlecorner;
-		.percentvalue {
-			height: .5em;
-			background-color: $blue;
-			border-radius: $gentlecorner;
+			input {
+				width: 5.75em;
+				text-align: right;
+			}
 		}
 	}
-	.values {
-		padding: .125em 0 .25em;
-		margin: 0 .5em;
-		text-align: center;
-		input {
-			width: 5.75em;
-			text-align: right;
+	nav {
+		@extend %flex-item-fixed;
+		@extend %flex-container-vertical;
+		width: 1em;
+		justify-content: center;
+		padding-right: .5em;
+		a:before {
+			margin-left: .125em;
 		}
-	}
-	&#addFund {
-		background-color: transparent;
-		padding-top: 1em;
-		text-align: center;
 	}
 }
