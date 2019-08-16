@@ -21,7 +21,7 @@ $(function() {
 function DeleteBookmark() {
 	var link = this;
 	var bookmark = $(link).parent();
-	$.post(link.href, {id: bookmark.data("id")}, function(result) {
+	$.post(link.href, { id: bookmark.data("id") }, function(result) {
 		if(result.fail)
 			alert(result.message);
 		else {
@@ -42,7 +42,7 @@ function DeleteBookmark() {
 function MoveBookmarkDown() {
 	var link = this;
 	var bookmark = $(link).parent();
-	$.post(link.href, {id: bookmark.data("id")}, function(result) {
+	$.post(link.href, { id: bookmark.data("id") }, function(result) {
 		if(result.fail)
 			alert(result.message);
 		else {
@@ -59,7 +59,7 @@ function MoveBookmarkDown() {
 function MoveBookmarkUp() {
 	var link = this;
 	var bookmark = $(link).parent();
-	$.post(link.href, {id: bookmark.data("id")}, function(result) {
+	$.post(link.href, { id: bookmark.data("id") }, function(result) {
 		if(result.fail)
 			alert(result.message);
 		else {
@@ -81,7 +81,7 @@ function SaveBookmark() {
 	if(title) {
 		var url = $("#bookmarkUrl");
 		$("#saveBookmark").prop("disabled", true).addClass("working");
-		$.post("api/bookmark/add", {name: title, page: url.data("page"), spec: url.data("spec")}, function(result) {
+		$.post("api/bookmark/add", { name: title, page: url.data("page"), spec: url.data("spec") }, function(result) {
 			if(result.fail)
 				alert(result.message);
 			else
@@ -175,7 +175,6 @@ ko.bindingHandlers.draggable = {
 		});
 		$(element).on("dragend", function() {
 			$(element).removeClass("dragging");
-			delete ko.abe.dragdata;
 		});
 	},
 	update: function(element, valueAccessor) {
@@ -201,8 +200,8 @@ ko.bindingHandlers.droppable = {
 			element.draglevel = 0;
 			$(element).removeClass("droptarget");
 			event.stopPropagation();
+			event.preventDefault();
 			data.drop(ko.abe.dragdata);
-			delete ko.abe.dragdata;
 		});
 	},
 	update: function(element, valueAccessor) {
