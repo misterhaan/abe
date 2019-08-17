@@ -128,7 +128,7 @@ var TransactionsModel = new function() {
 			self.filterAcct("");
 			self.filterCat("");
 			// use slice to make copies.  they will be restored on cancel.
-			self.oldFilters = {accounts:  self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd(), minAmount: self.minAmount(), searchName: self.searchName()};
+			self.oldFilters = { accounts: self.filterAccounts().slice(), categories: self.filterCategories().slice(), dateStart: self.dateStart(), dateEnd: self.dateEnd(), minAmount: self.minAmount(), searchName: self.searchName() };
 		}
 	});
 
@@ -190,13 +190,13 @@ var TransactionsModel = new function() {
 	self.categoriesForFilter = ko.computed(function() {
 		self = self || TransactionsModel;
 		var cats = [];
-		var uncat = {id: 0, name: "(uncategorized)", groupname: ""};
+		var uncat = { id: 0, name: "(uncategorized)", groupname: "" };
 		var search = self.filterCat();
-		if((!search || uncat.name.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) {return chosen.id == 0;}))
+		if((!search || uncat.name.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) { return chosen.id == 0; }))
 			cats.push(HighlightCategory(uncat, search));
 		for(var c = 0; c < self.categories().length; c++) {
 			var cat = self.categories()[c];
-			if((!search || cat.name.containsAnyCase(search) || cat.groupname.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) {return chosen.id == cat.id;}))
+			if((!search || cat.name.containsAnyCase(search) || cat.groupname.containsAnyCase(search)) && !self.filterCategories().find(function(chosen) { return chosen.id == cat.id; }))
 				cats.push(HighlightCategory(cat, search));
 		}
 		return cats;
@@ -210,7 +210,7 @@ var TransactionsModel = new function() {
 		if(!(self.dateStart() == "" || /^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(self.dateStart()))) {
 			// attempt to format the date to YYYY-MM-DD
 			var d = new Date(self.dateStart());
-			self.dateStart(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) );
+			self.dateStart(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2));
 		}
 	});
 	/**
@@ -221,7 +221,7 @@ var TransactionsModel = new function() {
 		if(!(self.dateEnd() == "" || /^[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(self.dateEnd()))) {
 			// attempt to format the date to YYYY-MM-DD
 			var d = new Date(self.dateEnd());
-			self.dateEnd(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) );
+			self.dateEnd(d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2));
 		}
 	});
 
@@ -281,7 +281,7 @@ var TransactionsModel = new function() {
 		cats = cats.split(",");
 		for(var fc = 0; fc < cats.length; fc++)
 			if(cats[fc] === "0")  // category zero isn't in the category list
-				self.filterCategories.push({id: 0, name: "(uncategorized)"});
+				self.filterCategories.push({ id: 0, name: "(uncategorized)" });
 			else if(cats[fc])  // skip blank values
 				for(var pc = 0; pc < self.categories().length; pc++)
 					if(self.categories()[pc].id == +cats[fc]) {
@@ -337,7 +337,7 @@ var TransactionsModel = new function() {
 	 * categories have been loaded.
 	 */
 	(self.GetAccounts = function() {
-		$.get("accounts.php?ajax=accountlist", null, function(result) {
+		$.get("api/account/list", null, function(result) {
 			if(!result.fail) {
 				self.accounts(result.accounts);
 				if(self.categoriesLoaded)
@@ -455,12 +455,12 @@ var TransactionsModel = new function() {
 						// data needs the id to know which transaction, plus anything that (could have) changed.
 						data.push({
 							id: tr.id, name: tr.name().trim(), notes: tr.notes().trim(),
-							catnames: tr.categories().map(function(c) {return c.name() ? c.name().trim() : "";}).join("\n"),
-							catamounts: tr.categories().map(function(c) {return +c.amount();}).join("\n")
+							catnames: tr.categories().map(function(c) { return c.name() ? c.name().trim() : ""; }).join("\n"),
+							catamounts: tr.categories().map(function(c) { return +c.amount(); }).join("\n")
 						});
 					}
 			if(data.length)  // should be true if self.changed was true
-				$.post("?ajax=save", {transactions: data}, function(result) {
+				$.post("?ajax=save", { transactions: data }, function(result) {
 					self.saving(false);
 					if(!result.fail) {
 						self.GetCategories(false);
@@ -498,7 +498,7 @@ var TransactionsModel = new function() {
 	self.ShowSuggestions = function(category) {
 		category.suggesting(true);
 	};
-	
+
 	/**
 	 * Show category suggestions for the filter menu's category field.
 	 */
@@ -557,7 +557,7 @@ var TransactionsModel = new function() {
 	 * @param category Category being included.
 	 */
 	self.ChooseFilterCategory = function(category) {
-		self.filterCategories.push({id: category.id, name: category.plainName || category.name});
+		self.filterCategories.push({ id: category.id, name: category.plainName || category.name });
 		self.suggestingFilterCategories(false);
 	};
 
@@ -946,7 +946,7 @@ function ObserveCategory(category) {
 			if(blankcat)
 				blankcat.amount(diff.toFixed(2));
 			else {
-				blankcat = {name: "", amount: diff.toFixed(2)};
+				blankcat = { name: "", amount: diff.toFixed(2) };
 				ObserveCategory(blankcat);
 				tran.categories.push(blankcat);
 			}
@@ -1033,18 +1033,18 @@ ko.bindingHandlers.scrollTo = {
 		if(ko.unwrap(valueAccessor())) {
 			var r = element.getBoundingClientRect();
 			if(r.top < 0)
-				$("body").animate({scrollTop: $(element).offset().top}, 100);
+				$("body").animate({ scrollTop: $(element).offset().top }, 100);
 			else if(r.bottom > $(window).height())
 				if(r.height + 3 > $(window).height())
-					$("body").animate({scrollTop: $(element).offset().top}, 100);
+					$("body").animate({ scrollTop: $(element).offset().top }, 100);
 				else
-					$("body").animate({scrollTop: $(element).offset().top - $(window).height() + r.height + 3}, 100);
+					$("body").animate({ scrollTop: $(element).offset().top - $(window).height() + r.height + 3 }, 100);
 		}
 	}
 };
 
 function HighlightCategory(cat, search) {
-	return {id: cat.id, plainName: cat.name, name: HighlightString(cat.name, search), groupname: HighlightString(cat.groupname, search)};
+	return { id: cat.id, plainName: cat.name, name: HighlightString(cat.name, search), groupname: HighlightString(cat.groupname, search) };
 }
 
 function HighlightString(str, search) {
@@ -1053,7 +1053,7 @@ function HighlightString(str, search) {
 }
 
 function EscapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
 /**

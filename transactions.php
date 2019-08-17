@@ -33,12 +33,12 @@ $html->FormAddBookmark();
 							<span class="all account">(all)</span>
 						<!-- /ko -->
 						<!-- ko foreach: filterAccounts -->
-							<span class="account" data-bind="css: typeclass"><span data-bind="text: name"></span><a class=remove data-bind="click: $root.RemoveAccount"></a></span>
+							<span class="account" data-bind="css: typeClass"><span data-bind="text: name"></span><a class=remove data-bind="click: $root.RemoveAccount"></a></span>
 						<!-- /ko -->
 						<input data-bind="textInput: filterAcct, event: { dblclick: ShowAcctSuggestions, keydown: AccountFilterKey, blur: HideFilterAcctSuggestions }" placeholder="Find an account">
 					</label>
 					<ol class=suggestions data-bind="visible: suggestingAccounts, foreach: accountsForFilter">
-						<li><div data-bind="text: name, click: $root.ChooseAccount, attr: {'class': 'account ' + typeclass}, css: {kbcursor: $data == $root.acctCursor()}"></div></li>
+						<li><div data-bind="text: name, click: $root.ChooseAccount, attr: {'class': 'account ' + typeClass}, css: {kbcursor: $data == $root.acctCursor()}"></div></li>
 					</ol>
 					<label class=categories title="Show transactions with these categories">
 						Categories:
