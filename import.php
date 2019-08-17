@@ -12,11 +12,11 @@ $html->Open('Import Transactions');
 				</label>
 				<label data-bind="visible: selectedAccount()">
 					<span class=label>Bank:</span>
-					<span class=field><a data-bind="text: selectedAccount().bankname + ' login', attr: {href: selectedAccount().bankurl}">bankname</a></span>
+					<span class=field><a data-bind="text: selectedAccount().bankname + ' login', attr: {href: selectedAccount().bankUrl}">bankname</a></span>
 				</label>
 				<label data-bind="visible: selectedAccount()">
 					<span class=label>Latest:</span>
-					<span class=field data-bind="text: selectedAccount().newest"></span>
+					<span class=field data-bind="text: selectedAccount().newestDisplay"></span>
 				</label>
 				<label>
 					<span class=label>Transactions:</span>
