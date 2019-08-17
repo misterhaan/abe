@@ -33,7 +33,7 @@ function ImportModel() {
 	self.previews = ko.observableArray([]);
 
 	// Load the list of accounts.
-	$.get("accounts.php?ajax=accountlist", {}, function(result) {
+	$.get("api/account/list", {}, function(result) {
 		if(!result.fail) {
 			for(var a = 0; a < result.accounts.length; a++)
 				self.accountlist.push(result.accounts[a]);
@@ -51,19 +51,21 @@ function ImportModel() {
 		$("#importtrans label:last-child .label").prop("disabled", true).addClass("waiting");
 		var acctid = $("select").val();
 		var acctname = $("select option[value='" + acctid + "']").text();
-		$.post({url: "api/transactions/parseFile", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
-			$("#importtrans label:last-child .label").prop("disabled", false).removeClass("waiting");
-			if(result.fail)
-				alert(result.message);
-			else {
-				result.preview.acctid = acctid;
-				result.preview.acctname = acctname;
-				result.preview.saved = ko.observable(false);
-				result.preview.working = ko.observable(false);
-				self.previews.unshift(result.preview);
-				$(window).scrollTop($(".transactions.preview").first().offset().top);
-			}
-		}, dataType: "json"});
+		$.post({
+			url: "api/transactions/parseFile", data: new FormData($("#importtrans")[0]), cache: false, contentType: false, processData: false, success: function(result) {
+				$("#importtrans label:last-child .label").prop("disabled", false).removeClass("waiting");
+				if(result.fail)
+					alert(result.message);
+				else {
+					result.preview.acctid = acctid;
+					result.preview.acctname = acctname;
+					result.preview.saved = ko.observable(false);
+					result.preview.working = ko.observable(false);
+					self.previews.unshift(result.preview);
+					$(window).scrollTop($(".transactions.preview").first().offset().top);
+				}
+			}, dataType: "json"
+		});
 		$("input[type='file']").val("");
 	};
 
@@ -73,7 +75,7 @@ function ImportModel() {
 	 */
 	self.Save = function(preview) {
 		preview.working(true);
-		$.post("api/transactions/import", {acctid: preview.acctid, transactions: preview.transactions, net: preview.net}, function(result) {
+		$.post("api/transactions/import", { acctid: preview.acctid, transactions: preview.transactions, net: preview.net }, function(result) {
 			if(result.fail)
 				alert(result.message);
 			else

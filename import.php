@@ -16,7 +16,7 @@ $html->Open('Import Transactions');
 				</label>
 				<label data-bind="visible: selectedAccount()">
 					<span class=label>Latest:</span>
-					<span class=field data-bind="text: selectedAccount().newest"></span>
+					<span class=field data-bind="text: selectedAccount().newestDisplay"></span>
 				</label>
 				<label>
 					<span class=label>Transactions:</span>
