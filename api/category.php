@@ -158,19 +158,20 @@ class CategoryApi extends abeApi {
 	 */
 	protected static function moveAction($ajax) {
 		global $db;
-		if(isset($_POST['id']) && isset($_POST['grp']) && ($id = +$_POST['id']) && $grp = +$_POST['grp'])
+		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$grp = isset($_POST['grp']) && +$_POST['grp'] ? +$_POST['grp'] : null;
 			if($u = $db->prepare('update categories set grp=? where id=? limit 1'))
 				if($u->bind_param('ii', $grp, $id))
 					if($u->execute())
-						$ajax->Data->audit = 'id=' . $id . ', grp=' . $grp; // success!
+						; // success!
 					else
 						$ajax->Fail('Error executing category move:  ' . $u->errno . ' ' . $u->error);
 				else
 					$ajax->Fail('Error binding parameters to move category:  ' . $u->errno . ' ' . $u->error);
 			else
 				$ajax->Fail('Error preparing to move category:  ' . $db->errno . ' ' . $db->error);
-		else
-			$ajax->Fail('Parameters \'id\' and \'grp\' are both required and must be numeric.');
+		} else
+			$ajax->Fail('Parameter \'id\' is required and must be numeric.');
 	}
 
 	/**

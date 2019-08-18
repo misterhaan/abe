@@ -128,8 +128,8 @@ class CategoryGroupApi extends abeApi {
 				$catnames = explode("\n", $group->catnames);
 				$cats = [];
 				for($c = 0; $c < count($catids); $c++)
-					$cats[] = ['id' => $catids[$c], 'name' => $catnames[$c]];
-				$ajax->Data->groups[] = ['id' => $group->id, 'name' => $group->name, 'categories' => $cats];
+					$cats[] = ['id' => +$catids[$c], 'name' => $catnames[$c]];
+				$ajax->Data->groups[] = ['id' => +$group->id, 'name' => $group->name, 'categories' => $cats];
 			}
 		} else
 			$ajax->Fail('Error looking up categories:  ' . $db->errno . ' ' . $db->error);

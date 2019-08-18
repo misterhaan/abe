@@ -1,34 +1,31 @@
-section#categorygroups,
-section#categories {
-	padding: 0 .5em;
-	ol {
-		list-style-type: none;
-		padding: 0;
-		margin: 1em 0 .25em;
+#categories {
+	@extend %flex-item-fill;
+}
+@media (min-width: 35em) {
+	#categories {
+		display: -webkit-flex;
+		display: flex;
 	}
+}
+#categorygroups,
+#groupcategories {
+	margin: 0;
+	padding: 1em .5em .25em;
+	list-style-type: none;
 	li {
 		padding: .125em .5em .125em .25em;
-		display: -webkit-flex;
-		display: flex;
-	}
-	div.add {
-		display: -webkit-flex;
-		display: flex;
-		margin: .25em 0 .5em;
-		input {
-			-webkit-flex: 1 1 auto;
-			flex: 1 1 auto;
-			width: 5.5em;
+		@extend %flex-container;
+		.name {
+			@extend %flex-item-grow;
 		}
-		button {
-			margin: 0 .5em;
+		.actionspacer {
+			width: 3em;
 		}
 	}
 }
-section#categorygroups {
+#categorygroups {
 	padding-right: 0;
-	-webkit-flex: 0 0 auto;
-	flex: 0 0 auto;
+	@extend %flex-item-fixed;
 	li {
 		cursor: pointer;
 		border-radius: $gentlecorner 0 0 $gentlecorner;
@@ -44,7 +41,8 @@ section#categorygroups {
 		}
 	}
 }
-section#categories {
+#groupcategories {
+	@extend %flex-item-grow;
 	background-color: $lightgreyblue;
 	padding-left: 1em;
 	border-radius: 0 0 0 $gentlecorner;

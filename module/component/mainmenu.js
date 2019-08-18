@@ -13,7 +13,7 @@ export default {
 			<a href="spending.php">Spending</a>
 			<a href="import.php">Import</a>
 			<a href="#${Views.Saving.Name}">${Views.Saving.Title}</a>
-			<a href="categories.php">Settings</a>
+			<a href="#${Views.Settings.Name}">${Views.Settings.Title}</a>
 		</nav>
 	`
 };

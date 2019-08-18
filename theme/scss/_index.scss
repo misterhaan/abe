@@ -76,7 +76,8 @@
 		&[href$='import.php']:before {
 			content: "\f093";
 		}
-		&[href$='categories.php']:before {
+		&[href$='categories.php']:before,
+		&[href^='#settings']:before {
 			content: "\f085";
 		}
 		&[href$='saving.php']:before,
