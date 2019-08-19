@@ -56,6 +56,17 @@ class FundApi extends abeApi {
 				<dd>ID of the fund to move down.</dd>
 			</dl>
 
+			<h2 id=POSTmoveTo>POST moveTo</h2>
+			<p>
+				Move a fund from its current sort position to just before another fund.
+			</p>
+			<dl class=parameters>
+				<dt>moveId</dt>
+				<dd>ID of the fund to move.</dd>
+				<dt>beforeId</dt>
+				<dd>ID of the fund the moveId fund should be moved before.</dd>
+			</dl>
+
 			<h2 id=POSTmoveUp>POST moveUp</h2>
 			<p>
 				Move a fund up in the sort order, switching with the fund
@@ -204,6 +215,46 @@ class FundApi extends abeApi {
 				$ajax->Fail('Database error preparing to move next fund up:  ' . $db->errno . ' ' . $db->error);
 		} else
 			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to move.');
+	}
+
+	/**
+	 * Action to move a fund before another fund in the sort order.
+	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
+	 */
+	protected static function moveToAction($ajax) {
+		global $db;
+		if(isset($_POST['moveId']) && isset($_POST['beforeId']) && ($moveid = +$_POST['moveId']) && $beforeid = +$_POST['beforeId']) {
+			$db->autocommit(false);
+			if($moveOthers = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=? limit 1) as f)'))
+				if($moveOthers->bind_param('i', $moveid))
+					if($moveOthers->execute())
+						if($moveOthers = $db->prepare('update funds set sort=sort+1 where sort>=(select sort from (select sort from funds where id=? limit 1) as f)'))
+							if($moveOthers->bind_param('i', $beforeid))
+								if($moveOthers->execute())
+									if($moveFund = $db->prepare('update funds set sort=(select sort-1 from (select sort as newsort from funds where id=? limit 1) as f) where id=? limit 1'))
+										if($moveFund->bind_param('ii', $beforeid, $moveid))
+											if($moveFund->execute())
+												$db->commit();
+											else
+												$ajax->Fail('Database error moving fund:  ' . $moveFund->errno . ' ' . $moveFund->error);
+										else
+											$ajax->Fail('Database error binding parameters to move fund:  ' . $moveFund->errno . ' ' . $moveFund->error);
+									else
+										$ajax->Fail('Database error preparing to move fund:  ' . $db->errno . ' ' . $db->error);
+								else
+									$ajax->Fail('Database error moving other funds down:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
+							else
+								$ajax->Fail('Database error binding parameter to move other funds down:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
+						else
+							$ajax->Fail('Database error preparing to other funds down:  ' . $db->errno . ' ' . $db->error);
+					else
+						$ajax->Fail('Database error moving other funds up:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
+				else
+					$ajax->Fail('Database error binding parameter to move other funds up:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
+			else
+				$ajax->Fail('Database error preparing to move other funds up:  ' . $db->errno . ' ' . $db->error);
+		} else
+			$ajax->Fail('Required parameters \'moveId\' and \'beforeId\' must be present and nonzero numeric.');
 	}
 
 	/**

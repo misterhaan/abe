@@ -1,6 +1,8 @@
 import FundApi from "../api/fund.js";
 import $ from "../../external/jquery-3.4.1.min.js";
 import ReportErrors from "../reportErrors.js";
+import FilterAmountKeys from "../filterAmountKeys.js";
+import DragDrop from "../dragDrop.js";
 
 export default {
 	data() {
@@ -21,7 +23,10 @@ export default {
 			tooltip: "Add a new savings fund"
 		});
 	},
-	mixins: [ReportErrors],
+	mixins: [
+		ReportErrors,
+		FilterAmountKeys,
+	],
 	methods: {
 		IsActive(fund) {
 			return fund.balance > 0 || fund.target > 0;
@@ -153,13 +158,23 @@ export default {
 					this.Error("Attempted to move active fund below an inactive fund.");
 			else
 				this.Error("Attempted to move fund down when it is already last.");
+		},
+		MoveFund(movingFund, beforeFund) {
+			if(movingFund && beforeFund && movingFund != beforeFund && this.IsActive(movingFund) == this.IsActive(beforeFund)) {
+				FundApi.MoveTo(movingFund.id, beforeFund.id).done(() => {
+					this.funds.splice(this.funds.indexOf(beforeFund), 0, this.funds.splice(this.funds.indexOf(movingFund), 1)[0]);
+				}).fail(this.Error);
+			}
 		}
 	},
+	directives: {
+		draggable: DragDrop.Draggable,
+		droptarget: DragDrop.DropTarget
+	},
 	// TODO:  show savings allocation donut
-	// TODO:  support ordering by dragging
 	template: /*html*/ `
 		<main role=main>
-			<div class=fundview :class="{active: IsActive(fund) || editFund == fund}" v-for="(fund, index) in funds">
+			<div class=fundview :class="{active: IsActive(fund) || editFund == fund}" v-for="(fund, index) in funds" v-draggable="{data: fund, name: fund.name, type: IsActive(fund) ? 'activeFund' : 'inactiveFund'}" v-droptarget="{data: fund, onDrop: MoveFund, type: IsActive(fund) ? 'activeFund' : 'inactiveFund'}">
 				<div class=fund @click="Edit(fund)">
 					<h2 v-if="editFund != fund">{{fund.name}}</h2>
 					<h2 v-if="editFund == fund">
@@ -170,9 +185,9 @@ export default {
 					</div>
 					<div v-if="editFund != fund && IsActive(fund)" class=values>{{fund.balanceDisplay}} of {{fund.targetDisplay}}</div>
 					<div v-if="editFund == fund" class=values>
-						<input class=balance v-model=fund.balance event="{keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01 placeholder=Current>
+						<input class=balance v-model=fund.balance type=number step=.01 placeholder=Current @keypress=FilterAmountKeys>
 						of
-						<input v-model=fund.target event="{keypress: ko.nonVmHandlers.AmountKey}" type=number step=.01 placeholder=Target>
+						<input v-model=fund.target type=number step=.01 placeholder=Target @keypress=FilterAmountKeys>
 					</div>
 					<div v-if="!IsActive(fund) && editFund != fund" class=values>
 						(inactive)

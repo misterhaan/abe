@@ -98,6 +98,25 @@ export default {
 			throw new Error(request.status + " " + request.statusText + " from " + url);
 		});
 	},
+	MoveTo(moveId, beforeId) {
+		const url = urlbase + "moveTo";
+		return $.ajax({
+			method: "POST",
+			url: url,
+			data: {
+				moveId: moveId,
+				beforeId: beforeId
+			},
+			dataType: "json"
+		}).then(result => {
+			if(result.fail)
+				throw new Error(result.message);
+			else
+				return true;
+		}, request => {
+			throw new Error(request.status + " " + request.statusText + " from " + url);
+		});
+	},
 	Close(id) {
 		const url = urlbase + "close";
 		return $.ajax({

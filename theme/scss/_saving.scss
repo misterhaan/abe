@@ -1,12 +1,17 @@
 .fundview {
 	@extend %flex-container;
 	margin-top: 1px;
-	&.active,
-	&:hover {
+	&.active {
 		background-color: $lightgreyblue;
 		.fund {
 			color: #000;
 		}
+	}
+	&.dragging {
+		opacity: .4;
+	}
+	&.droptarget {
+		border-top: 3px solid $blue;
 	}
 	.fund {
 		@extend %flex-item-fill;
