@@ -5,6 +5,10 @@ export default {
 		Name: "home",
 		Title: AppName.Full
 	},
+	Import: {
+		Name: "import",
+		Title: "Import"
+	},
 	Saving: {
 		Name: "saving",
 		Title: "Saving"

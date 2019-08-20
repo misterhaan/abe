@@ -2,10 +2,10 @@
 require_once dirname(__DIR__) . '/etc/class/abe.php';
 
 /**
- * Handler for transactions API requests.
+ * Handler for transaction API requests.
  * @author misterhaan
  */
-class TransactionsApi extends abeApi {
+class TransactionApi extends abeApi {
 	/**
 	 * Write out the documentation for the transaction file import API controller.
 	 * The page is already opened with an h1 header, and will be closed after the
@@ -51,14 +51,17 @@ class TransactionsApi extends abeApi {
 		global $db;
 		if(isset($_POST['acctid']) && $account = +$_POST['acctid'])
 			if(isset($_POST['transactions']) && is_array($_POST['transactions']) && $count = count($_POST['transactions'])) {
-				$db->real_query('start transaction');  // transaction makes all these inserts much faster
+				$db->autocommit(false);  // transaction makes all these inserts much faster
 				if($ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
 					if($ins->bind_param('issssdssss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip, $notes)) {
+						$ajax->Data->newestSortable = '';
 						foreach($_POST['transactions'] as $trans) {
 							$trans = (object)$trans;
 							$extid = $trans->extid ? $trans->extid : null;
 							$transdate = $trans->transdate ? $trans->transdate : null;
 							$posted = $trans->posted;
+							if($posted > $ajax->Data->newestSortable)
+								$ajax->Data->newestSortable = $posted;
 							$name = $trans->name;
 							$amount = $trans->amount;
 							$city = $trans->city ? $trans->city : null;
@@ -68,16 +71,18 @@ class TransactionsApi extends abeApi {
 							if($ins->execute())
 								$count--;
 						}
-						if($count > 0)
-							$ajax->Fail('Error saving ' . $count . ' of ' . count($_POST['transactions']) . ' transactions:  ' . $ins->error);
+						$ajax->Data->newestDisplay = date('M jS', strtotime($ajax->Data->newestSortable));
+						if($count)
+							$ajax->Fail('Error saving ' . $count . ' of ' . count($_POST['transactions']) . ' transactions:  ' . $ins->errno . ' ' . $ins->error);
 						$ins->close();
-						if(!$db->real_query('update accounts set updated=\'' . +time() . '\', balance=balance+\'' . +$_POST['net'] . '\' where id=\'' . +$account .'\' limit 1'))
-							$ajax->Fail('Error updating account:  ' . $db->error);
+						if($db->real_query('update accounts set updated=\'' . +time() . '\', balance=balance+\'' . +$_POST['net'] . '\' where id=\'' . +$account .'\' limit 1'))
+							$db->commit();
+						else
+							$ajax->Fail('Error updating account:  ' . $db->errno . ' ' . $db->error);
 					} else
-						$ajax->Fail('Error binding import parameters:  ' . $ins->error);
+						$ajax->Fail('Error binding import parameters:  ' . $ins->errno . ' ' . $ins->error);
 				else
-					$ajax->Fail('Database error preparing to import transactions:  ' . $db->error);
-				$db->real_query('commit');
+					$ajax->Fail('Database error preparing to import transactions:  ' . $db->errno . ' ' . $db->error);
 			} else
 				$ajax->Fail('No transactions to save.');
 		else
@@ -119,8 +124,8 @@ class TransactionsApi extends abeApi {
 			} else
 				$ajax->Fail('Account not found.');
 		else
-			$ajax->Fail('Error looking up account:  ' . $db->error);
+			$ajax->Fail('Error looking up account:  ' . $db->errno . ' ' . $db->error);
 		return false;
 	}
 }
-TransactionsApi::Respond();
+TransactionApi::Respond();

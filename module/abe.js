@@ -5,6 +5,7 @@ import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
 import Home from "./component/home.js";
+import Import from "./component/import.js";
 import Saving from "./component/saving.js";
 import Settings from "./component/settings.js";
 
@@ -103,6 +104,7 @@ new Vue({
 		titlebar: TitleBar,
 		statusbar: StatusBar,
 		[Views.Home.Name]: Home,
+		[Views.Import.Name]: Import,
 		[Views.Saving.Name]: Saving,
 		[Views.Settings.Name]: Settings
 	}

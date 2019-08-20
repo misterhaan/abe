@@ -40,7 +40,7 @@ export default {
 				<div class=actions>
 					<a class=transactions :href="'transactions.php#!accts=' + account.id" title="See transactions from this account"><span>transactions</span></a>
 					<a class=bank :href=account.bankUrl title="Visit this account’s bank website" v-if=!account.closed><span>bank</span></a>
-					<a class=import :href="'import.php?acct=' + account.id" title="Import transactions to this account" v-if=!account.closed><span>import</span></a>
+					<a class=import :href="'#import!acct=' + account.id" title="Import transactions to this account" v-if=!account.closed><span>import</span></a>
 					<a class=edit :href="'account.php?id=' + account.id"><span>edit</span></a>
 				</div>
 			</div>

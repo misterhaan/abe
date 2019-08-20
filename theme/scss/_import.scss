@@ -1,3 +1,23 @@
+#accountlist.select .account {
+	&:not(.selected) {
+		h2{
+			background-color: $lightgreyblue;
+			color: $darkgrey;
+		}
+	}
+	.bank {
+		margin-left: auto;
+	}
+}
+#transactionsFile {
+	@extend %flex-container-baseline;
+	margin: 1em .5em;
+	input {
+		margin-left: .5em;
+		@extend %flex-item-fill;
+	}
+}
+
 .transactions.preview {
 	h2 {
 		margin: 1em .5em 0;
@@ -47,5 +67,6 @@
 		@extend %fa-label;
 		content: "\f00d";
 		margin-left: 1em;
+		margin-right: .25em;
 	}
 }

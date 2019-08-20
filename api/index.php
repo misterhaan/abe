@@ -27,7 +27,7 @@ $html->Open('API');
 			<h2 class=api><a href=summary>summary</a></h2>
 			<p>The summary API summarizes transactions by month and year.</p>
 
-			<h2 class=api><a href=transactions>transactions</a></h2>
+			<h2 class=api><a href=transaction>transaction</a></h2>
 			<p>
 				The transactions API manages transactions, including importing
 				transaction files.

@@ -15,6 +15,10 @@ class AccountApi extends abeApi {
 ?>
 			<h2 id=GETlist>GET list</h2>
 			<p>Get the list of accounts.</p>
+			<dl class=parameters>
+				<dt>activeOnly</dt>
+				<dd>If specified, closed accounts will left out of results.</dd>
+			</dl>
 <?php
 	}
 
@@ -25,13 +29,17 @@ class AccountApi extends abeApi {
 	protected static function listAction($ajax) {
 		global $db;
 		$accts = <<<ACCTS
-			select a.id, a.name, a.closed, at.class as typeClass, b.name as bankname, b.url as bankUrl, a.balance, max(t.posted) as newestSortable, date_format(max(t.posted), '%b %D') as newestDisplay
+			select a.id, a.name, a.closed, at.class as typeClass, b.name as bankName, b.url as bankUrl, a.balance, max(t.posted) as newestSortable, date_format(max(t.posted), '%b %D') as newestDisplay
 			from accounts as a
 				left join banks as b on b.id=a.bank
 				left join account_types as at on at.id=a.account_type
 				left join transactions as t on t.account=a.id
-			group by a.id order by a.closed, a.updated desc
+			group by a.id
 ACCTS;
+		$accts .= isset($_GET['activeOnly'])
+			? ' where a.closed=0 order by a.updated desc'
+			: ' order by a.closed, a.updated desc';
+
 		if($accts = $db->query($accts)) {
 			$ajax->Data->accounts = [];
 			while($acct = $accts->fetch_object()) {

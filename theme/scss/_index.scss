@@ -73,7 +73,8 @@
 			font-size: 2em;
 			padding: .25em 0;
 		}
-		&[href$='import.php']:before {
+		&[href$='import.php']:before,
+		&[href^='#import']:before {
 			content: "\f093";
 		}
 		&[href$='categories.php']:before,
