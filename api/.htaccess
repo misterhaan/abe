@@ -1,3 +1,5 @@
+DirectoryIndex index.php
+
 AcceptPathInfo Default
 RewriteEngine On
 RewriteOptions inherit
