@@ -18,6 +18,29 @@ export default {
 			throw new Error(request.status + " " + request.statusText + " from " + url);
 		});
 	},
+	Add(bookmarkUrl, name) {
+		const url = urlbase + "add";
+		bookmarkUrl = bookmarkUrl.split("!");
+		const page = bookmarkUrl.shift();
+		const spec = bookmarkUrl.join("!");
+		return $.ajax({
+			method: "POST",
+			url: url,
+			data: {
+				page: page,
+				spec: spec,
+				name: name
+			},
+			dataType: "json"
+		}).then(result => {
+			if(result.fail)
+				throw new Error(result.message);
+			else
+				return true;
+		}, request => {
+			throw new Error(request.status + " " + request.statusText + " from " + url);
+		});
+	},
 	MoveDown(id) {
 		const url = urlbase + "moveDown";
 		return $.ajax({

@@ -5,6 +5,11 @@ export default {
 		Name: "home",
 		Title: AppName.Full
 	},
+	Transactions: {
+		Name: "transactions",
+		Title: "Transactions",
+		BookmarkParams: ["cats", "search", "datestart", "dateend", "minamount", "accts"]
+	},
 	Import: {
 		Name: "import",
 		Title: "Import"

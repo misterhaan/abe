@@ -9,7 +9,7 @@ export default {
 	},
 	template: /*html*/ `
 		<nav id=mainmenu>
-			<a href="transactions.php">Transactions</a>
+			<a href="#${Views.Transactions.Name}">${Views.Transactions.Title}</a>
 			<a href="spending.php">Spending</a>
 			<a href="#${Views.Import.Name}">${Views.Import.Title}</a>
 			<a href="#${Views.Saving.Name}">${Views.Saving.Title}</a>

@@ -5,6 +5,7 @@ import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
 import Home from "./component/home.js";
+import Transactions from "./component/transactions.js";
 import Import from "./component/import.js";
 import Saving from "./component/saving.js";
 import Settings from "./component/settings.js";
@@ -16,11 +17,6 @@ new Vue({
 		subView: false,
 		params: false,
 		actions: []
-	},
-	computed: {
-		isHome() {
-			return this.view == Views.Home;
-		}
 	},
 	watch: {
 		view(val) {
@@ -71,12 +67,12 @@ new Vue({
 
 					let params = false;
 					if(hash.length) {
-						params = [];
+						params = {};
 						let paramlist = hash.join("!").split("/");
 						for(let p in paramlist) {
 							let pair = paramlist[p].split("=");
 							if(pair.length > 1)
-								params[pair.shift()] = pair.join("-");
+								params[decodeURIComponent(pair.shift())] = decodeURIComponent(pair.join("="));
 						}
 					}
 
@@ -87,10 +83,12 @@ new Vue({
 		},
 
 		ChangeView(view, subView = false, params = false) {
-			this.actions = [];
 			this.params = params;
-			this.subView = subView;
-			this.view = view;
+			if(this.view != view || this.subView != subView) {
+				this.actions = [];
+				this.subView = subView;
+				this.view = view;
+			}
 		},
 		OnAddAction(action) {
 			this.actions.push(action);
@@ -104,6 +102,7 @@ new Vue({
 		titlebar: TitleBar,
 		statusbar: StatusBar,
 		[Views.Home.Name]: Home,
+		[Views.Transactions.Name]: Transactions,
 		[Views.Import.Name]: Import,
 		[Views.Saving.Name]: Saving,
 		[Views.Settings.Name]: Settings

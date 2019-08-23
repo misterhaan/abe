@@ -70,34 +70,23 @@ class BookmarkApi extends abeApi {
 	 */
 	protected static function addAction($ajax) {
 		global $db;
-		if(isset($_POST['page']) && isset($_POST['spec']) && isset($_POST['name'])) {
-			$page = trim($_POST['page']);
-			if(false === strpos($page, '/')) {
-				if(file_exists(dirname(__DIR__) . '/' . $page . '.php')) {
-					$spec = trim($_POST['spec']);
-					if(substr($spec, 0, 1) == '#' || substr($spec, 0, 1) == '?') {
-						$name = trim($_POST['name']);
-						if($name) {
-							if($ins = $db->prepare('insert into bookmarks (page, spec, name, sort) values (?, ?, ?, (select coalesce(max(b.sort), 0) + 1 from bookmarks as b))')) {
-								if($ins->bind_param('sss', $page, $spec, $name)) {
-									if($ins->execute()) {
-										; // success!  done.
-									} elseif($db->errno == 1062)
-										$ajax->Fail('This page is already bookmarked.');
-									else
-										$ajax->Fail('Database error saving bookmark:  ' . $db->errno . ' ' . $db->error);
-								} else
-									$ajax->Fail('Database error binding parameters to save bookmark:  ' . $db->errno . ' ' . $db->error);
-							} else
-								$ajax->Fail('Database error preparing to save bookmark:  ' . $db->errno . ' ' . $db->error);
-						} else
-							$ajax->Fail('Invalid name parameter:  cannot be blank.');
+		if(isset($_POST['page'], $_POST['spec'], $_POST['name']) && ($page = trim($_POST['page'])) && ($spec = trim($_POST['spec'])) && ($name = trim($_POST['name']))) {
+			$pagename = explode('/', $page)[0];
+			if(file_exists(dirname(__DIR__) . '/' . $pagename . '.php') || file_exists(dirname(__DIR__) . '/module/component/' . $pagename . '.js'))
+				if($ins = $db->prepare('insert into bookmarks (page, spec, name, sort) values (?, ?, ?, (select coalesce(max(b.sort), 0) + 1 from bookmarks as b))')) {
+					if($ins->bind_param('sss', $page, $spec, $name)) {
+						if($ins->execute())
+							; // success!  done.
+						elseif($db->errno == 1062)
+							$ajax->Fail('This page is already bookmarked.');
+						else
+							$ajax->Fail('Database error saving bookmark:  ' . $db->errno . ' ' . $db->error);
 					} else
-						$ajax->Fail('Invalid spec parameter:  must start with # or ?');
+						$ajax->Fail('Database error binding parameters to save bookmark:  ' . $db->errno . ' ' . $db->error);
 				} else
-					$ajax->Fail('Invalid page parameter:  page does not exist.');
-			} else
-				$ajax->Fail('Invalid page pararmeter:  cannot include slashes.');
+					$ajax->Fail('Database error preparing to save bookmark:  ' . $db->errno . ' ' . $db->error);
+			else
+				$ajax->Fail('Invalid page parameter:  page does not exist.');
 		} else
 			$ajax->Fail('Required parameter(s) missing.  Provide page, spec, and name.');
 	}
@@ -139,7 +128,8 @@ class BookmarkApi extends abeApi {
 	 */
 	protected static function listAction($ajax) {
 		global $db;
-		$bookmarks = 'select id, page, concat(\'#/\', page, trim(leading \'#\' from spec)) as url, name from bookmarks order by sort';
+		// TODO:  remove if function when spending is converted
+		$bookmarks = 'select id, page, if(page = \'spending\', concat(page, \'.php\', spec), concat(\'#\', page, \'!\', trim(leading \'#!\' from spec))) as url, name from bookmarks order by sort';
 		if($bookmarks = $db->query($bookmarks)) {
 			$list = [];
 			while($bookmark = $bookmarks->fetch_object())

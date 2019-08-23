@@ -31,6 +31,7 @@ body > header,
 
 		a {
 			@extend %fa-replaced;
+			margin-left: .25em;
 
 			&:before {
 				margin-left: .25em;
@@ -92,8 +93,10 @@ h1 {
 	position: absolute;
 	width: 14.25em;
 	z-index: 1;
+	top: 1.55em;
 	right: 0;
 	background-color: $medgreyblue;
+	color: #000;
 	border: 2px solid $green;
 	border-top: none;
 	border-right: none;

@@ -3,6 +3,62 @@ import $ from "../../external/jquery-3.4.1.min.js";
 const urlbase = "api/transaction/";
 
 export default {
+	List(oldest = null, oldid = null, accts = null, cats = null, datestart = null, dateend = null, minamount = null, search = null) {
+		const url = urlbase + "list";
+		let data = {};
+		if(oldest) data.oldest = oldest;
+		if(oldid) data.oldid = oldid;
+		if(accts) data.accts = accts;
+		if(cats) data.cats = cats;
+		if(datestart) data.datestart = datestart;
+		if(dateend) data.dateend = dateend;
+		if(minamount) data.minamount = minamount;
+		if(search) data.search = search;
+		return $.ajax({
+			method: "GET",
+			url: url,
+			data: data,
+			dataType: "json"
+		}).then(result => {
+			if(result.fail)
+				throw new Error(result.message);
+			else
+				return {
+					dates: result.dates,
+					more: result.more
+				};
+		}, request => {
+			throw new Error(request.status + " " + request.statusText + " from " + url);
+		});
+	},
+	Save(id, name, notes, categories) {
+		const url = urlbase + "save";
+		let catnames = [];
+		let catamounts = [];
+		for(let c in categories) {
+			catnames.push(categories[c].name);
+			catamounts.push(categories[c].amount);
+		}
+		return $.ajax({
+			method: "POST",
+			url: url,
+			data: {
+				id: id,
+				name: name,
+				notes: notes,
+				catnames: catnames,
+				catamounts: catamounts
+			},
+			dataType: "json"
+		}).then(result => {
+			if(result.fail)
+				throw new Error(result.message);
+			else
+				return true;
+		}, request => {
+			throw new Error(request.status + " " + request.statusText + " from " + url);
+		});
+	},
 	ParseFile(accountId, transactionFile) {
 		const url = urlbase + "parseFile";
 		let data = new FormData();

@@ -8,9 +8,12 @@
 		text-align: right;
 		padding: .25em .5em 0;
 	}
-	li.transaction {
+	li.transaction:not(.selected) {
 		background-color: $lightgreyblue;
 		margin: 1px 0;
+	}
+	.saveerror {
+		border-left: 7px solid $red;
 	}
 	.transaction {
 		@extend %flex-container;
@@ -32,12 +35,16 @@
 		margin-left: .25em;
 		margin-right: 0;
 	}
+	.accounts {
+		display: block;
+		.account {
+			display: block;
+			@extend %ellipsis;
+		}
+	}
 	.account:before {
 		@extend %fa-label;
 		margin-left: 0;
-	}
-	.account.all:before {
-		content: "\f19c";
 	}
 	li.creditvisa > .amount:after,
 	.account.creditvisa:before {
@@ -60,14 +67,12 @@
 		@extend %icon-savings;
 	}
 	.full {
-		position: absolute;
-		left: .25em;
-		right: .25em;
 		padding: .25em .5em;
 		background-color: $lightgreyblue;
 		border: 1px solid $blue;
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 2px $darkgrey;
+		margin-top: .125em;
 		.details > div,
 		.details > label {
 			margin: .25em 0;
@@ -91,7 +96,7 @@
 		}
 	}
 	ol label {
-		@extend %flex-container-center;
+		@extend %flex-container-baseline;
 		margin: 0;
 	}
 	input {
@@ -153,10 +158,9 @@
 		padding: .25em .5em;
 	}
 	.suggestions {
-		font-size: .85em;
 		position: absolute;
-		margin-top: -.25em;
-		margin-left: 1.8em;
+		margin-top: 1.45em;
+		margin-left: 1.85em;
 		padding: 0;
 		background-color: $medgreyblue;
 		box-shadow: 2px 2px 1px $darkgrey;
@@ -198,6 +202,24 @@
 	.suggestions > li:last-child li:last-child > div:last-child {
 		border-radius: 0 0 $gentlecorner $gentlecorner;
 	}
+	.subamounts {
+		@extend %flex-container;
+		justify-content: flex-end;
+		span {
+			margin: 0 .25em;
+			word-wrap: none;
+			&.active,
+			&.multiplier,
+			&.sum {
+				@extend %flex-container;
+				margin: 0;
+			}
+			&.active {
+				background-color: #fff;
+				border-radius: $gentlecorner;
+			}
+		}
+	}
 	#filters {
 		display: none;
 		position: absolute;
@@ -210,7 +232,6 @@
 		border-right: none;
 		border-radius: 0 0 0 $gentlecorner;
 		padding: 0 .25em .25em;
-		label > .account,
 		.category {
 			display: -webkit-inline-flex;
 			display: inline-flex;
@@ -229,7 +250,7 @@
 				cursor: pointer;
 			}
 		}
-		input {
+		input:not[type='checkbox'] {
 			display: block;
 			margin: .25em 0;
 			width: calc(100% - .5em);
@@ -237,10 +258,6 @@
 		.suggestions {
 			margin-top: -.6em;
 			margin-left: .9em;
-			.account:hover:before,
-			.account.kbcursor:before {
-				color: $medgreyblue;
-			}
 		}
 		label.date,
 		label.amount,
@@ -252,6 +269,14 @@
 			}
 			input[type=number] {
 				text-align: right;
+			}
+		}
+		.calltoaction {
+			@extend %flex-container;
+			justify-content: space-around;
+			margin: 1em .125em .5em;
+			button {
+				margin: 0;
 			}
 		}
 	}

@@ -5,6 +5,8 @@ RewriteEngine on
 RewriteBase /
 RewriteRule \.git/ - [F]
 RewriteRule etc/ - [F]
+RewriteCond %{REQUEST_URI} ^(.*)transactions\.php
+RewriteRule transactions.php %1#transactions [R,NE]
 RewriteCond %{REQUEST_URI} ^(.*)import\.php
 RewriteRule import.php %1#import [R,NE]
 RewriteCond %{REQUEST_URI} ^(.*)saving\.php

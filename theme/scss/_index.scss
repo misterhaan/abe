@@ -88,7 +88,8 @@
 		&[href$='spending.php']:before {
 			content: "\f200";
 		}
-		&[href$='transactions.php']:before {
+		&[href$='transactions.php']:before,
+		&[href^='#transactions']:before {
 			content: "\f0ae";
 		}
 	}
