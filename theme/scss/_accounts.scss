@@ -1,6 +1,9 @@
 // Styles for the Abe Personal Finance account list page (/accounts.php)
 
 #accountlist {
+	@extend %flex-container;
+	align-items: flex-start;
+	flex-wrap: wrap;
 	.account {
 		margin: 1em .5em;
 		background-color: $lightgreyblue;
@@ -24,6 +27,9 @@
 			margin: 0;
 			border-radius: $gentlecorner $gentlecorner 0 0;
 			@extend %ellipsis;
+			input {
+				width: calc(100% - .5em);
+			}
 		}
 		&.closed {
 			box-shadow: none;
@@ -62,10 +68,10 @@
 		@extend %flex-container;
 		margin: .25em 0;
 		padding: 0 .5em;
-	}
-	.balance {
-		@extend %flex-item-grow;
-		text-align: right;
+		.balance {
+			@extend %flex-item-grow;
+			text-align: right;
+		}
 	}
 	.actions {
 		margin: .25em 0;
@@ -91,5 +97,65 @@
 				content: "\f093";
 			}
 		}
+	}
+	.account > label {
+		@extend %flex-container-baseline;
+		margin: .25em .5em;
+		.label {
+			width: 5em;
+			@extend %flex-item-fixed;
+		}
+		input,
+		select {
+			@extend %flex-item-fill;
+		}
+		label {
+			margin: 0;
+		}
+	}
+	.accttype {
+		input {
+			display: none;
+		}
+		span:before {
+			@extend %fa-label;
+			font-style: normal;
+			width: 1.75em;
+			text-align: center;
+			padding: 2px;
+			margin-right: 0;
+		}
+		input:checked + span:before {
+			color: #000;
+			background-color: #fff;
+			border-radius: $gentlecorner;
+			padding: 0;
+			border: 2px solid $blue;
+		}
+		.creditvisa:before {
+			@extend %icon-visa;
+		}
+		.creditmc:before {
+			@extend %icon-mastercard;
+		}
+		.credit:before {
+			@extend %icon-credit;
+		}
+		.checking:before {
+			@extend %icon-checking;
+		}
+		.savings:before {
+			@extend %icon-savings;
+		}
+	}
+	.balance input {
+		text-align: right;
+		width: 5em;
+	}
+	label.closed {
+		@extend %flex-container;
+	}
+	button {
+		margin-left: auto;
 	}
 }
