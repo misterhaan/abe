@@ -1,9 +1,9 @@
+import "../../external/jquery-3.4.1.min.js";
 import AccountApi from "../api/account.js";
 import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import SlideVisible from "../slideVisible.js";
 import T from "../transactionShared.js";
-import $ from "../../external/jquery-3.4.1.min.js";
 
 const DateCheckInterval = 300000;  // 5 minutes
 

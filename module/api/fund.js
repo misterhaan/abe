@@ -1,4 +1,4 @@
-import $ from "../../external/jquery-3.4.1.min.js";
+import "../../external/jquery-3.4.1.min.js";
 
 const urlbase = "api/fund/";
 

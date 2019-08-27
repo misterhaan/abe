@@ -130,5 +130,4 @@ export default {
 			</div>
 		</section>
 	`
-	// TODO: edit / create accounts on this page
 };
