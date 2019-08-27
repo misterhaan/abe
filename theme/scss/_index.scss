@@ -73,22 +73,18 @@
 			font-size: 2em;
 			padding: .25em 0;
 		}
-		&[href$='import.php']:before,
 		&[href^='#import']:before {
 			content: "\f093";
 		}
-		&[href$='categories.php']:before,
 		&[href^='#settings']:before {
 			content: "\f085";
 		}
-		&[href$='saving.php']:before,
 		&[href^='#saving']:before {
 			content: "\f024";
 		}
-		&[href$='spending.php']:before {
+		&[href^='#spending']:before {
 			content: "\f200";
 		}
-		&[href$='transactions.php']:before,
 		&[href^='#transactions']:before {
 			content: "\f0ae";
 		}

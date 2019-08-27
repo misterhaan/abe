@@ -10,6 +10,11 @@ export default {
 		Title: "Transactions",
 		BookmarkParams: ["cats", "search", "datestart", "dateend", "minamount", "accts"]
 	},
+	Spending: {
+		Name: "spending",
+		Title: "Spending",
+		BookmarkParams: ["size", "type"]
+	},
 	Import: {
 		Name: "import",
 		Title: "Import"

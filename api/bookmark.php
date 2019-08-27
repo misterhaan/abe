@@ -128,8 +128,7 @@ class BookmarkApi extends abeApi {
 	 */
 	protected static function listAction($ajax) {
 		global $db;
-		// TODO:  remove if function when spending is converted
-		$bookmarks = 'select id, page, if(page = \'spending\', concat(page, \'.php\', spec), concat(\'#\', page, \'!\', trim(leading \'#!\' from spec))) as url, name from bookmarks order by sort';
+		$bookmarks = 'select id, page, concat(\'#\', page, \'!\', trim(leading \'#!\' from spec)) as url, name from bookmarks order by sort';
 		if($bookmarks = $db->query($bookmarks)) {
 			$list = [];
 			while($bookmark = $bookmarks->fetch_object())
