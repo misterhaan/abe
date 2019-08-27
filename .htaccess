@@ -15,5 +15,3 @@ RewriteCond %{REQUEST_URI} ^(.*)categories\.php
 RewriteRule categories.php %1#settings/categories [R,NE]
 RewriteCond %{REQUEST_URI} ^(.*)accounts\.php
 RewriteRule accounts.php %1#settings/accounts [R,NE]
-RewriteCond %{REQUEST_URI} ^(.*)account\.php
-RewriteRule account.php %1#settings/accounts [R,NE]
