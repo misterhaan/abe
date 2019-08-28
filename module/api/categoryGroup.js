@@ -1,76 +1,21 @@
-import "../../external/jquery-3.4.1.min.js";
+import ApiBase from "./apiBase.js";
 
 const urlbase = "api/categoryGroup/";
 
-export default {
-	List() {
-		const url = urlbase + "list";
-		return $.ajax({
-			method: "GET",
-			url: url,
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return result.groups;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
-	},
-	Add(name) {
-		const url = urlbase + "add";
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: {
-				name: name
-			},
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return result.id;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
-	},
-	Rename(id, name) {
-		const url = urlbase + "rename";
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: {
-				id: id,
-				name: name
-			},
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return true;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
-	},
-	Delete(id) {
-		const url = urlbase + "delete";
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: {
-				id: id
-			},
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return true;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
+export default class CategoryGroupApi extends ApiBase {
+	static List() {
+		return super.GET(urlbase + "list", result => result.groups);
+	}
+	static Add(name) {
+		return super.POST(urlbase + "add", { name: name }, result => result.id);
+	}
+	static Rename(id, name) {
+		return super.POST(urlbase + "rename", {
+			id: id,
+			name: name
+		}, () => true);
+	}
+	static Delete(id) {
+		return super.POST(urlbase + "delete", { id: id }, () => true);
 	}
 };

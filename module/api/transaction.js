@@ -1,11 +1,10 @@
-import "../../external/jquery-3.4.1.min.js";
+import ApiBase from "./apiBase.js";
 
 const urlbase = "api/transaction/";
 
-export default {
-	List(oldest = null, oldid = null, accts = null, cats = null, datestart = null, dateend = null, minamount = null, search = null) {
-		const url = urlbase + "list";
-		let data = {};
+export default class TransactionApi extends ApiBase {
+	static List(oldest = null, oldid = null, accts = null, cats = null, datestart = null, dateend = null, minamount = null, search = null) {
+		const data = {};
 		if(oldest) data.oldest = oldest;
 		if(oldid) data.oldid = oldid;
 		if(accts) data.accts = accts;
@@ -14,91 +13,44 @@ export default {
 		if(dateend) data.dateend = dateend;
 		if(minamount) data.minamount = minamount;
 		if(search) data.search = search;
-		return $.ajax({
-			method: "GET",
-			url: url,
-			data: data,
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return {
-					dates: result.dates,
-					more: result.more
-				};
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
+		return super.GETwithParams(urlbase + "list", data, result => {
+			return {
+				dates: result.dates,
+				more: result.more
+			};
 		});
-	},
-	Save(id, name, notes, categories) {
-		const url = urlbase + "save";
-		let catnames = [];
-		let catamounts = [];
+	}
+	static Save(id, name, notes, categories) {
+		const catnames = [];
+		const catamounts = [];
 		for(let c in categories) {
 			catnames.push(categories[c].name);
 			catamounts.push(categories[c].amount);
 		}
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: {
-				id: id,
-				name: name,
-				notes: notes,
-				catnames: catnames,
-				catamounts: catamounts
-			},
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return true;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
-	},
-	ParseFile(accountId, transactionFile) {
-		const url = urlbase + "parseFile";
-		let data = new FormData();
+		return super.POST(urlbase + "save", {
+			id: id,
+			name: name,
+			notes: notes,
+			catnames: catnames,
+			catamounts: catamounts
+		}, () => true);
+	}
+	static ParseFile(accountId, transactionFile) {
+		const data = new FormData();
 		data.append("acctid", accountId);
 		data.append("transfile", transactionFile.files[0], transactionFile.value);
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: data,
-			cache: false,
-			contentType: false,
-			processData: false,
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return result.preview;
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
-	},
-	Import(accountId, transactions, net) {
-		const url = urlbase + "import";
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: {
-				acctid: accountId,
-				transactions: transactions,
-				net: net
-			},
-			dataType: "json"
-		}).then(result => {
-			if(result.fail)
-				throw new Error(result.message);
-			else
-				return { sortable: result.newestSortable, display: result.newestDisplay };
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
+		return super.POSTwithFile(urlbase + "parseFile", data, result => result.preview);
+	}
+	static Import(accountId, transactions, net) {
+		return super.POST(urlbase + "import", {
+			acctid: accountId,
+			transactions: transactions,
+			net: net
+		}, result => {
+			return {
+				sortable: result.newestSortable,
+				display: result.newestDisplay
+			};
 		});
 	}
 };
