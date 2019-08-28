@@ -151,7 +151,7 @@ export default {
 		MoveDown(fund, index) {
 			if(index < this.funds.length - 1)
 				if(!this.IsActive(fund) || this.IsActive(this.funds[index + 1]))
-					FundApi.MoveUp(fund.id).done(success => {
+					FundApi.MoveDown(fund.id).done(success => {
 						this.funds[index] = this.funds.splice(index + 1, 1, fund)[0];
 					}).fail(this.Error);
 				else
