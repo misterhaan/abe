@@ -58,7 +58,7 @@ export default {
 		},
 		categoryAmountsTotal() {
 			return this.editing
-				? this.editing.categories.reduce((s, c) => s + +c.amount, 0)
+				? this.editing.categories.reduce((s, c) => s + +(c == this.editCategory ? this.subAmountTotal : c.amount), 0)
 				: 0;
 		},
 		subAmountTotal() {
