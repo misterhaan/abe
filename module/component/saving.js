@@ -14,6 +14,8 @@ export default {
 	created() {
 		FundApi.List().done(funds => {
 			this.funds = funds;
+			if(!this.funds.length)
+				this.Add();
 		}).fail(this.Error);
 		this.$emit("add-action", {
 			action: this.Add,

@@ -10,6 +10,7 @@ export default {
 	],
 	data() {
 		return {
+			loading: true,
 			accounts: [],
 			selected: false,
 			previews: [],
@@ -26,7 +27,9 @@ export default {
 				});
 			if(!this.selected && this.accounts.length)
 				this.selected = this.accounts[0];
-		}).fail(this.Error);
+		}).fail(this.Error).always(() => {
+			this.loading = false;
+		});
 	},
 	mixins: [ReportErrors],
 	methods: {
@@ -84,6 +87,10 @@ export default {
 	},
 	template: /*html*/ `
 		<main role=main>
+			<p v-if="!loading && !accounts.length">
+				Cannot import because there are no open accounts.  You’ll need to
+				<a href=#settings/accounts>add or reopen at least one account</a> first.
+			</p>
 			<section id=accountlist class=select>
 				<div class=account v-for="account in accounts" :class="[account.typeClass, {selected: account == selected}]" @click=Select(account)>
 					<h2>{{account.name}}</h2>
@@ -93,7 +100,7 @@ export default {
 					</div>
 				</div>
 			</section>
-			<label id=transactionsFile :disabled=uploading :class="{working: uploading}">
+			<label id=transactionsFile :disabled=uploading :class="{working: uploading}" v-if=accounts.length>
 				Transaction file:
 				<input type=file @change=Preview>
 			</label>

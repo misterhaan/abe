@@ -13,6 +13,7 @@ export default {
 	],
 	data() {
 		return {
+			loading: true,
 			dates: [],
 			cats: []
 		};
@@ -60,13 +61,16 @@ export default {
 				location = "#spending";
 		},
 		Load() {
+			this.loading = true;
 			(this.size == "yearly"
 				? SummaryApi.YearlyCategories()
 				: SummaryApi.MonthlyCategories()
 			).done(results => {
 				this.dates = results.dates;
 				this.cats = results.cats;
-			}).fail(this.Error);
+			}).fail(this.Error).always(() => {
+				this.loading = false;
+			});
 		}
 	},
 	mixins: [ReportErrors],
@@ -88,6 +92,11 @@ export default {
 					<label><input type=radio name=summarytype value=det :checked="type == 'det'" @change="SetType('det')"><span title="Table of category spending amounts"></span></label>
 				</div>
 			</header>
+			<p v-if="!loading && !dates.length">
+				No transactions to summarize.  You may need to
+				<a href=#import>import transactions</a> or
+				<a href=#settings/accounts>add accounts</a>.
+			</p>
 			<component :is=summary :dates=dates :cats=cats></component>
 		</div>
 	`
