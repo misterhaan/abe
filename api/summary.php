@@ -42,7 +42,7 @@ class SummaryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function monthlyCategoriesAction($ajax) {
-		global $db;
+		$db = self::RequireLatestDatabase($ajax);
 		// TODO:  accept $_GET['oldest'] for getting older data
 		$oldest = date('Y') - 1 . '-' . date('m') . '-00';
 		if($amts = $db->query('call GetMonthlyCategorySpending(\'' . $oldest . '\')'))
@@ -56,7 +56,7 @@ class SummaryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function yearlyCategoriesAction($ajax) {
-		global $db;
+		$db = self::RequireLatestDatabase($ajax);
 		// TODO:  accept $_GET['oldest'] for getting older data
 		$oldest = date('Y') - 10 . '-01-00';
 		if($amts = $db->query('call GetYearlyCategorySpending(\'' . $oldest . '\')'))

@@ -107,11 +107,11 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function addAction($ajax) {
-		global $db;
 		if(isset($_POST['name']) && isset($_POST['target']) && $name = trim($_POST['name'])) {
 			$target = round(+$_POST['target'], 2);
 			$balance = round(+$_POST['balance'], 2);
 			if($target != 0 || $balance !=0) {
+				$db = self::RequireLatestDatabase($ajax);
 				$db->autocommit(false);
 				if($db->real_query('update funds set sort=sort+1 where balance=0 and target=0'))
 					if($ins = $db->prepare('insert into funds (name, balance, target, sort) values (?, ?, ?, (select coalesce(max(sort), 0) + 1 from (select sort from funds where balance!=0 or target!=0) as f))'))
@@ -140,8 +140,8 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function closeAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && ($id = +$_POST['id'])) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($shiftsort = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=?) as f) and (balance>0 or target>0)'))
 				if($shiftsort->bind_param('i', $id))
@@ -171,7 +171,7 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function listAction($ajax) {
-		global $db;
+		$db = self::RequireLatestDatabase($ajax);
 		$ajax->Data->funds = [];
 		if($funds = $db->query('select id, name, balance, target from funds order by sort'))
 			while($fund = $funds->fetch_object()) {
@@ -191,8 +191,8 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveDownAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($swap = $db->prepare('update funds set sort=sort-1 where sort=(select sort+1 from (select sort from funds where id=? limit 1) as f) limit 1'))
 				if($swap->bind_param('i', $id))
@@ -222,8 +222,8 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveToAction($ajax) {
-		global $db;
 		if(isset($_POST['moveId']) && isset($_POST['beforeId']) && ($moveid = +$_POST['moveId']) && $beforeid = +$_POST['beforeId']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($moveOthers = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=? limit 1) as f)'))
 				if($moveOthers->bind_param('i', $moveid))
@@ -262,8 +262,8 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveUpAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($swap = $db->prepare('update funds set sort=sort+1 where sort=(select sort-1 from (select sort from funds where id=? limit 1) as f) limit 1'))
 				if($swap->bind_param('i', $id))
@@ -293,13 +293,13 @@ class FundApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function saveAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && ($id = +$_POST['id'])
 				&& isset($_POST['name']) && ($name = trim($_POST['name']))
 				&& isset($_POST['balance']) && isset($_POST['target'])) {
 			$balance = round(+$_POST['balance'], 2);
 			$target = round(+$_POST['target'], 2);
-			if($balance != 0 || $target != 0)
+			if($balance != 0 || $target != 0) {
+				$db = self::RequireLatestDatabase($ajax);
 				if($u = $db->prepare('update funds set name=?, balance=?, target=? where id=? limit 1'))
 					if($u->bind_param('sddi', $name, $balance, $target, $id))
 						if($u->execute()) {
@@ -311,7 +311,7 @@ class FundApi extends abeApi {
 						$ajax->Fail('Error binding parameters to save fund:  ' . $u->errno . ' ' . $u->error);
 				else
 					$ajax->Fail('Error preparing to save fund:  ' . $db->errno . ' ' . $db->error);
-			else
+			} else
 				$ajax->Fail('Funds must have nonzero current balance or target.');
 		} else
 			$ajax->Fail('Parameters \'id\', \'name\', \'balance\', and \'target\' must be provided and non-empty.');

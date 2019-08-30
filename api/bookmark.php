@@ -69,10 +69,10 @@ class BookmarkApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function addAction($ajax) {
-		global $db;
 		if(isset($_POST['page'], $_POST['spec'], $_POST['name']) && ($page = trim($_POST['page'])) && ($spec = trim($_POST['spec'])) && ($name = trim($_POST['name']))) {
 			$pagename = explode('/', $page)[0];
-			if(file_exists(dirname(__DIR__) . '/' . $pagename . '.php') || file_exists(dirname(__DIR__) . '/module/component/' . $pagename . '.js'))
+			if(file_exists(dirname(__DIR__) . '/' . $pagename . '.php') || file_exists(dirname(__DIR__) . '/module/component/' . $pagename . '.js')) {
+				$db = self::RequireLatestDatabase($ajax);
 				if($ins = $db->prepare('insert into bookmarks (page, spec, name, sort) values (?, ?, ?, (select coalesce(max(b.sort), 0) + 1 from bookmarks as b))')) {
 					if($ins->bind_param('sss', $page, $spec, $name)) {
 						if($ins->execute())
@@ -85,7 +85,7 @@ class BookmarkApi extends abeApi {
 						$ajax->Fail('Database error binding parameters to save bookmark:  ' . $db->errno . ' ' . $db->error);
 				} else
 					$ajax->Fail('Database error preparing to save bookmark:  ' . $db->errno . ' ' . $db->error);
-			else
+			} else
 				$ajax->Fail('Invalid page parameter:  page does not exist.');
 		} else
 			$ajax->Fail('Required parameter(s) missing.  Provide page, spec, and name.');
@@ -96,8 +96,8 @@ class BookmarkApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function deleteAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($update = $db->prepare('update bookmarks set sort=sort-1 where sort>(select sort from (select sort from bookmarks where id=?) as b)'))
 				if($update->bind_param('i', $id))
@@ -127,7 +127,7 @@ class BookmarkApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function listAction($ajax) {
-		global $db;
+		$db = self::RequireLatestDatabase($ajax);
 		$bookmarks = 'select id, page, concat(\'#\', page, \'!\', trim(leading \'#!\' from spec)) as url, name from bookmarks order by sort';
 		if($bookmarks = $db->query($bookmarks)) {
 			$list = [];
@@ -143,8 +143,8 @@ class BookmarkApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveDownAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($swap = $db->prepare('update bookmarks set sort=sort-1 where sort=(select sort+1 from (select sort from bookmarks where id=? limit 1) as b) limit 1'))
 				if($swap->bind_param('i', $id))
@@ -174,8 +174,8 @@ class BookmarkApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveUpAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($swap = $db->prepare('update bookmarks set sort=sort+1 where sort=(select sort-1 from (select sort from bookmarks where id=? limit 1) as b) limit 1'))
 				if($swap->bind_param('i', $id))

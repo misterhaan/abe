@@ -1,0 +1,14 @@
+main.setup {
+	background-color: $lightgreyblue;
+	padding-bottom: .5em;
+}
+a.show:before {
+	@extend %fontawesome;
+	margin-left: .375em;
+	content: "\f06e";
+}
+a.hide:before {
+	@extend %fontawesome;
+	margin-left: .375em;
+	content: "\f070";
+}

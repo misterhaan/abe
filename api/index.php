@@ -24,6 +24,12 @@ $html->Open('API');
 			<h2 class=api><a href=fund>fund</a></h2>
 			<p>The fund API manages the funds used to allocate savings.</p>
 
+			<h2 class=api><a href=setup>setup</a></h2>
+			<p>
+				The setup API handles configuring, creating, installing, and upgrading
+				the Abe database.
+			</p>
+
 			<h2 class=api><a href=summary>summary</a></h2>
 			<p>The summary API summarizes transactions by month and year.</p>
 

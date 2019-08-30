@@ -11,4 +11,3 @@ class abeFormat {
 		return number_format(+$amt, 2, '.', '');
 	}
 }
-?>

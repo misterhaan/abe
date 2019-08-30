@@ -79,8 +79,8 @@ class CategoryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function addAction($ajax) {
-		global $db;
-		if(isset($_POST['name']) && $name = trim($_POST['name']))
+		if(isset($_POST['name']) && $name = trim($_POST['name'])) {
+			$db = self::RequireLatestDatabase($ajax);
 			if($i = $db->prepare('insert into categories (name, grp) values (?, ?)'))
 				if($i->bind_param('si', $name, $grp)) {
 					$grp = isset($_POST['grp']) && +$_POST['grp'] ? +$_POST['grp'] : null;
@@ -94,7 +94,7 @@ class CategoryApi extends abeApi {
 					$ajax->Fail('Error binding parameters to add category:  ' . $i->errno . ' ' . $i->error);
 			else
 				$ajax->Fail('Error preparing to add category:  ' . $db->errno . ' ' . $db->error);
-		else
+		} else
 			$ajax->Fail('Parameter \'name\' is required and cannot be blank.');
 	}
 
@@ -103,8 +103,8 @@ class CategoryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function deleteAction($ajax) {
-		global $db;
-		if(isset($_POST['id']) && $id = +$_POST['id'])
+		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			if($chk = $db->prepare('select case when exists(select 1 from transactions where category=? limit 1) or exists(select 1 from splitcats where category=?) then 1 else 0 end'))
 				if($chk->bind_param('ii', $id, $id))
 					if($chk->execute())
@@ -134,7 +134,7 @@ class CategoryApi extends abeApi {
 					$ajax->Fail('Error binding parameters to check category usage:  ' . $chk->errno . ' ' . $chk->error);
 			else
 				$ajax->Fail('Error preparing to check category usage:  ' . $db->errno . ' ' . $db->error);
-		else
+		} else
 			$ajax->Fail('Parameter \'id\' is required and must be numeric.');
 	}
 
@@ -143,7 +143,7 @@ class CategoryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function listAction($ajax) {
-		global $db;
+		$db = self::RequireLatestDatabase($ajax);
 		if($cats = $db->query('select c.id, c.name, coalesce(g.name, \'(ungrouped)\') as groupname from categories as c left join category_groups as g on g.id=c.grp order by groupname, c.name')) {
 			$ajax->Data->categories = [];
 			while($cat = $cats->fetch_object())
@@ -157,8 +157,8 @@ class CategoryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function moveAction($ajax) {
-		global $db;
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
+			$db = self::RequireLatestDatabase($ajax);
 			$grp = isset($_POST['grp']) && +$_POST['grp'] ? +$_POST['grp'] : null;
 			if($u = $db->prepare('update categories set grp=? where id=? limit 1'))
 				if($u->bind_param('ii', $grp, $id))
@@ -179,8 +179,8 @@ class CategoryApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function renameAction($ajax) {
-		global $db;
-		if(isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name']))
+		if(isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
+			$db = self::RequireLatestDatabase($ajax);
 			if($u = $db->prepare('update categories set name=? where id=? limit 1'))
 				if($u->bind_param('si', $name, $id))
 					if($u->execute())
@@ -191,7 +191,7 @@ class CategoryApi extends abeApi {
 					$ajax->Fail('Error binding parameters to rename category:  ' . $u->errno . ' ' . $u->error);
 			else
 				$ajax->Fail('Error preparing to rename category:  ' . $db->errno . ' ' . $db->error);
-		else
+		} else
 			$ajax->Fail('Parameters \'id\' and \'name\' are required and cannot be zero or blank.');
 	}
 }

@@ -61,7 +61,7 @@ export default {
 	template: /*html*/ `
 		<header>
 			<span class=back>
-				<a v-if=!isHome id=toggleMenuPane href="." title="Go to main menu"><span>home</span></a>
+				<a v-if=!isHome href="." title="Go to main menu"><span>home</span></a>
 			</span>
 			<span class=actions>
 				<a class=bookmark title="Add a bookmark to this location on the main menu" href=#showBookmark v-if=bookmarkParams @click.prevent=ToggleBookmark><span>Bookmark</span></a>

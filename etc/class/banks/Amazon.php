@@ -9,10 +9,10 @@ class Amazon extends abeBank {
 	 * Parse transactions from a CSV file for a credit card account from Amazon.
 	 * @param string $filename Full path to the CSV file on the server.
 	 * @param int $acctid Account ID for duplicate checking.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseCsvTransactions($filename, $acctid) {
-		global $db;
+	public static function ParseCsvTransactions($filename, $acctid, $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			// first line is header
 			fgets($fh);

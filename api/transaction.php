@@ -132,10 +132,10 @@ class TransactionApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function importAction($ajax) {
-		global $db;
 		if(isset($_POST['acctid']) && $account = +$_POST['acctid'])
 			if(isset($_POST['transactions']) && is_array($_POST['transactions']) && $count = count($_POST['transactions'])) {
-				$db->autocommit(false);  // transaction makes all these inserts much faster
+				$db = self::RequireLatestDatabase($ajax);
+				$db->autocommit(false);
 				if($ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
 					if($ins->bind_param('issssdssss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip, $notes)) {
 						$ajax->Data->newestSortable = '';
@@ -178,67 +178,67 @@ class TransactionApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function listAction($ajax) {
-		global $db;
-	if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-		if($select->bind_param('isissssds', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount, $search)) {
-			$maxcount = self::MAX;
-			$oldest = isset($_GET['oldest']) ? $_GET['oldest'] : null;
-			$oldid = isset($_GET['oldid']) ? $_GET['oldid'] : null;
-			$accountids = isset($_GET['accts']) && $_GET['accts'] ? $_GET['accts'] : null;
-			$categoryids = isset($_GET['cats']) && ($_GET['cats'] || $_GET['cats'] === '0') ? $_GET['cats'] : null;
-			$datestart = isset($_GET['datestart'] ) && $_GET['datestart'] ? $_GET['datestart'] : null;
-			$dateend = isset($_GET['dateend']) && $_GET['dateend'] ? $_GET['dateend'] : null;
-			$minamount = isset($_GET['minamount']) && $_GET['minamount'] ? $_GET['minamount'] : null;
-			$search = isset($_GET['search']) && $_GET['search'] ? trim($_GET['search']) : null;
-			if($select->execute())
-				if($transactions = $select->get_result()) {
-					$ajax->Data->dates = [];
-					while($transaction = $transactions->fetch_object()) {
-						if(!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $transaction->posted)
-							$ajax->Data->dates[] = (object)['date' => $transaction->posted, 'displayDate' => date('F j, Y (D)', strtotime($transaction->posted . ' 12:00 PM')), 'transactions' => []];
+		$db = self::RequireLatestDatabase($ajax);
+		if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+			if($select->bind_param('isissssds', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount, $search)) {
+				$maxcount = self::MAX;
+				$oldest = isset($_GET['oldest']) ? $_GET['oldest'] : null;
+				$oldid = isset($_GET['oldid']) ? $_GET['oldid'] : null;
+				$accountids = isset($_GET['accts']) && $_GET['accts'] ? $_GET['accts'] : null;
+				$categoryids = isset($_GET['cats']) && ($_GET['cats'] || $_GET['cats'] === '0') ? $_GET['cats'] : null;
+				$datestart = isset($_GET['datestart'] ) && $_GET['datestart'] ? $_GET['datestart'] : null;
+				$dateend = isset($_GET['dateend']) && $_GET['dateend'] ? $_GET['dateend'] : null;
+				$minamount = isset($_GET['minamount']) && $_GET['minamount'] ? $_GET['minamount'] : null;
+				$search = isset($_GET['search']) && $_GET['search'] ? trim($_GET['search']) : null;
+				if($select->execute())
+					if($transactions = $select->get_result()) {
+						$ajax->Data->dates = [];
+						while($transaction = $transactions->fetch_object()) {
+							if(!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $transaction->posted)
+								$ajax->Data->dates[] = (object)['date' => $transaction->posted, 'displayDate' => date('F j, Y (D)', strtotime($transaction->posted . ' 12:00 PM')), 'transactions' => []];
 
-						$transaction->id += 0;
-						$transaction->amount += 0;
+							$transaction->id += 0;
+							$transaction->amount += 0;
 
-						$transaction->categories = [];
-						if(+$transaction->splitcat) {
-							$sc_names = explode("\n", $transaction->sc_names);
-							$sc_amounts = explode("\n", $transaction->sc_amounts);
-							$remaining = $transaction->amount;
-							for($i = 0; $i < count($sc_names); $i++) {
-								$transaction->categories[] = (object)['name' => $sc_names[$i], 'amount' => +$sc_amounts[$i]];
-								$remaining -= +$sc_amounts[$i];
-							}
-							if(round($remaining, 2) != 0)  // save should prevent this case
-								$transaction->categories[] = (object)['name' => null, 'amount' => $remaining];
-						} else
-							$transaction->categories[] = (object)['name' => $transaction->category, 'amount' => +$transaction->amount];
-						unset($transaction->splitcat, $transaction->sc_names, $transaction->sc_amounts, $transaction->category);
+							$transaction->categories = [];
+							if(+$transaction->splitcat) {
+								$sc_names = explode("\n", $transaction->sc_names);
+								$sc_amounts = explode("\n", $transaction->sc_amounts);
+								$remaining = $transaction->amount;
+								for($i = 0; $i < count($sc_names); $i++) {
+									$transaction->categories[] = (object)['name' => $sc_names[$i], 'amount' => +$sc_amounts[$i]];
+									$remaining -= +$sc_amounts[$i];
+								}
+								if(round($remaining, 2) != 0)  // save should prevent this case
+									$transaction->categories[] = (object)['name' => null, 'amount' => $remaining];
+							} else
+								$transaction->categories[] = (object)['name' => $transaction->category, 'amount' => +$transaction->amount];
+							unset($transaction->splitcat, $transaction->sc_names, $transaction->sc_amounts, $transaction->category);
 
-						$transaction->amountDisplay = abeFormat::Amount($transaction->amount);
-						$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = $transaction;
-						$oldest = $transaction->posted;
-						$oldid = $transaction->id;
-					}
-					$ajax->Data->more = false;
-					$maxcount = 1;
-					$db->next_result();  // get past the extra stored procedure result, otherwise there's a segmentation fault!?!?
-					if($select->execute())
-						if($ajax->Data->more = $select->get_result())
-							$ajax->Data->more = !!$ajax->Data->more->num_rows;
+							$transaction->amountDisplay = abeFormat::Amount($transaction->amount);
+							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = $transaction;
+							$oldest = $transaction->posted;
+							$oldid = $transaction->id;
+						}
+						$ajax->Data->more = false;
+						$maxcount = 1;
+						$db->next_result();  // get past the extra stored procedure result, otherwise there's a segmentation fault!?!?
+						if($select->execute())
+							if($ajax->Data->more = $select->get_result())
+								$ajax->Data->more = !!$ajax->Data->more->num_rows;
+							else
+								$ajax->Fail('Error getting result checking for more:  ' . $select->errno . ' ' . $select->error);
 						else
-							$ajax->Fail('Error getting result checking for more:  ' . $select->errno . ' ' . $select->error);
-					else
-						$ajax->Fail('Error executing check for more:  ' . $select->errno . ' ' . $select->error);
-				} else
-					$ajax->Fail('Error getting result of looking up transactions:  ' . $select->errno . ' ' . $select->error);
-			else
-				$ajax->Fail('Error executing statement to look up transactions:  ' . $select->errno . ' ' . $select->error);
-			$select->close();
-		} else
-			$ajax->Fail('Error binding parameters to look up transactions:  ' . $select->errno . ' ' . $select->error);
-	else
-		$ajax->Fail('Error preparing to look up transactions:  ' . $db->errno . ' ' . $db->error);
+							$ajax->Fail('Error executing check for more:  ' . $select->errno . ' ' . $select->error);
+					} else
+						$ajax->Fail('Error getting result of looking up transactions:  ' . $select->errno . ' ' . $select->error);
+				else
+					$ajax->Fail('Error executing statement to look up transactions:  ' . $select->errno . ' ' . $select->error);
+				$select->close();
+			} else
+				$ajax->Fail('Error binding parameters to look up transactions:  ' . $select->errno . ' ' . $select->error);
+		else
+			$ajax->Fail('Error preparing to look up transactions:  ' . $db->errno . ' ' . $db->error);
 	}
 
 	/**
@@ -250,9 +250,11 @@ class TransactionApi extends abeApi {
 		// TODO:  automatic categorization engine
 		if(isset($_POST['acctid']) && $_POST['acctid'] += 0)
 			if(file_exists($_FILES['transfile']['tmp_name']) && is_uploaded_file($_FILES['transfile']['tmp_name'])) {
-				if($bankclass = self::LookupBank($_POST['acctid'], $ajax))
-					if($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $_POST['acctid']))
+				if($bankclass = self::LookupBank($_POST['acctid'], $ajax)) {
+					$db = self::RequireLatestDatabase($ajax);
+					if($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $_POST['acctid'], $ajax, $db))
 						$ajax->Data->preview = $preview;
+				}
 			} else
 				$ajax->Fail('Transaction file not provided.');
 		else
@@ -265,8 +267,8 @@ class TransactionApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function saveAction($ajax) {
-		global $db;
 		if(isset($_POST['id'], $_POST['name']) && ($id = +$_POST['id']) && ($name = trim($_POST['name']))) {
+			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
 			if($update = $db->prepare('update transactions set name=?, notes=?, category=GetCategoryID(?), splitcat=?, reviewed=1 where id=? limit 1'))
 				if($update->bind_param('sssii', $name, $notes, $catname, $splitcat, $id)) {
@@ -324,10 +326,11 @@ class TransactionApi extends abeApi {
 	/**
 	 * Look up the class for the account's bank.
 	 * @param integer $acctid Account ID
+	 * @param abeAjax $ajax Ajax object for reporting an error.
+	 * @param mysqli $db Database connection object
 	 * @return string Class name for account's bank class
 	 */
-	private static function LookupBank($acctid, $ajax) {
-		global $db;
+	private static function LookupBank($acctid, $ajax, $db) {
 		$acct = 'select b.class from accounts as a left join banks as b on b.id=a.bank where a.id=\'' . +$acctid . '\' limit 1';
 		if($acct = $db->query($acct))
 			if($acct = $acct->fetch_object()) {

@@ -8,10 +8,10 @@ class BmoHarris extends abeBank {
 	 * Parse transactions from a CSV file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the CSV file on the server.
 	 * @param int $acctid Account ID for duplicate checking.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseCsvTransactions($filename, $acctid) {
-		global $db;
+	public static function ParseCsvTransactions($filename, $acctid, $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			// first three lines are header
 			fgets($fh);
@@ -67,10 +67,10 @@ class BmoHarris extends abeBank {
 	 * Parse transactions from an OFX file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the OFX file on the server.
 	 * @param int $acctid Account ID for duplicate checking.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseOfxTransactions($filename, $acctid) {
-		global $db;
+	public static function ParseOfxTransactions($filename, $acctid, $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			$preview = new stdClass();
 			$preview->transactions = [];
@@ -143,21 +143,24 @@ class BmoHarris extends abeBank {
 	/**
 	 * Parse transactions from a QBO file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the QBO file on the server.
+	 * @param int $acctid Account ID for duplicate checking.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseQboTransactions($filename) {
+	public static function ParseQboTransactions($filename, $acctid, $db) {
 		// The qbo file is basically the same as ofx, just with some extra stuff we will ignore anyway.
-		self::ParseOfxTransactions($filename);
+		self::ParseOfxTransactions($filename, $acctid, $db);
 	}
 
 	/**
 	 * Parse transactions from a QFX file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the QFX file on the server.
+	 * @param int $acctid Account ID for duplicate checking.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseQfxTransactions($filename) {
+	public static function ParseQfxTransactions($filename, $acctid, $db) {
 		// The qfx file is basically the same as ofx, just with some extra stuff we will ignore anyway.
-		self::ParseOfxTransactions($filename, $account);
+		self::ParseOfxTransactions($filename, $acctid, $db);
 	}
 }
-?>

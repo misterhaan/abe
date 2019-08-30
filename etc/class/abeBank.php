@@ -11,15 +11,16 @@ abstract class abeBank {
 	 * @param string $origname Original filename, used to infer file format from extension.
 	 * @param string $filename Full path to the file on the server.
 	 * @param int $acctid Account ID for duplicate checking.
+	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
+	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ParseTransactions($origname, $filename, $acctid) {
-		global $ajax;
+	public function ParseTransactions($origname, $filename, $acctid, $ajax, $db) {
 		$ext = explode('.', $origname);
 		$ext = $ext[count($ext) - 1];
 		$parse = 'Parse' . ucfirst(strtolower($ext)) . 'Transactions';
 		if(method_exists(static::class, $parse)) {
-			$return = static::$parse($filename, $acctid);
+			$return = static::$parse($filename, $acctid, $db);
 			$return->name = $origname;
 			return $return;
 		} else
@@ -36,10 +37,5 @@ abstract class abeBank {
 		if(preg_match('/[a-z]/', $string))
 			return $string;
 		return ucwords(strtolower($string));
-	}
-
-	protected function GetDuplicateChecker() {
-		global $db;
-		return $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)');
 	}
 }
