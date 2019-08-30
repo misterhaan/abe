@@ -9,6 +9,7 @@
 		background-color: $lightgreyblue;
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 1px $darkgrey;
+		width: calc(100% - 1em);
 		@media (min-width: 55.5em) {
 			display: inline-block;
 			width: calc(50% - 1.25em);
@@ -38,6 +39,22 @@
 			h2 {
 				color: $blue;
 				background-color: transparent;
+			}
+		}
+		&.error {
+			border-left: 7px solid $red;
+			width: calc(100% - 1em - 7px);
+			h2 {
+				border-radius: 0 $gentlecorner 0 0;
+			}
+			@media (min-width: 55.5em) {
+				width: calc(50% - 1.25em - 7px);
+			}
+			@media (min-width: 78em) {
+				width: calc(33.33% - 1.1875em - 7px);
+			}
+			@media (min-width: 102em) {
+				width: calc(25% - 1.125em - 7px);
 			}
 		}
 	}

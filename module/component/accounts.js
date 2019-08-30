@@ -1,3 +1,4 @@
+import "../../external/jquery-3.4.1.min.js";
 import AccountApi from "../api/account.js";
 import ReportErrors from "../reportErrors.js";
 
@@ -16,6 +17,8 @@ export default {
 		Promise.all([
 			AccountApi.List().done(accounts => {
 				this.accounts = accounts;
+				if(!this.accounts.length)
+					this.Add();
 			}).fail(this.Error),
 			AccountApi.Types().done(result => {
 				this.types = result.types;
@@ -48,10 +51,12 @@ export default {
 				newestDisplay: ""
 			};
 			this.accounts.push(this.editing);
+			setTimeout(() => $("h2 input").focus());
 		},
 		Edit(account) {
 			this.Save();
 			this.editing = account;
+			setTimeout(() => $("h2 input").focus());
 		},
 		Save() {
 			if(this.editing) {
@@ -86,7 +91,7 @@ export default {
 	template: /*html*/ `
 		<section id=accountlist>
 			<p class=loading v-if=loading>Loading accounts...</p>
-			<div class=account v-for="account in accounts" :class="[account.typeClass, {closed: account.closed}]">
+			<div class=account v-for="account in accounts" :class="[account.typeClass, {closed: account.closed, error: errored.includes(account)}]">
 				<template v-if="account != editing">
 					<h2>{{account.name}}</h2>
 					<div class=detail>
