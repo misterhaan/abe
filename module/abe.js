@@ -17,7 +17,8 @@ new Vue({
 		view: Views.Home,
 		subView: false,
 		params: false,
-		actions: []
+		actions: [],
+		error: false
 	},
 	watch: {
 		view(val) {
@@ -93,10 +94,6 @@ new Vue({
 		},
 		OnAddAction(action) {
 			this.actions.push(action);
-		},
-		OnError(error) {
-			// TODO:  put errors into the status bar instead
-			alert(error.message || error);
 		}
 	},
 	components: {

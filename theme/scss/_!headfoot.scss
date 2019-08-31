@@ -57,10 +57,6 @@ body > header,
 	}
 }
 
-#abe > footer {
-	margin-top: auto;
-}
-
 h1 {
 	font-weight: normal;
 	position: absolute;
@@ -73,19 +69,6 @@ h1 {
 	margin: 0;
 	padding: 0;
 	line-height: 1.55em;
-}
-
-#menuPane {
-	display: none;
-	position: absolute;
-	z-index: 1;  // stay on top of translated elements
-	background-color: $medgreyblue;
-	border-bottom: 2px solid $green;
-	@media (min-width: 35em) {
-		width: 18em;
-		border-right: 2px solid $green;
-		border-radius: 0 0 $gentlecorner 0;
-	}
 }
 
 #newBookmark {
@@ -109,8 +92,105 @@ h1 {
 	}
 }
 
-#copyright {
-	text-align: right;
-	margin: 1em .5em .25em;
+#abe > footer {
+	@extend %flex-container;
+	margin: auto .5em .25em;
+	padding-top: 1em;
 	font-size: .8em;
+	#errorToast {
+		position: absolute;
+		bottom: 2em;
+		border: 3px solid $red;
+		border-left: none;
+		background-color: #fff;
+		border-radius: $gentlecorner;
+		padding: .125em .25em;
+		@extend %flex-container-baseline;
+		&:before {
+			@extend %fontawesome;
+			color: #fff;
+			background-color: $red;
+			padding-right: 3px;
+			content: "\f06a";
+			margin: -.125em .375em -.125em -.25em;
+			padding: .125em .5em;
+		}
+		a {
+			color: $darkgrey;
+			&:hover {
+				color: $red;
+			}
+		}
+	}
+	div.errors {
+		position: absolute;
+		bottom: 1.3em;
+		border: 3px solid $red;
+		border-top: none;
+		border-radius: $gentlecorner $gentlecorner $gentlecorner 0;
+		background-color: #fff;
+		header {
+			@extend %flex-container-baseline;
+			padding: 0 .25em;
+			background-color: $red;
+			color: #fff;
+			a {
+				color: #fff;
+			}
+		}
+		ol {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			max-height: calc(100vh - 3.5em);
+			overflow-y: auto;
+		}
+		li {
+			@extend %flex-container-baseline;
+			padding: .125em .25em;
+			&:not(:first-child) {
+				border-top: 1px solid $red;
+			}
+			a {
+				color: $darkgrey;
+				&:hover {
+					color: $red;
+				}
+			}
+		}
+	}
+	#errorToast,
+	div.errors {
+		a {
+			@extend %fa-replaced;
+			@extend %flex-item-fixed;
+			&:first-child {
+				margin-left: auto;
+			}
+			&.minimize:before {
+				content: "\f2d1";
+				padding: 0 .25em;
+			}
+			&.close:before {
+				content: "\f00d";
+				padding-left: .25em;
+			}
+		}
+	}
+	a.errors {
+		color: #fff;
+		text-decoration: none;
+		background-color: $red;
+		border-radius: $gentlecorner;
+		padding: 0 .25em;
+		&:before {
+			@extend %fontawesome;
+			content: "\f06a";
+			margin-right: .25em;
+		}
+	}
+}
+
+#copyright {
+	margin-left: auto;
 }

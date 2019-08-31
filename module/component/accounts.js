@@ -83,7 +83,7 @@ export default {
 					});
 				} else {
 					this.errored.push(account);
-					this.Error("Accounts must have a name, type, and bank.");
+					this.Error(new Error("Accounts must have a name, type, and bank."));
 				}
 			}
 		}

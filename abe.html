@@ -30,9 +30,9 @@
 	</head>
 	<body>
 		<div id=abe>
-			<titlebar :view=view :sub-view=subView :params=params :actions=actions @error="OnError($event)"></titlebar>
-			<component :is=view.Name :view=subView :params=params @add-action="OnAddAction($event)" @error="OnError($event)"></component>
-			<statusbar></statusbar>
+			<titlebar :view=view :sub-view=subView :params=params :actions=actions @error="error = $event"></titlebar>
+			<component :is=view.Name :view=subView :params=params @add-action=OnAddAction($event) @error="error = $event"></component>
+			<statusbar :last-error=error></statusbar>
 		</div>
 	</body>
 </html>

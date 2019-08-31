@@ -85,7 +85,7 @@ export default {
 				}
 				this.editFund = false;
 			} else
-				this.Error("Attempted to discard changes when nothing was being edited.");
+				this.Error(new Error("Attempted to discard changes when nothing was being edited."));
 		},
 		Save() {
 			if(this.editFund) {
@@ -113,7 +113,7 @@ export default {
 						this.Error(error);
 					});
 			} else
-				this.Error("Attempted to save changes when nothing was being edited.");
+				this.Error(new Error("Attempted to save changes when nothing was being edited."));
 		},
 		Deactivate() {
 			if(this.editFund)
@@ -135,9 +135,9 @@ export default {
 						this.Error(error);
 					});
 				} else
-					this.Error("Attempted to close a fund that hasn’t been saved yet.");
+					this.Error(new Error("Attempted to close a fund that hasn’t been saved yet."));
 			else
-				this.Error("Attempted to close a fund when nothing was being edited.")
+				this.Error(new Error("Attempted to close a fund when nothing was being edited."));
 		},
 		MoveUp(fund, index) {
 			if(index > 0)
@@ -146,9 +146,9 @@ export default {
 						this.funds[index] = this.funds.splice(index - 1, 1, fund)[0];
 					}).fail(this.Error);
 				else
-					this.Error("Attempted to move inactive fund ahead of an active fund.");
+					this.Error(new Error("Attempted to move inactive fund ahead of an active fund."));
 			else
-				this.Error("Attempted to move fund up when it is already first.");
+				this.Error(new Error("Attempted to move fund up when it is already first."));
 		},
 		MoveDown(fund, index) {
 			if(index < this.funds.length - 1)
@@ -157,9 +157,9 @@ export default {
 						this.funds[index] = this.funds.splice(index + 1, 1, fund)[0];
 					}).fail(this.Error);
 				else
-					this.Error("Attempted to move active fund below an inactive fund.");
+					this.Error(new Error("Attempted to move active fund below an inactive fund."));
 			else
-				this.Error("Attempted to move fund down when it is already last.");
+				this.Error(new Error("Attempted to move fund down when it is already last."));
 		},
 		MoveFund(movingFund, beforeFund) {
 			if(movingFund && beforeFund && movingFund != beforeFund && this.IsActive(movingFund) == this.IsActive(beforeFund)) {

@@ -31,8 +31,8 @@
 	<body>
 		<div id=abe>
 			<titlebar :view="{Title: 'Setup'}"></titlebar>
-			<component :is=step @error="OnError($event)" @set-level="level = $event" @error=OnError($event)></component>
-			<statusbar></statusbar>
+			<component :is=step @set-level="level = $event" @error="error = $event"></component>
+			<statusbar :last-error=error></statusbar>
 		</div>
 	</body>
 </html>

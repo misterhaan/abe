@@ -17,7 +17,8 @@ const SetupLevel = {
 const setup = new Vue({
 	el: "#abe",
 	data: {
-		level: SetupLevel.Unknown
+		level: SetupLevel.Unknown,
+		error: false
 	},
 	computed: {
 		step() {
@@ -35,11 +36,6 @@ const setup = new Vue({
 		SetupApi.Level().done(level => {
 			this.level = level;
 		});  // this API call has no failure cases
-	},
-	methods: {
-		OnError(error) {
-			alert(error.message || error);
-		}
 	},
 	components: {
 		titlebar: TitleBar,
