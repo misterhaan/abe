@@ -98,11 +98,10 @@ h1 {
 	padding-top: 1em;
 	font-size: .8em;
 	#errorToast {
-		position: absolute;
 		bottom: 2em;
 		border: 3px solid $red;
 		border-left: none;
-		background-color: #fff;
+		background: linear-gradient(90deg, $red 1.85em, #fff 1.85em);  // makes the red behind the icon look like it goes all the way down
 		border-radius: $gentlecorner;
 		padding: .125em .25em;
 		@extend %flex-container-baseline;
@@ -123,7 +122,6 @@ h1 {
 		}
 	}
 	div.errors {
-		position: absolute;
 		bottom: 1.3em;
 		border: 3px solid $red;
 		border-top: none;
@@ -161,6 +159,8 @@ h1 {
 	}
 	#errorToast,
 	div.errors {
+		position: fixed;
+		margin-right: .5em;
 		a {
 			@extend %fa-replaced;
 			@extend %flex-item-fixed;
@@ -178,6 +178,8 @@ h1 {
 		}
 	}
 	a.errors {
+		position: fixed;
+		bottom: .25em;
 		color: #fff;
 		text-decoration: none;
 		background-color: $red;
