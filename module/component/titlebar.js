@@ -8,7 +8,8 @@ export default {
 		"view",
 		"subView",
 		"params",
-		"actions"
+		"actions",
+		"titlePrefix"
 	],
 	data() {
 		return {
@@ -67,7 +68,7 @@ export default {
 				<a class=bookmark title="Add a bookmark to this location on the main menu" href=#showBookmark v-if=bookmarkParams @click.prevent=ToggleBookmark><span>Bookmark</span></a>
 				<a v-for="action in actions" :class=action.class :href=action.url @click.prevent=action.action :title=action.tooltip><span>{{action.text}}</span></a>
 			</span>
-			<h1>{{view.Title}}</h1>
+			<h1>{{titlePrefix}} {{view.Title}}</h1>
 			<div id=newBookmark v-slideVisible=showAddBookmark @keydown.esc=ToggleBookmark>
 				<label>
 					<span>Title:</span>

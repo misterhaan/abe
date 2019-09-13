@@ -1,0 +1,173 @@
+#newBudget {
+	background-color: $medgreyblue;
+	border-bottom: 2px solid $green;
+	border-left: 2px solid $green;
+	border-radius: 0 0 0 $gentlecorner;
+	position: absolute;
+	right: 0;
+	input {
+		width: 11.5em;
+		display: block;
+	}
+}
+table.budget {
+	border-spacing: 0;
+	border-collapse: separate;
+	width: 100%;
+	tr {
+		margin-bottom: 1px;
+	}
+	th {
+		font-weight: normal;
+		text-align: left;
+		padding: .125em .5em;
+		&.heading {
+			font-weight: bold;
+			padding: .5em .5em .25em;
+		}
+		&.amount {
+			text-align: right;
+			font-size: .8em;
+		}
+	}
+	td {
+		background-color: $lightgreyblue;
+		padding: .125em .5em;
+		border-bottom: 1px solid $medgreyblue;
+		&.amount {
+			text-align: right;
+		}
+		&:first-child {
+			width: 100%;
+		}
+		a.remove:link {
+			color: $blue;
+		}
+		input {
+			width: 5.5em;
+			text-align: right;
+		}
+	}
+	tbody.income td:first-child {
+		border-left: 7px solid $green;
+	}
+	tbody.expenses td:first-child {
+		border-left: 7px solid $orange;
+	}
+	tbody.saving td:first-child {
+		border-left: 7px solid $blue;
+	}
+	tfoot th {
+		text-align: right;
+	}
+}
+#activebudget nav {
+	@extend %flex-container;
+	margin: .5em .5em;
+	span {
+		flex: 1 1 10em;
+		text-align: center;
+		&:first-child {
+			text-align: left;
+		}
+		&:last-child {
+			text-align: right;
+		}
+	}
+	a {
+		background-color: $blue;
+		color: #fff;
+		border-radius: $gentlecorner;
+		padding: .125em .25em;
+		text-decoration: none;
+		&:before {
+			@extend %fontawesome;
+			margin-right: .25em;
+			font-size: .9em;
+		}
+		&.prev:before {
+			content: "\f053";
+		}
+		&.auto:before {
+			content: "\f0d0";
+		}
+		&.next:before {
+			content: "\f054";
+		}
+		&.add:before {
+			content: "\f067";
+		}
+		&:hover {
+			background-color: $green;
+			box-shadow: 2px 2px 1px $darkgrey;
+		}
+	}
+}
+h2.budgetsect {
+	margin: .25em 0 0;
+	padding: .25em .5em 0;
+	font-weight: bold;
+}
+header.saving {
+	@extend %flex-container-baseline;
+	h2 {
+		margin-right: 1em;
+	}
+	div {
+		margin-left: auto;
+		margin-right: .5em;
+	}
+}
+header.budgetgroup {
+	padding: .25em .5em;
+}
+.budgetitem {
+	background-color: $lightgreyblue;
+	margin-top: 1px;
+	padding-bottom: .25em;
+	.info {
+		@extend %flex-container;
+		& > div {
+			padding: .25em .5em .125em;
+			&.values {
+				@extend %flex-item-grow;
+				text-align: right;
+			}
+		}
+	}
+	a.auto {
+		@extend %fa-replaced;
+		&:before {
+			content: "\f0d0";
+			color: $darkgrey;
+			font-size: .9em;
+		}
+		&:hover:before {
+			color: $green;
+		}
+	}
+	.expanded {
+		padding: .25em .5em .125em;
+		text-align: right;
+	}
+	input[type="number"] {
+		width: 5.5em;
+		text-align: right;
+	}
+	button.save {
+		padding: .125em .25em .125em .35em;
+		&:before {
+			font-family: fontawesome;
+			content: "\f0c7";
+		}
+	}
+	&.income {
+		border-left: 7px solid $green;
+	}
+	&.expense {
+		border-left: 7px solid $orange;
+	}
+	&.saving {
+		border-left: 7px solid $blue;
+	}
+}

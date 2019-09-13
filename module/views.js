@@ -10,6 +10,10 @@ export default {
 		Title: "Transactions",
 		BookmarkParams: ["cats", "search", "datestart", "dateend", "minamount", "accts"]
 	},
+	Budget: {
+		Name: "budget",
+		Title: "Budget"
+	},
 	Spending: {
 		Name: "spending",
 		Title: "Spending",

@@ -6,6 +6,7 @@ import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
 import Home from "./component/home.js";
 import Transactions from "./component/transactions.js";
+import Budget from "./component/budget.js";
 import Spending from "./component/spending.js";
 import Import from "./component/import.js";
 import Saving from "./component/saving.js";
@@ -18,6 +19,7 @@ new Vue({
 		subView: false,
 		params: false,
 		actions: [],
+		titlePrefix: "",
 		error: false
 	},
 	watch: {
@@ -87,6 +89,7 @@ new Vue({
 		ChangeView(view, subView = false, params = false) {
 			this.params = params;
 			if(this.view != view || this.subView != subView) {
+				this.titlePrefix = "";
 				this.actions = [];
 				this.subView = subView;
 				this.view = view;
@@ -101,6 +104,7 @@ new Vue({
 		statusbar: StatusBar,
 		[Views.Home.Name]: Home,
 		[Views.Transactions.Name]: Transactions,
+		[Views.Budget.Name]: Budget,
 		[Views.Spending.Name]: Spending,
 		[Views.Import.Name]: Import,
 		[Views.Saving.Name]: Saving,

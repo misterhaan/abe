@@ -51,7 +51,7 @@ class SetupApi extends abeApi {
 	 * Configure the database connection.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function configureDatabaseAction($ajax) {
+	protected static function configureDatabaseAction(abeAjax $ajax) {
 		if(isset($_POST['host'], $_POST['name'], $_POST['user'], $_POST['pass']) && ($host = trim($_POST['host']))
 			&& ($name = trim($_POST['name'])) && ($user = trim($_POST['user'])) && ($pass = $_POST['pass']))
 			if($fh = fopen(dirname(DOCROOT) . '/.abeKeys.php', 'w'))
@@ -72,7 +72,7 @@ class abeKeysDB {
 	 * Create the database and grant access to the configured user.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function createDatabaseAction($ajax) {
+	protected static function createDatabaseAction(abeAjax $ajax) {
 		if(isset($_POST['rootpw']) && ($rootpw = trim($_POST['rootpw']))) {
 			require_once dirname(DOCROOT) . '/.abeKeys.php';
 			$rdb = @new mysqli(abeKeysDB::HOST, 'root', $rootpw);
@@ -96,7 +96,7 @@ class abeKeysDB {
 	 * Install the database at the latest version.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function installDatabaseAction($ajax) {
+	protected static function installDatabaseAction(abeAjax $ajax) {
 		$db = self::RequireDatabase($ajax);
 		// tables, views, routines; then alphabetical order.  if anything has
 		// dependencies that come later, it comes after its last dependency.
@@ -135,7 +135,7 @@ class abeKeysDB {
 	 * Get the current setup level.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function levelAction($ajax) {
+	protected static function levelAction(abeAjax $ajax) {
 		if(!file_exists(dirname(DOCROOT) . '/.abeKeys.php')) {
 			$ajax->Data->level = -4;
 			return;
@@ -162,7 +162,7 @@ class abeKeysDB {
 	 * Run all applicable upgrade scripts to bring the database up to the current version.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function upgradeDatabaseAction($ajax) {
+	protected static function upgradeDatabaseAction(abeAjax $ajax) {
 		$db = self::RequireDatabaseWithConfig($ajax);
 		$db->autocommit(false);  // each step should commit only if the entire step succeeds
 		if($db->config->structureVersion < abeVersion::Structure)
@@ -177,7 +177,7 @@ class abeKeysDB {
 	 * @param mysqli $db Database connection object.
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 */
-	private static function ImportBanks($db, $ajax) {
+	private static function ImportBanks(mysqli $db, abeAjax $ajax) {
 		if(false !== $f = fopen(dirname(__DIR__) . '/etc/db/data/banks.csv', 'r'))
 			if($ins = $db->prepare('insert into banks (class, name, url) select * from (select ? as class, ? as name, ? as url) as b where not exists (select class from banks where class=?) limit 1'))
 				if($ins->bind_param('ssss', $class, $name, $url, $class)) {
@@ -198,7 +198,7 @@ class abeKeysDB {
 	 * @param mysqli $db Database connection object.
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 */
-	private static function ImportAccountTypes($db, $ajax) {
+	private static function ImportAccountTypes(mysqli $db, abeAjax $ajax) {
 		if(false !== $f = fopen(dirname(__DIR__) . '/etc/db/data/account_types.csv', 'r'))
 			if($ins = $db->prepare('insert into account_types (name, class) select * from (select ? as name, ? as class) as a where not exists (select class from account_types where name=?) limit 1'))
 				if($ins->bind_param('sss', $name, $class, $name)) {
@@ -220,61 +220,72 @@ class abeKeysDB {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return boolean True if successful
 	 */
-	private static function UpgradeDatabaseStructure($db, $ajax) {
-		if($db->config->structureVersion < abeStructureVersion::Bookmarks)
-			if(self::RunQueryFile('tables/bookmarks', $db, $ajax) && self::SetStructureVersion(abeStructureVersion::Bookmarks, $db, $ajax))
-				$db->commit();
-			else {
-				$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Bookmarks . ':  ' . $db->errno . ' ' . $db->error);
-				return false;
-			}
-		if($db->config->structureVersion < abeStructureVersion::Duplicates)
-			if(self::RunQueryFile('routines/IsDuplicateTransaction', $db, $ajax) && self::SetStructureVersion(abeStructureVersion::Duplicates, $db, $ajax))
-				$db->commit();
-			else {
-				$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Duplicates . ':  ' . $db->errno . ' ' . $db->error);
-				return false;
-			}
-		if($db->config->structureVersion < abeStructureVersion::SummaryProcedures)
-			if(
-				self::RunQueryFile('routines/GetMonthlyCategorySpending', $db, $ajax)
-				&& self::RunQueryFile('routines/GetYearlyCategorySpending', $db, $ajax)
-				&& self::SetStructureVersion(abeStructureVersion::SummaryProcedures, $db, $ajax)
-			)
-				$db->commit();
-			else {
-				$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::SummaryProcedures . ':  ' . $db->errno . ' ' . $db->error);
-				return false;
-			}
-		if($db->config->structureVersion < abeStructureVersion::CategoryGroups)
-			if(
-				self::RunQueryFile('tables/category_groups', $db, $ajax)
-				&& self::RunQueryFile('transitions/5-categories', $db, $ajax)
-				&& self::RunQueryFile('routines/GetMonthlyCategorySpending', $db, $ajax)
-				&& self::RunQueryFile('routines/GetYearlyCategorySpending', $db, $ajax)
-				&& self::SetStructureVersion(abeStructureVersion::CategoryGroups, $db, $ajax)
-			)
-				$db->commit();
-			else {
-				$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::CategoryGroups . ':  ' . $db->errno . ' ' . $db->error);
-				return false;
-			}
-		if($db->config->structureVersion < abeStructureVersion::Funds)
-			if(self::RunQueryFile('tables/funds', $db, $ajax) && self::SetStructureVersion(abeStructureVersion::Funds, $db, $ajax))
-				$db->commit();
-			else {
-				$ajax->Fail('Error upgrading database structure to version ' . abeStructureVersion::Funds . ':  ' . $db->errno . ' ' . $db->error);
-				return false;
-			}
+	private static function UpgradeDatabaseStructure(mysqli $db, abeAjax $ajax) {
+		if($db->config->structureVersion < abeStructureVersion::Bookmarks
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::Bookmarks, $db, $ajax, 'tables/bookmarks')
+		)
+			return false;
+
+		if($db->config->structureVersion < abeStructureVersion::Duplicates
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::Duplicates, $db, $ajax, 'routines/IsDuplicateTransaction')
+		)
+			return false;
+
+		if($db->config->structureVersion < abeStructureVersion::SummaryProcedures
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::SummaryProcedures, $db, $ajax,
+				'routines/GetMonthlyCategorySpending',
+				'routines/GetYearlyCategorySpending'
+		))
+			return false;
+
+		if($db->config->structureVersion < abeStructureVersion::CategoryGroups
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::CategoryGroups, $db, $ajax,
+				'tables/category_groups',
+				'transitions/5-categories',
+				'routines/GetMonthlyCategorySpending',
+				'routines/GetYearlyCategorySpending'
+		))
+			return false;
+
+		if($db->config->structureVersion < abeStructureVersion::Funds
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::Funds, $db, $ajax, 'tables/funds')
+		)
+			return false;
+
+		if($config->structureVersion < abeStructureVersion::Budgets
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::Budgets, $db, $ajax,
+				'tables/budget_categories',
+				'tables/budget_funds',
+				'views/spending_monthly',
+				'views/spending_yearly',
+				'routines/GetBudget',
+				'routines/GetLastFullMonth',
+				'routines/GetMonthlyCategoryAverage',
+				'transitions/7-budgets',
+				'routines/GetMonthlyCategorySpending',
+				'routines/GetYearlyCategorySpending'
+		))
+			return false;
 		// add more upgrades here (older ones need to go first)
 		return true;
+	}
+
+	private static function UpgradeDatabaseStructureStep(int $version, mysqli $db, abeAjax $ajax, string ...$queryfiles) {
+		foreach($queryfiles as $file)
+			if(!self::RunQueryFile($file, $db, $ajax))
+				return false;
+		if(self::SetStructureVersion($version, $db, $ajax)) {
+			$db->commit();
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Upgrade database data and update the data version.
 	 * @return boolean True if successful
 	 */
-	private static function UpgradeDatabaseData($ajax) {
+	private static function UpgradeDatabaseData(abeAjax $ajax) {
 		// add future data upgrades here (older ones need to go first)
 	}
 
@@ -285,11 +296,33 @@ class abeKeysDB {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return bool True if successful
 	 */
-	private static function RunQueryFile($filepath, $db, $ajax) {
+	private static function RunQueryFile(string $filepath, mysqli $db, abeAjax $ajax) {
 		$sql = trim(file_get_contents(dirname(__DIR__) . '/etc/db/' . $filepath . '.sql'));
-		if(substr($sql, -1) == ';')
-			$sql = substr($sql, 0, -1);
-		if($db->real_query($sql))
+		if(substr($filepath, 0, 12) == 'transitions/') {  // transitions usually have more than one query
+			if($db->multi_query($sql)) {
+				while($db->next_result());  // these queries don't return results but we need to get past them to continue
+				return true;
+			}
+		} else {
+			if(substr($sql, -1) == ';')
+				$sql = substr($sql, 0, -1);
+			if($db->real_query($sql))
+				return true;
+		}
+		$ajax->Fail('Error running query file ' . $filepath . ':  ' . $db->errno . ' ' . $db->error);
+		return false;
+	}
+
+	/**
+	 * Load multiple queries from a file and run them.
+	 * @param string $filepath File subdirectory and name without extension.
+	 * @param mysqli $db Database connection object.
+	 * @param abeAjax $ajax Ajax object for reporting an error.
+	 * @return bool True if successful
+	 */
+	private static function RunMultiQueryFile(string $filepath, mysqli $db, abeAjax $ajax) {
+		$sql = trim(file_get_contents(dirname(__DIR__) . '/etc/db/' . $filepath . '.sql'));
+		if($db->multi_query($sql))
 			return true;
 		$ajax->Fail('Error running query file ' . $filepath . ':  ' . $db->errno . ' ' . $db->error);
 		return false;
@@ -298,12 +331,12 @@ class abeKeysDB {
 	/**
 	 * Sets the structure version to the provided value.  Use this after making
 	 * database structure upgrades.
-	 * @param integer $ver Structure version to set (use a constant from abeStructureVersion)
+	 * @param int $ver Structure version to set (use a constant from abeStructureVersion)
 	 * @param mysqli $db Database connection object.
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return bool True if successful
 	 */
-	private static function SetStructureVersion($ver, $db, $ajax) {
+	private static function SetStructureVersion(int $ver, mysqli $db, abeAjax $ajax) {
 		if($db->real_query('update config set structureVersion=' . +$ver . ' limit 1')) {
 			$config->structureVersion = +$ver;
 			return true;

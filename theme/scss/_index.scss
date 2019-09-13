@@ -73,6 +73,9 @@
 			font-size: 2em;
 			padding: .25em 0;
 		}
+		&[href^='#budget']:before {
+			content: "\f24e";
+		}
 		&[href^='#import']:before {
 			content: "\f093";
 		}

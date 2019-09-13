@@ -22,7 +22,7 @@ export default {
 	watch: {
 		lastError(error) {
 			if(error) {
-				error.time = new Date();
+				error.time = new Date();  // TODO:  use error.time and this.now to show how old each error is
 				this.errors.push(error);
 				this.toastError = error;
 			}

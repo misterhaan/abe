@@ -11,6 +11,9 @@ $html->Open('API');
 			<h2 class=api><a href=bookmark>bookmark</a></h2>
 			<p>The bookmark API manages bookmarks that appear with the main menu.</p>
 
+			<h2 class=api><a href=budget>budget</a></h2>
+			<p>The budget API manages budgets.</p>
+
 			<h2 class=api><a href=category>category</a></h2>
 			<p>
 				The category API manages the categories that are used for transactions.
