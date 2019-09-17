@@ -131,7 +131,7 @@ class TransactionApi extends abeApi {
 	 * Save previewed transactions.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function importAction($ajax) {
+	protected static function importAction(abeAjax $ajax) {
 		if(isset($_POST['acctid']) && $account = +$_POST['acctid'])
 			if(isset($_POST['transactions']) && is_array($_POST['transactions']) && $count = count($_POST['transactions'])) {
 				$db = self::RequireLatestDatabase($ajax);
@@ -177,7 +177,7 @@ class TransactionApi extends abeApi {
 	 * Get transactions in order according to filter parameters.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		if($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?, ?)'))
 			if($select->bind_param('isissssds', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount, $search)) {
@@ -245,13 +245,13 @@ class TransactionApi extends abeApi {
 	 * Translate uploaded file into a list of transactions for preview.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function parseFileAction($ajax) {
+	protected static function parseFileAction(abeAjax $ajax) {
 		// TODO:  accept bankclass or bankid instead of acctid
 		// TODO:  automatic categorization engine
 		if(isset($_POST['acctid']) && $_POST['acctid'] += 0)
 			if(file_exists($_FILES['transfile']['tmp_name']) && is_uploaded_file($_FILES['transfile']['tmp_name'])) {
-				if($bankclass = self::LookupBank($_POST['acctid'], $ajax)) {
-					$db = self::RequireLatestDatabase($ajax);
+				$db = self::RequireLatestDatabase($ajax);
+				if($bankclass = self::LookupBank($_POST['acctid'], $ajax, $db)) {
 					if($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $_POST['acctid'], $ajax, $db))
 						$ajax->Data->preview = $preview;
 				}
@@ -266,7 +266,7 @@ class TransactionApi extends abeApi {
 	 * Save changes to a transaction.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function saveAction($ajax) {
+	protected static function saveAction(abeAjax $ajax) {
 		if(isset($_POST['id'], $_POST['name']) && ($id = +$_POST['id']) && ($name = trim($_POST['name']))) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -330,7 +330,7 @@ class TransactionApi extends abeApi {
 	 * @param mysqli $db Database connection object
 	 * @return string Class name for account's bank class
 	 */
-	private static function LookupBank($acctid, $ajax, $db) {
+	private static function LookupBank(int $acctid, abeAjax $ajax, mysqli $db) {
 		$acct = 'select b.class from accounts as a left join banks as b on b.id=a.bank where a.id=\'' . +$acctid . '\' limit 1';
 		if($acct = $db->query($acct))
 			if($acct = $acct->fetch_object()) {

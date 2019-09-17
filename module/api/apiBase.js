@@ -12,7 +12,7 @@ export default class ApiBase {
 	}
 	static POSTwithFile(url, data, successTransform) {
 		return $.ajax({
-			method: method,
+			method: "POST",
 			url: url,
 			data: data,
 			cache: false,
