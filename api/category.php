@@ -78,7 +78,7 @@ class CategoryApi extends abeApi {
 	 * Add a new category.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function addAction($ajax) {
+	protected static function addAction(abeAjax $ajax) {
 		if(isset($_POST['name']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($i = $db->prepare('insert into categories (name, grp) values (?, ?)'))
@@ -102,7 +102,7 @@ class CategoryApi extends abeApi {
 	 * Delete a category.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function deleteAction($ajax) {
+	protected static function deleteAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($chk = $db->prepare('select case when exists(select 1 from transactions where category=? limit 1) or exists(select 1 from splitcats where category=?) then 1 else 0 end'))
@@ -142,7 +142,7 @@ class CategoryApi extends abeApi {
 	 * Get the list of all categories.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		if($cats = $db->query('select c.id, c.name, coalesce(g.name, \'(ungrouped)\') as groupname from categories as c left join category_groups as g on g.id=c.grp order by groupname, c.name')) {
 			$ajax->Data->categories = [];
@@ -156,7 +156,7 @@ class CategoryApi extends abeApi {
 	 * Move a category to a different group.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveAction($ajax) {
+	protected static function moveAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$grp = isset($_POST['grp']) && +$_POST['grp'] ? +$_POST['grp'] : null;
@@ -178,7 +178,7 @@ class CategoryApi extends abeApi {
 	 * Rename an existing category.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function renameAction($ajax) {
+	protected static function renameAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($u = $db->prepare('update categories set name=? where id=? limit 1'))

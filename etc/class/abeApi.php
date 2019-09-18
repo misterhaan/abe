@@ -42,7 +42,7 @@ abstract class abeApi {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return mysqli Database connection object.
 	 */
-	protected static function RequireDatabase($ajax) {
+	protected static function RequireDatabase(abeAjax $ajax) {
 		if(@include_once dirname(DOCROOT) . '/.abeKeys.php') {
 			$db = @new mysqli(abeKeysDB::HOST, abeKeysDB::USER, abeKeysDB::PASS, abeKeysDB::NAME);
 			if(!$db->connect_errno) {
@@ -63,7 +63,7 @@ abstract class abeApi {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return mysqli Database connection object.
 	 */
-	protected static function RequireDatabaseWithConfig($ajax) {
+	protected static function RequireDatabaseWithConfig(abeAjax $ajax) {
 		$db = self::RequireDatabase($ajax);
 		if($config = $db->query('select * from config limit 1'))
 			if($config = $config->fetch_object()) {
@@ -82,7 +82,7 @@ abstract class abeApi {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return mysqli Database connection object.
 	 */
-	protected static function RequireLatestDatabase($ajax) {
+	protected static function RequireLatestDatabase(abeAjax $ajax) {
 		$db = self::RequireDatabaseWithConfig($ajax);
 		if($db->config->structureVersion >= abeVersion::Structure && $db->config->dataVersion >= abeVersion::Data)
 			return $db;
@@ -96,7 +96,7 @@ abstract class abeApi {
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @param string $message Error message to report.
 	 */
-	private static function FailToSetup($ajax, $message) {
+	private static function FailToSetup(abeAjax $ajax, string $message) {
 		$ajax->Fail($message);
 		$ajax->Data->redirect = "setup.html";
 		$ajax->Send();

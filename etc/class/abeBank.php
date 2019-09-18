@@ -15,7 +15,7 @@ abstract class abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public function ParseTransactions($origname, $filename, $acctid, $ajax, $db) {
+	public function ParseTransactions(string $origname, string $filename, int $acctid, abeAjax $ajax, mysqli $db) {
 		$ext = explode('.', $origname);
 		$ext = $ext[count($ext) - 1];
 		$parse = 'Parse' . ucfirst(strtolower($ext)) . 'Transactions';
@@ -33,7 +33,7 @@ abstract class abeBank {
 	 * @param string $string String in all-caps.
 	 * @return string The string, converted to Title Case.
 	 */
-	protected function TitleCase($string) {
+	protected function TitleCase(string $string) {
 		if(preg_match('/[a-z]/', $string))
 			return $string;
 		return ucwords(strtolower($string));

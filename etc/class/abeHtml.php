@@ -32,7 +32,7 @@ class abeHtml {
 	 * any other HTML output from the script.
 	 * @param string $title Title of the page to display on the browser tab.  The site name will be added to the end if it's not contained in the title.
 	 */
-	public function Open($title) {
+	public function Open(string $title) {
 		if($this->isopen)
 			return;
 		$this->isopen = true;

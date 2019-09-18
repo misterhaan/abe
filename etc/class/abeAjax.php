@@ -22,7 +22,7 @@ class abeAjax {
 	 * mark the request failed and add a reason.
 	 * @param string $message failure reason
 	 */
-	public function Fail($message) {
+	public function Fail(string $message) {
 		$this->Data->fail = true;
 		$this->Data->message = $message;
 	}

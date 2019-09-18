@@ -106,7 +106,7 @@ class FundApi extends abeApi {
 	 * Add a new fund.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function addAction($ajax) {
+	protected static function addAction(abeAjax $ajax) {
 		if(isset($_POST['name']) && isset($_POST['target']) && $name = trim($_POST['name'])) {
 			$target = round(+$_POST['target'], 2);
 			$balance = round(+$_POST['balance'], 2);
@@ -139,7 +139,7 @@ class FundApi extends abeApi {
 	 * Close a fund and sort it down to the beginning of the closed funds.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function closeAction($ajax) {
+	protected static function closeAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && ($id = +$_POST['id'])) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -170,7 +170,7 @@ class FundApi extends abeApi {
 	 * Get the list of all funds.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		$ajax->Data->funds = [];
 		if($funds = $db->query('select id, name, balance, target from funds order by sort'))
@@ -190,7 +190,7 @@ class FundApi extends abeApi {
 	 * Action to move a fund down in the sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveDownAction($ajax) {
+	protected static function moveDownAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -221,7 +221,7 @@ class FundApi extends abeApi {
 	 * Action to move a fund before another fund in the sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveToAction($ajax) {
+	protected static function moveToAction(abeAjax $ajax) {
 		if(isset($_POST['moveId']) && isset($_POST['beforeId']) && ($moveid = +$_POST['moveId']) && $beforeid = +$_POST['beforeId']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -261,7 +261,7 @@ class FundApi extends abeApi {
 	 * Action to move a fund up in the sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveUpAction($ajax) {
+	protected static function moveUpAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -292,7 +292,7 @@ class FundApi extends abeApi {
 	 * Save changes to a fund.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function saveAction($ajax) {
+	protected static function saveAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && ($id = +$_POST['id'])
 				&& isset($_POST['name']) && ($name = trim($_POST['name']))
 				&& isset($_POST['balance']) && isset($_POST['target'])) {

@@ -41,7 +41,7 @@ class SummaryApi extends abeApi {
 	 * Action to lookup monthly spending totals.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function monthlyCategoriesAction($ajax) {
+	protected static function monthlyCategoriesAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		// TODO:  accept $_GET['oldest'] for getting older data
 		$oldest = date('Y') - 1 . '-' . date('m') . '-00';
@@ -55,7 +55,7 @@ class SummaryApi extends abeApi {
 	 * Action to lookup yearly spending totals.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function yearlyCategoriesAction($ajax) {
+	protected static function yearlyCategoriesAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		// TODO:  accept $_GET['oldest'] for getting older data
 		$oldest = date('Y') - 10 . '-01-00';
@@ -71,7 +71,7 @@ class SummaryApi extends abeApi {
 	 * @param mysqli_result $amts Results of monthly or yearly category spending query.
 	 * @param abeAjax $ajax Ajax object for returning data.
 	 */
-	private static function ParseQueryResults($amts, $ajax) {
+	private static function ParseQueryResults(mysqli_result $amts, abeAjax $ajax) {
 		$ajax->Data->dates = [];
 		$ajax->Data->cats = [];
 		$lastdate = false;
@@ -111,7 +111,7 @@ class SummaryApi extends abeApi {
 	 * @param array $a First named array.
 	 * @param array $b Second named array.
 	 */
-	private static function AlphabetizeNamed($a, $b) {
+	private static function AlphabetizeNamed(array $a, array $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 }

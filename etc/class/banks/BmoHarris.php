@@ -11,7 +11,7 @@ class BmoHarris extends abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseCsvTransactions($filename, $acctid, $db) {
+	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			// first three lines are header
 			fgets($fh);
@@ -70,7 +70,7 @@ class BmoHarris extends abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseOfxTransactions($filename, $acctid, $db) {
+	public static function ParseOfxTransactions(string $filename, int $acctid, mysqli $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			$preview = new stdClass();
 			$preview->transactions = [];
@@ -147,7 +147,7 @@ class BmoHarris extends abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseQboTransactions($filename, $acctid, $db) {
+	public static function ParseQboTransactions(string $filename, int $acctid, mysqli $db) {
 		// The qbo file is basically the same as ofx, just with some extra stuff we will ignore anyway.
 		self::ParseOfxTransactions($filename, $acctid, $db);
 	}
@@ -159,7 +159,7 @@ class BmoHarris extends abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseQfxTransactions($filename, $acctid, $db) {
+	public static function ParseQfxTransactions(string $filename, int $acctid, mysqli $db) {
 		// The qfx file is basically the same as ofx, just with some extra stuff we will ignore anyway.
 		self::ParseOfxTransactions($filename, $acctid, $db);
 	}

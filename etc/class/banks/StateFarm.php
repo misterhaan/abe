@@ -12,7 +12,7 @@ class StateFarm extends abeBank {
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseCsvTransactions($filename, $acctid, $db) {
+	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
 			// first line is headers
 			fgets($fh);

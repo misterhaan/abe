@@ -61,7 +61,7 @@ class AccountApi extends abeApi {
 	 * Add a new account.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function addAction($ajax) {
+	protected static function addAction(abeAjax $ajax) {
 		if(isset($_POST['name'], $_POST['type'], $_POST['bank']) && ($name = trim($_POST['name'])) && ($type = +$_POST['type']) && ($bank = +$_POST['bank'])) {
 			$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
 			$closed = isset($_POST['closed']) && $_POST['closed'] ? 1 : 0;
@@ -84,7 +84,7 @@ class AccountApi extends abeApi {
 	 * Get the list of all funds.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		$accts = <<<ACCTS
 			select a.id, a.name, a.closed, at.id as type, at.class as typeClass, b.id as bank, b.name as bankName, b.url as bankUrl, a.balance, max(t.posted) as newestSortable, date_format(max(t.posted), '%b %D') as newestDisplay
@@ -117,7 +117,7 @@ ACCTS;
 	 * Save changes to an account.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function saveAction($ajax) {
+	protected static function saveAction(abeAjax $ajax) {
 		if(isset($_POST['id'], $_POST['name'], $_POST['type'], $_POST['bank']) && ($id = +$_POST['id']) && ($name = trim($_POST['name'])) && ($type = +$_POST['type']) && ($bank = +$_POST['bank'])) {
 			$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
 			$closed = isset($_POST['closed']) && $_POST['closed'] ? 1 : 0;
@@ -140,7 +140,7 @@ ACCTS;
 	 * Get the lists of available account types and supported banks.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function typesAction($ajax) {
+	protected static function typesAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		$ajax->Data->banks = [];
 		$ajax->Data->types = [];

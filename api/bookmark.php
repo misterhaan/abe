@@ -68,7 +68,7 @@ class BookmarkApi extends abeApi {
 	 * Action to add a bookmark.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function addAction($ajax) {
+	protected static function addAction(abeAjax $ajax) {
 		if(isset($_POST['page'], $_POST['spec'], $_POST['name']) && ($page = trim($_POST['page'])) && ($spec = trim($_POST['spec'])) && ($name = trim($_POST['name']))) {
 			$pagename = explode('/', $page)[0];
 			if(file_exists(dirname(__DIR__) . '/' . $pagename . '.php') || file_exists(dirname(__DIR__) . '/module/component/' . $pagename . '.js')) {
@@ -95,7 +95,7 @@ class BookmarkApi extends abeApi {
 	 * Action to delete a bookmark.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function deleteAction($ajax) {
+	protected static function deleteAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -126,7 +126,7 @@ class BookmarkApi extends abeApi {
 	 * Action to get the complete list of bookmarks in the correct sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		$bookmarks = 'select id, page, concat(\'#\', page, \'!\', trim(leading \'#!\' from spec)) as url, name from bookmarks order by sort';
 		if($bookmarks = $db->query($bookmarks)) {
@@ -142,7 +142,7 @@ class BookmarkApi extends abeApi {
 	 * Action to move a bookmark down in the sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveDownAction($ajax) {
+	protected static function moveDownAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);
@@ -173,7 +173,7 @@ class BookmarkApi extends abeApi {
 	 * Action to move a bookmark up in the sort order.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function moveUpAction($ajax) {
+	protected static function moveUpAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			$db->autocommit(false);

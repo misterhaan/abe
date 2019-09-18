@@ -57,7 +57,7 @@ class CategoryGroupApi extends abeApi {
 	 * Add a new category group.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function addAction($ajax) {
+	protected static function addAction(abeAjax $ajax) {
 		if(isset($_POST['name']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($i = $db->prepare('insert into category_groups (name) values (?)'))
@@ -79,7 +79,7 @@ class CategoryGroupApi extends abeApi {
 	 * Delete a category group.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function deleteAction($ajax) {
+	protected static function deleteAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($chk = $db->prepare('select case when exists(select 1 from categories where grp=? limit 1) then 1 else 0 end'))
@@ -119,7 +119,7 @@ class CategoryGroupApi extends abeApi {
 	 * Get the list of all categories organized into their groups.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction($ajax) {
+	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
 		if($groups = $db->query('select g.id, coalesce(g.name, \'(ungrouped)\') as name, group_concat(c.id order by c.name separator \'\\n\') as catids, group_concat(c.name order by c.name separator \'\\n\') as catnames from categories as c left join category_groups as g on g.id=c.grp group by g.id order by g.name')) {
 			$ajax->Data->groups = [];
@@ -139,7 +139,7 @@ class CategoryGroupApi extends abeApi {
 	 * Rename an existing category group.
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function renameAction($ajax) {
+	protected static function renameAction(abeAjax $ajax) {
 		if(isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
 			if($u = $db->prepare('update category_groups set name=? where id=? limit 1'))
