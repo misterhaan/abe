@@ -222,14 +222,14 @@ export default {
 		<div id=filters v-slideVisible=visible @keydown.esc=Cancel>
 			<label class=search title="Show transactions that have this text in the name">
 				<span>Search:</span>
-				<input v-model=search maxlength=64>
+				<input v-model=search maxlength=64 @keydown.enter=Update>
 			</label>
 			<label class=categories title="Show transactions with these categories">
 				Categories:
 				<span class="all category" v-if=!categories.length>(all)</span>
 				<span class="category" v-for="cat in categories"><span>{{cat.name || "${T.UncategorizedName}"}}</span><a class=remove @click=RemoveCategory(cat)></a></span>
 				<input @blur=CategoryBlur @dblclick="showSuggestions = true" @input=CategoryInput @keydown.esc=HideSuggestions
-					@keydown.enter=AddCategory(catCursor) @keydown.tab=AddCategory(catCursor)
+					@keydown.enter.stop=AddCategory(catCursor) @keydown.tab=AddCategory(catCursor)
 					@keydown.up=PrevCategory @keydown.down=NextCategory
 					maxlength=24 placeholder="Find a category">
 			</label>
@@ -241,15 +241,15 @@ export default {
 			</ol>
 			<label class=date title="Show transactions posted on or after this date">
 				<span>Since:</span>
-				<input type=date :max="dateend || today" v-model=datestart>
+				<input type=date :max="dateend || today" v-model=datestart @keydown.enter=Update>
 			</label>
 			<label class=date title="Show transactions posted on or before this date">
 				<span>Before:</span>
-				<input type=date :min=datestart :max=tomorrow v-model=dateend>
+				<input type=date :min=datestart :max=tomorrow v-model=dateend @keydown.enter=Update>
 			</label>
 			<label class=amount title="Show transactions that are at least this amount">
 				<span>Min $:</span>
-				<input type=number step=.01 min=0 v-model=minamount @keypress=FilterAmountKeys>
+				<input type=number step=.01 min=0 v-model=minamount @keypress=FilterAmountKeys @keydown.enter=Update>
 			</label>
 			<label class=accounts title="Show transactions from these accounts">
 				Accounts:
