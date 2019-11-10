@@ -349,7 +349,7 @@ class abeKeysDB {
 	 */
 	private static function SetStructureVersion(int $ver, mysqli $db, abeAjax $ajax) {
 		if($db->real_query('update config set structureVersion=' . +$ver . ' limit 1')) {
-			$config->structureVersion = +$ver;
+			$db->config->structureVersion = +$ver;
 			return true;
 		}
 		$ajax->Fail('Error setting structure version to ' . $ver . ':  ' . $db->errno . ' ' . $db->error);
