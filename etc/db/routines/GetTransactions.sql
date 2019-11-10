@@ -27,7 +27,7 @@ create procedure GetTransactions (in maxcount smallint unsigned, in oldest date,
 	end if;
 
 	if daterangestart is null then
-		set daterangestart = '0000-00-00';
+		set daterangestart = '1000-01-01';
 	end if;
 
 	if daterangeend is null then
@@ -43,7 +43,7 @@ create procedure GetTransactions (in maxcount smallint unsigned, in oldest date,
 			left join categories as scc on scc.id=sc.category
 		where
 			(accountids is null or instr(accountids, concat(',', t.account, ',')))
-			and (categoryids is null 
+			and (categoryids is null
 				or t.splitcat=0 and instr(categoryids, concat(',', ifnull(t.category, 0), ','))
 				or t.splitcat=1 and categoryids!=',0,' and exists (select 1 from splitcats as isc where isc.transaction=t.id and instr(categoryids, concat(',', isc.category, ','))))
 			and (t.posted>=daterangestart and t.posted<=daterangeend)

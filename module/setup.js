@@ -131,16 +131,23 @@ const setup = new Vue({
 					<div class=percentfield><div class=percentvalue style="width: 33.333%"></div></div>
 					<p>
 						${AppName.Full} can’t connect to the database.  Usually this is
-						because the database hasn’t been created yet.  Enter the password
-						for the MySQL root user below to create the database and grant
-						access to the configured user, or complete this step manually and
-						reload this page to move on.
+						because the database hasn’t been created yet.  If your MySQL server
+						is set up with a root password, enter it below to create the Abe
+						database and grant access to the configured user.  Alternately, run
+						the two queries listed below as root and reload this page to move on.
 					</p>
 					<label title="Enter the password for the MySQL root user (will not be stored)">
 						<span class=label>Password:</span>
 						<span class=field><input type=password required v-model.trim=password></span>
 					</label>
 					<nav class=calltoaction><button :disabled="working || !password" :class="{working: working}" @click=Create>Create</button></nav>
+					<p>
+						Make sure to change \`abe\` below to your database name, USERNAME
+						to your username, and PASSWORD to your password.  Then copy and
+						paste into a root MySQL prompt.
+					</p>
+					<textarea>create database \`abe\` character set utf8mb4 collate utf8mb4_unicode_ci;
+grant all on \`abe\`.* to 'USERNAME'@'localhost' identified by 'PASSWORD';</textarea>
 				</main>
 			`
 		},

@@ -103,7 +103,7 @@ class BudgetApi extends abeApi {
 	protected static function activeAction(abeAjax $ajax) {
 		if(isset($_GET['month']) && $_GET['month'])
 			if(preg_match(self::MonthRegex, $month = trim($_GET['month']))) {
-				$month .= '-00';
+				$month .= '-01';
 				$db = self::RequireLatestDatabase($ajax);
 				// TODO:  also get summary data for this month and combine with this
 				if($cats = $db->prepare('call GetBudget(?)'))
@@ -156,7 +156,7 @@ class BudgetApi extends abeApi {
 		if(isset($_POST['month']) && preg_match(self::MonthRegex, $month = trim($_POST['month'])))
 			if(isset($_POST['id']) && (($multi = is_array($_POST['id'])) || +$_POST['id']))
 				if(isset($_POST['amount']) && is_array($_POST['amount']) == $multi && (!$multi || count($_POST['id']) == count($_POST['amount']))) {
-					$month .= '-00';
+					$month .= '-01';
 					$ids = $multi ? $_POST['id'] : [$_POST['id']];
 					$amounts = $multi ? $_POST['amount'] : [$_POST['amount']];
 					$db = self::RequireLatestDatabase($ajax);
@@ -189,7 +189,7 @@ class BudgetApi extends abeApi {
 	protected static function actualFundAction(abeAjax $ajax) {
 		if(isset($_POST['month']) && preg_match(self::MonthRegex, $month = trim($_POST['month'])))
 			if(isset($_POST['id']) && $id = +$_POST['id']) {
-				$month .= '-00';
+				$month .= '-01';
 				$amount = +$_POST['amount'];
 				$db = self::RequireLatestDatabase($ajax);
 				$db->autocommit(false);
@@ -224,7 +224,7 @@ class BudgetApi extends abeApi {
 	 */
 	protected static function createAction(abeAjax $ajax) {
 		if(isset($_POST['month']) && preg_match(self::MonthRegex, $month = trim($_POST['month']))) {
-			$month .= '-00';
+			$month .= '-01';
 			$catids = isset($_POST['catids']) ? $_POST['catids'] : [];
 			$catamounts = isset($_POST['catamounts']) ? $_POST['catamounts'] : [];
 			if(count($catids) == count($catamounts)) {
@@ -351,7 +351,7 @@ class BudgetApi extends abeApi {
 					$m += 12;
 				}
 				// if previous month isn't a full month, use last full month
-				if(date('Y-m-00', strtotime($y . '-' . $m)) > $lastfullmonth) {
+				if(date('Y-m-01', strtotime($y . '-' . $m)) > $lastfullmonth) {
 					list($ly, $lm, $ld) = explode('-', $lastfullmonth);
 					$y = +$ly;
 					$m = +$lm;

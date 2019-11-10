@@ -14,7 +14,7 @@ class abeVersion {
 	 * the setup script in upgrade mode.
 	 * @var integer
 	 */
-	const Structure = abeStructureVersion::Budgets;
+	const Structure = abeStructureVersion::MySqlStrict;
 	/**
 	 * Database data (rows) version.  Changing this triggers the setup script in
 	 * update mode.
@@ -30,6 +30,7 @@ class abeVersion {
  * @author misterhaan
  */
 class abeStructureVersion {
+	const MySqlStrict = 8;
 	const Budgets = 7;
 	const Funds = 6;
 	const CategoryGroups = 5;

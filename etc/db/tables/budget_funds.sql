@@ -1,5 +1,5 @@
 create table budget_funds (
-	month date not null comment 'stored as YYYY-MM-00 because the day isn’t used',
+	month date not null comment 'stored as YYYY-MM-01 because the day isn’t used',
 	fund smallint unsigned not null,
 	foreign key(fund) references funds(id) on update cascade on delete cascade,
 	primary key(month, fund),

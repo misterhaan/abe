@@ -252,7 +252,7 @@ class abeKeysDB {
 		)
 			return false;
 
-		if($config->structureVersion < abeStructureVersion::Budgets
+		if($db->config->structureVersion < abeStructureVersion::Budgets
 			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::Budgets, $db, $ajax,
 				'tables/budget_categories',
 				'tables/budget_funds',
@@ -263,6 +263,17 @@ class abeKeysDB {
 				'routines/GetMonthlyCategoryAverage',
 				'transitions/7-budgets',
 				'routines/GetMonthlyCategorySpending',
+				'routines/GetYearlyCategorySpending'
+		))
+			return false;
+
+		if($db->config->structureVersion < abeStructureVersion::MySqlStrict
+			&& !self::UpgradeDatabaseStructureStep(abeStructureVersion::MySqlStrict, $db, $ajax,
+				'transitions/8-mysql-strict',
+				'views/spending_monthly',
+				'routines/GetLastFullMonth',
+				'routines/GetMonthlyCategorySpending',
+				'routines/GetTransactions',
 				'routines/GetYearlyCategorySpending'
 		))
 			return false;
