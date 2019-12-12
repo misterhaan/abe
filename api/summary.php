@@ -96,8 +96,9 @@ class SummaryApi extends abeApi {
 					$ajax->Data->cats[] = ['id' => +$amt->catid, 'name' => $amt->catname, 'subcats' => false];
 					$ctrack[] = $amt->catid;
 			}
-			$ajax->Data->dates[$d]['net'] += $amt->amount;
-			$ajax->Data->dates[$d][$amt->amount < 0 ? 'spent' : 'made'] += $amt->amount;
+			$ajax->Data->dates[$d]['net'] = round($ajax->Data->dates[$d]['net'] + $amt->amount, 2);
+			$type = $amt->amount < 0 ? 'spent' : 'made';
+			$ajax->Data->dates[$d][$type] = round($ajax->Data->dates[$d][$type] + $amt->amount, 2);
 			$ajax->Data->dates[$d]['cats'][+$amt->catid] = $amt->amount;
 		}
 		usort($ajax->Data->cats, ['SummaryApi', 'AlphabetizeNamed']);
