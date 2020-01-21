@@ -87,7 +87,7 @@ class abeHtml {
 ?>
 		</main>
 		<footer>
-			<div id=copyright>© 2017 - 2019 <?=self::SITE_NAME_FULL; ?></div>
+			<div id=copyright>© 2017 - 2020 <?=self::SITE_NAME_FULL; ?></div>
 		</footer>
 	</body>
 </html>
