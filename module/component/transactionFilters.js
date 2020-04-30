@@ -189,7 +189,7 @@ export default {
 					let found = false;
 					for(const group of this.categoryChoices)
 						for(const cat of group.categories)
-							if(cat.value == this.catCursor)
+							if(cat == this.catCursor)
 								found = true;
 							else if(found) {
 								this.catCursor = cat;
@@ -228,8 +228,8 @@ export default {
 				Categories:
 				<span class="all category" v-if=!categories.length>(all)</span>
 				<span class="category" v-for="cat in categories"><span>{{cat.name || "${T.UncategorizedName}"}}</span><a class=remove @click=RemoveCategory(cat)></a></span>
-				<input @blur=CategoryBlur @dblclick="showSuggestions = true" @input=CategoryInput @keydown.esc=HideSuggestions
-					@keydown.enter.stop=AddCategory(catCursor) @keydown.tab=AddCategory(catCursor)
+				<input @blur=CategoryBlur @dblclick="showSuggestions = true" @input=CategoryInput :value=catSearch
+					@keydown.esc=HideSuggestions @keydown.enter.stop=AddCategory(catCursor) @keydown.tab=AddCategory(catCursor)
 					@keydown.up=PrevCategory @keydown.down=NextCategory
 					maxlength=24 placeholder="Find a category">
 			</label>
