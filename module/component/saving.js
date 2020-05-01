@@ -1,4 +1,3 @@
-import "../../external/jquery-3.4.1.min.js";
 import FundApi from "../api/fund.js";
 import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";

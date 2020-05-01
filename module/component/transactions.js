@@ -1,4 +1,3 @@
-import "../../external/jquery-3.4.1.min.js";
 import TransactionApi from "../api/transaction.js";
 import CategoryApi from "../api/categoryGroup.js";
 import ReportErrors from "../reportErrors.js";

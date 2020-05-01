@@ -1,5 +1,3 @@
-import "../external/jquery-3.4.1.min.js";
-
 export default {
 	bind(el, bind) {
 		bind.value

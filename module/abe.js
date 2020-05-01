@@ -1,5 +1,4 @@
 import Vue from "../external/vue.esm.browser.min.js";
-import "../external/jquery-3.4.1.min.js";
 import AppName from "./appname.js";
 import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";

@@ -1,8 +1,6 @@
 import AccountApi from "../api/account.js";
 import TransactionApi from "../api/transaction.js";
 import ReportErrors from "../reportErrors.js";
-import "../../external/jquery-3.4.1.min.js";
-
 
 export default {
 	props: [

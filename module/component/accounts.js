@@ -1,4 +1,3 @@
-import "../../external/jquery-3.4.1.min.js";
 import AccountApi from "../api/account.js";
 import ReportErrors from "../reportErrors.js";
 

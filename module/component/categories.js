@@ -1,4 +1,3 @@
-import "../../external/jquery-3.4.1.min.js";
 import GroupApi from "../api/categoryGroup.js";
 import CategoryApi from "../api/category.js";
 import ReportErrors from "../reportErrors.js";

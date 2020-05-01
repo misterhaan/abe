@@ -1,5 +1,3 @@
-import "../../external/jquery-3.4.1.min.js";
-
 export default class ApiBase {
 	static GET(url, successTransform) {
 		return this.GETwithParams(url, {}, successTransform)
