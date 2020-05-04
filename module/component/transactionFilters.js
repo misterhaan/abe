@@ -199,7 +199,7 @@ export default {
 			}
 		},
 		CategoryBlur() {
-			setTimeout(this.HideSuggestions, T.BlurDelay);
+			this.HideSuggestions();
 		},
 		HideSuggestions(event) {
 			if(this.showSuggestions) {
@@ -235,7 +235,7 @@ export default {
 			<ol class=suggestions v-if=showSuggestions data-bind="foreach: categoriesForFilter">
 				<template v-for="group in categoryChoices">
 					<li v-if=group.name class=grouper v-html=group.name></li>
-					<li class=choice v-for="cat in group.categories" v-html=cat.name :class="{kbcursor: cat == catCursor}" @click=AddCategory(cat)></li>
+					<li class=choice v-for="cat in group.categories" v-html=cat.name :class="{kbcursor: cat == catCursor}" @mousedown.prevent=AddCategory(cat)></li>
 				</template>
 			</ol>
 			<label class=date title="Show transactions posted on or after this date">

@@ -254,7 +254,7 @@ export default {
 		CategoryBlur(category) {
 			if(category.name)
 				category.name = category.name.trim();
-			setTimeout(this.HideSuggestions, T.BlurDelay);
+			this.HideSuggestions();
 			if(this.editing) {
 				let uncat = false;
 				for(let c in this.editing.categories) {
@@ -431,7 +431,7 @@ export default {
 												<ol class=suggestions v-if="showSuggestions && cat == editCategory">
 													<template v-for="group in categoryChoices">
 														<li class=grouper v-html=group.name></li>
-														<li class=choice v-for="cat in group.categories" v-html=cat.name :class="{kbcursor: cat.value == catCursor}" @click=ChooseCategory(cat.value)></li>
+														<li class=choice v-for="cat in group.categories" v-html=cat.name :class="{kbcursor: cat.value == catCursor}" @mousedown.prevent=ChooseCategory(cat.value)></li>
 													</template>
 												</ol>
 												<input class=catamount type=number step=.01 v-model=cat.amount :disabled=!cat.name @focus="editCategory = cat" @keypress=FilterAmountKeys
