@@ -118,11 +118,10 @@ class abeKeysDB {
 			}
 		}
 		if($db->real_query('insert into config (structureVersion) values (' . +abeVersion::Structure . ')')) {
-			self::ImportBanks($db, $ajax);
-			if(!$ajax->Data->fail) {
+			if(self::ImportBanks($db, $ajax)) {
 				self::ImportAccountTypes($db, $ajax);
 				if(!$ajax->Data->fail)
-					if($db->real_query('update config set dataVersion=' . +abeVersion::Data . ' limit 1'))
+					if(self::SetDataVersion(abeVersion::Data, $db, $ajax))
 						$db->commit();
 					else
 						$ajax->Fail('Error configuring data version.');
@@ -173,7 +172,8 @@ class abeKeysDB {
 	}
 
 	/**
-	 * Import bank definitions into the database.  Part of InstallDatabase().
+	 * Import bank definitions into the database.  Part of InstallDatabase() but
+	 * can also be called for data upgrades because it will only import new banks.
 	 * @param mysqli $db Database connection object.
 	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 */
@@ -185,12 +185,14 @@ class abeKeysDB {
 						if(!$ins->execute())
 							$ajax->Fail('Error importing bank:  ' . $ins->error);
 					$ins->close();
+					return !$ajax->Data->fail;
 				} else
 					$ajax->Fail('Error binding bank import parameters:  ' . $ins->error);
 			else
 				$ajax->Fail('Database error preparing to import banks:  ' . $db->error);
 		else
 			$ajax->Fail('Unable to read banks data file.');
+		return false;
 	}
 
 	/**
@@ -294,9 +296,18 @@ class abeKeysDB {
 
 	/**
 	 * Upgrade database data and update the data version.
+	 * @param mysqli $db Database connection object.
+	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return boolean True if successful
 	 */
-	private static function UpgradeDatabaseData(abeAjax $ajax) {
+	private static function UpgradeDatabaseData(mysqli $db, abeAjax $ajax) {
+		if($db->config->dataVersion < abeDataVersion::UsBank) {
+			if(ImportBanks($db, $ajax) && self::SetDataVersion(abeDataVersion::UsBank, $db, $ajax))
+				$db->commit();
+			else
+				return false;
+		}
+		return true;
 		// add future data upgrades here (older ones need to go first)
 	}
 
@@ -348,11 +359,42 @@ class abeKeysDB {
 	 * @return bool True if successful
 	 */
 	private static function SetStructureVersion(int $ver, mysqli $db, abeAjax $ajax) {
-		if($db->real_query('update config set structureVersion=' . +$ver . ' limit 1')) {
-			$db->config->structureVersion = +$ver;
-			return true;
-		}
-		$ajax->Fail('Error setting structure version to ' . $ver . ':  ' . $db->errno . ' ' . $db->error);
+		if($update = $db->prepare('update config set structureVersion=? limit 1'))
+			if($update->bind_param('i', $ver))
+				if($update->execute()) {
+					$update->close();
+					$db->config->structureVersion = $ver;
+					return true;
+				} else
+					$ajax->Fail('Error executing query to set structure version to ' . $ver . ':  ' . $update->errno . ' ' . $update->error);
+			else
+				$ajax->Fail('Error binding parameter to set structure version to ' . $ver . ':  ' . $update->errno . ' ' . $update->error);
+		else
+			$ajax->Fail('Error preparing to set structure version to ' . $ver . ':  ' . $db->errno . ' ' . $db->error);
+		return false;
+	}
+
+	/**
+	 * Sets the data version to the provided value.  Use this after making
+	 * database data upgrades.
+	 * @param int $ver Data version to set (use a constant from abeDataVersion)
+	 * @param mysqli $db Database connection object.
+	 * @param abeAjax $ajax Ajax object for reporting an error.
+	 * @return bool True if successful
+	 */
+	private static function SetDataVersion(int $ver, mysqli $db, abeAjax $ajax) {
+		if($update = $db->prepare('update config set dataVersion=? limit 1'))
+			if($update->bind_param('i', $ver))
+				if($update->execute()) {
+					$update->close();
+					$db->config->dataVersion = $ver;
+					return true;
+				} else
+					$ajax->Fail('Error executing query to set data version to ' . $ver . ':  ' . $update->errno . ' ' . $update->error);
+			else
+				$ajax->Fail('Error binding parameter to set data version to ' . $ver . ':  ' . $update->errno . ' ' . $update->error);
+		else
+			$ajax->Fail('Error preparing to set data version to ' . $ver . ':  ' . $db->errno . ' ' . $db->error);
 		return false;
 	}
 }
