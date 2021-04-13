@@ -302,7 +302,7 @@ class abeKeysDB {
 	 */
 	private static function UpgradeDatabaseData(mysqli $db, abeAjax $ajax) {
 		if($db->config->dataVersion < abeDataVersion::UsBank) {
-			if(ImportBanks($db, $ajax) && self::SetDataVersion(abeDataVersion::UsBank, $db, $ajax))
+			if(self::ImportBanks($db, $ajax) && self::SetDataVersion(abeDataVersion::UsBank, $db, $ajax))
 				$db->commit();
 			else
 				return false;
