@@ -57,6 +57,9 @@ export default {
 			});
 			fileInput.val("");
 		},
+		Ignore(preview, transaction) {
+			preview.transactions.splice(preview.transactions.indexOf(transaction), 1);
+		},
 		Save(preview, next = 0, oldNewest = false) {
 			preview.working = true;
 			const last = next + TransactionApi.MaxTransactions;
@@ -128,6 +131,7 @@ export default {
 						<div class=quick>
 							<div class=name>{{transaction.name}}</div>
 							<div class=amount :class="{duplicate: transaction.duplicate}" :title="transaction.duplicate ? 'Abe already has this transaction' : null">{{transaction.amount.toFixed(2)}}</div>
+							<a class=delete v-if="transaction.duplicate || !transaction.amount" href="#import!ignore" @click="Ignore(preview, transaction)" title="Exclude this transaction from import"><span>ignore</span></a>
 						</div>
 						<div class=detail>
 							<div class="transdate" v-if=transaction.transdate>Transaction <time>{{transaction.transdate}}</time></div>
