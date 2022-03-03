@@ -58,6 +58,7 @@ export default {
 			fileInput.val("");
 		},
 		Ignore(preview, transaction) {
+			preview.net -= transaction.amount;
 			preview.transactions.splice(preview.transactions.indexOf(transaction), 1);
 		},
 		Save(preview, next = 0, oldNewest = false) {
