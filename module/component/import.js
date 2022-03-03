@@ -125,14 +125,14 @@ export default {
 					<span class=amount>{{preview.net.toFixed(2)}} net</span>
 					<span class=status v-if=preview.saved>Imported</span>
 					<button v-if=!preview.saved :class="{working: preview.working}" :disabled=preview.working @click=Save(preview)>Save</button>
-					<a class=dismiss href="#import!done" title="Remove this preview" @click=Done(preview)>Dismiss</a>
+					<a class=dismiss href="#import!done" title="Remove this preview" @click.prevent=Done(preview)>Dismiss</a>
 				</header>
 				<ul v-for="transaction in preview.transactions">
 					<li class=transaction>
 						<div class=quick>
 							<div class=name>{{transaction.name}}</div>
 							<div class=amount :class="{duplicate: transaction.duplicate}" :title="transaction.duplicate ? 'Abe already has this transaction' : null">{{transaction.amount.toFixed(2)}}</div>
-							<a class=delete v-if="transaction.duplicate || !transaction.amount" href="#import!ignore" @click="Ignore(preview, transaction)" title="Exclude this transaction from import"><span>ignore</span></a>
+							<a class=delete v-if="transaction.duplicate || !transaction.amount" href="#import!ignore" @click.prevent="Ignore(preview, transaction)" title="Exclude this transaction from import"><span>ignore</span></a>
 						</div>
 						<div class=detail>
 							<div class="transdate" v-if=transaction.transdate>Transaction <time>{{transaction.transdate}}</time></div>

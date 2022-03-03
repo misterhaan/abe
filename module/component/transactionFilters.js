@@ -226,7 +226,7 @@ export default {
 			<label class=categories title="Show transactions with these categories">
 				Categories:
 				<span class="all category" v-if=!categories.length>(all)</span>
-				<span class="category" v-for="cat in categories"><span>{{cat.name || "${T.UncategorizedName}"}}</span><a class=remove @click=RemoveCategory(cat)></a></span>
+				<span class="category" v-for="cat in categories"><span>{{cat.name || "${T.UncategorizedName}"}}</span><a class=remove @click.prevent=RemoveCategory(cat)></a></span>
 				<input @blur=CategoryBlur @dblclick="showSuggestions = true" @input=CategoryInput :value=catSearch
 					@keydown.esc=HideSuggestions @keydown.enter.stop=AddCategory(catCursor) @keydown.tab=AddCategory(catCursor)
 					@keydown.up=PrevCategory @keydown.down=NextCategory
