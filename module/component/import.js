@@ -57,27 +57,38 @@ export default {
 			});
 			fileInput.val("");
 		},
-		Save(preview) {
+		Save(preview, next = 0, oldNewest = false) {
 			preview.working = true;
-			TransactionApi.Import(preview.acctid, preview.transactions, preview.net).done(newest => {
-				preview.saved = true;
-				let account;
-				if(preview.acctid == this.selected.id)
-					account = this.selected;
-				else
-					for(let a in this.accounts)
-						if(this.accounts[a].id == preview.acctid) {
-							account = this.accounts[a];
-							break;
-						}
-				if(account && account.newestSortable < newest.sortable) {
-					account.newestSortable = newest.sortable;
-					account.newestDisplay = newest.display;
-					this.SortAccounts();
-				}
-			}).fail(this.Error).always(() => {
-				preview.working = false;
+			const last = next + TransactionApi.MaxTransactions;
+			const transactions = preview.transactions.slice(next, last);
+			const net = next ? 0 : preview.net;  // only adjust net the first time
+			const promise = TransactionApi.Import(preview.acctid, transactions, net).then(newNewest => {
+				const newest = oldNewest && oldNewest.sortable > newNewest.sortable ? oldNewest : newNewest;
+				return last >= preview.transactions.length
+					? newest
+					: this.Save(preview, last, newest);
 			});
+			if(!next)
+				promise = promise.done(newest => {
+					preview.saved = true;
+					let account;
+					if(preview.acctid == this.selected.id)
+						account = this.selected;
+					else
+						for(let a in this.accounts)
+							if(this.accounts[a].id == preview.acctid) {
+								account = this.accounts[a];
+								break;
+							}
+					if(account && account.newestSortable < newest.sortable) {
+						account.newestSortable = newest.sortable;
+						account.newestDisplay = newest.display;
+						this.SortAccounts();
+					}
+				}).fail(this.Error).always(() => {
+					preview.working = false;
+				});
+			return promise;
 		},
 		Done(preview) {
 			this.previews.splice(this.previews.indexOf(preview), 1);

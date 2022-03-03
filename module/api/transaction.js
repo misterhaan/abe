@@ -41,7 +41,20 @@ export default class TransactionApi extends ApiBase {
 		data.append("transfile", transactionFile.files[0], transactionFile.value);
 		return super.POSTwithFile(urlbase + "parseFile", data, result => result.preview);
 	}
+
+	/**
+	 * Maximum number of transactions allowed to be saved at a time.
+	 * This value needs to give enough room for the php.ini setting max_input_vars
+	 * which defaults to 1000, using the formula of number of transactions
+	 * multiplied my fields per transaction (currently 10) plus 2 more for the
+	 * account id and net change.
+	 */
+	static MaxTransactions = 80;
+
 	static Import(accountId, transactions, net) {
+		if(transactions.length > this.MaxTransactions)
+			throw new Error(`Cannot import more than ${this.MaxTransactions} transactions at a time.  Received ${transactions.length}.`);
+
 		return super.POST(urlbase + "import", {
 			acctid: accountId,
 			transactions: transactions,
