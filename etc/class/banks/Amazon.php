@@ -42,6 +42,7 @@ class Amazon extends abeBank {
 						if($tran->city == 'You' && substr($tran->name, -5) == 'Thank') {
 							$tran->name .= ' You';
 							$tran->city = '';
+							$tran->extid = $extid = null;
 						}
 						if($tran->city == 'Credit' && substr($tran->name, -9) == 'Statement') {
 							$tran->name .= ' Credit';

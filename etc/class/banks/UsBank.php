@@ -27,7 +27,7 @@ class UsBank extends abeBank {
 					while($line = fgetcsv($fh)) {
 						$tran = new stdClass();
 						// translate the data
-						$tran->extid = $extid = explode(';', $line[3])[0];
+						$tran->extid = $extid = self::ParseExtId($line[3]);
 						$tran->posted = $posted = date('Y-m-d', strtotime($line[0]));
 						$tran->name = self::TitleCase($line[2]);
 						$tran->amount = $amount = +$line[4];
@@ -52,5 +52,13 @@ class UsBank extends abeBank {
 				}
 		}
 		return false;
+	}
+
+
+	private static function ParseExtId(string $csvValue) {
+		$extid = explode(';', $csvValue)[0];
+		if($extid == 'WEB FUTURE')
+			$extid = '';
+		return $extid;
 	}
 }
