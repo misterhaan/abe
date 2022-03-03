@@ -58,7 +58,7 @@ class UsBank extends abeBank {
 	private static function ParseExtId(string $csvValue) {
 		$extid = explode(';', $csvValue)[0];
 		if($extid == 'WEB FUTURE')
-			$extid = '';
+			$extid = null;
 		return $extid;
 	}
 }
