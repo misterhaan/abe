@@ -13,9 +13,7 @@ class BmoHarris extends abeBank {
 	 */
 	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
 		if(false !== $fh = fopen($filename, 'r')) {
-			// first three lines are header
-			fgets($fh);
-			fgets($fh);
+			// first line is header
 			fgets($fh);
 
 			$preview = new stdClass();
@@ -28,18 +26,15 @@ class BmoHarris extends abeBank {
 					while($line = fgetcsv($fh)) {
 						$tran = new stdClass();
 						// translate the data
-						// first column is blank
-						$tran->posted = $posted = date('Y-m-d', strtotime($line[1]));
-						$tran->name = self::TitleCase($line[2]);
-						$amount = +$line[3];
-						// fifth column is currency which is probably always USD
-						if($line[5])
-							$tran->name .= ' ' . $line[5];
-						$tran->extid = $extid = $line[6];
-						// eigth column is credit/check/debit
-						if(strtolower($line[8]) == 'debit')
-							$amount = -$amount;
-						$tran->amount = $amount;
+						$tran->posted = $posted = date('Y-m-d', strtotime($line[0]));
+						$tran->name = self::TitleCase($line[1]);
+						$tran->amount = $amount = +$line[2];
+						// fourth column is currency which is probably always USD
+						if($line[4])
+							$tran->name .= ' ' . $line[4];
+						$tran->extid = $extid = $line[5];
+						// seventh column is credit/check/debit
+						// eigth column is credit/debit
 
 						// fields not provided
 						$tran->transdate = null;
