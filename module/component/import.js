@@ -59,6 +59,8 @@ export default {
 		},
 		Ignore(preview, transaction) {
 			preview.net -= transaction.amount;
+			if(transaction.duplicate)
+				preview.dupeCount--;
 			preview.transactions.splice(preview.transactions.indexOf(transaction), 1);
 		},
 		Save(preview, next = 0, oldNewest = false) {
