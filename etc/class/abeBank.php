@@ -34,8 +34,8 @@ abstract class abeBank {
 	 * @return string The string, converted to Title Case.
 	 */
 	protected function TitleCase(string $string) {
-		if(preg_match('/[a-z]/', $string))
-			return $string;
-		return ucwords(strtolower($string));
+		if(!preg_match('/[a-z]/', $string))
+			$string = ucwords(strtolower($string));
+		return mb_convert_encoding($string, 'UTF-8', 'ISO-8859-2');
 	}
 }
