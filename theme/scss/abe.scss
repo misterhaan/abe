@@ -8,25 +8,35 @@ body {
 	margin: 0;
 	-moz-text-size-adjust: none;
 	-webkit-text-size-adjust: 100%;
-	font-family: roboto;
+	font-family: roboto, sans-serif;
 	font-size: 1.25em;
 }
-h1, h2, h3, h4, h5, h6 {
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
 	font-size: 1em;
 }
+
 h2,
 p,
 dl {
 	margin: 1em .5em;
 }
+
 *[draggable] {
 	cursor: -webkit-grab;
 	cursor: grab;
 }
+
 a:link,
 a:visited {
 	color: $green;
 }
+
 a.edit,
 a.save,
 a.undo,
@@ -35,48 +45,61 @@ a.remove,
 a.up,
 a.down {
 	@extend %fa-replaced;
+
 	&:before {
 		font-size: .9em;
 		margin-left: .5em;
 		color: $darkgrey;
 	}
+
 	&:hover:before {
 		color: #000;
 	}
 }
+
 a.edit:before {
 	content: "\f044";
 }
+
 a.undo:before {
 	content: "\f0e2";
 }
+
 a.save:before {
 	content: "\f0c7";
 }
+
 a.delete:before {
 	content: "\f1f8";
 }
+
 a.remove:before {
 	content: "\f057";
 }
+
 a.up:before {
 	content: "\f0d8";
 }
+
 a.down:before {
 	content: "\f0d7";
 }
+
 a.delete:hover:before,
 a.remove:hover:before {
 	color: $red;
 }
+
 button.add {
 	@extend %fa-replaced;
+
 	&:before {
 		content: "\f067";
 		font-size: .9em;
 		margin: 0;
 	}
 }
+
 .loading:before,
 .working:after {
 	@extend %fa-label;
@@ -84,9 +107,11 @@ button.add {
 	-webkit-animation: fa-spin 1s infinite steps(8);
 	animation: fa-spin 1s infinite steps(8);
 }
+
 .calltoaction .working:after {
 	color: #ccc;
 }
+
 .working:after {
 	margin-left: .5em;
 	margin-right: 0;
@@ -95,6 +120,7 @@ button.add {
 .calltoaction {
 	text-align: center;
 }
+
 .calltoaction a {
 	@extend button;
 	display: inline-block;
@@ -106,6 +132,7 @@ button.add {
 	margin: .125em 1em;
 	background-color: $medgreyblue;
 	border-radius: $gentlecorner;
+
 	.percentvalue {
 		height: .5em;
 		background-color: $blue;
@@ -117,6 +144,7 @@ button.add {
 	.tabbed {
 		display: -webkit-flex;
 		display: flex;
+
 		.tabs {
 			margin: 0 .5em 0 0;
 			padding: .75em 0 0 .5em;
@@ -128,6 +156,7 @@ button.add {
 			flex-direction: column;
 			background-color: $green;
 			border-radius: 0 0 $gentlecorner;
+
 			span {
 				border-radius: $gentlecorner 0 0 $gentlecorner;
 				margin-bottom: .5em;
@@ -135,27 +164,33 @@ button.add {
 				padding-right: .5em;
 				background-color: $medgreyblue;
 				color: #000;
+
 				&.accounts:before,
 				&.categories:before {
 					color: $darkgrey;
 				}
 			}
+
 			a {
 				color: #fff;
 				margin-bottom: .5em;
+
 				&:before {
 					color: $medgreyblue;
 				}
 			}
 		}
+
 		section:last-child {
 			-webkit-flex: 1 1 auto;
 			flex: 1 1 auto;
 		}
 	}
 }
+
 .tabs {
 	margin: 1em;
+
 	.accounts,
 	.categories {
 		&:before {
@@ -163,17 +198,21 @@ button.add {
 			margin-left: .25em;
 		}
 	}
+
 	.accounts:before {
 		content: "\f19c";
 	}
+
 	.categories:before {
 		content: "\f02c";
 	}
+
 	a {
 		margin: .125em;
 		padding: .125em .25em;
 		text-decoration: none;
 	}
+
 	span {
 		background-color: $green;
 		color: #fff;
@@ -181,6 +220,7 @@ button.add {
 		padding: .125em .25em;
 		-webkit-border-radius: $gentlecorner;
 		border-radius: $gentlecorner;
+
 		&.accounts:before,
 		&.categories:before {
 			color: $medgreyblue;
