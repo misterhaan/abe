@@ -301,8 +301,9 @@ class abeKeysDB {
 	 * @return boolean True if successful
 	 */
 	private static function UpgradeDatabaseData(mysqli $db, abeAjax $ajax) {
-		if($db->config->dataVersion < abeDataVersion::UsBank) {
-			if(self::ImportBanks($db, $ajax) && self::SetDataVersion(abeDataVersion::UsBank, $db, $ajax))
+		// the older data version UsBank does the same thing as CapitalOne and works to do both steps at once, so it's not listed here explicitly
+		if($db->config->dataVersion < abeDataVersion::CapitalOne) {
+			if(self::ImportBanks($db, $ajax) && self::SetDataVersion(abeDataVersion::CapitalOne, $db, $ajax))
 				$db->commit();
 			else
 				return false;

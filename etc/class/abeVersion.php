@@ -20,7 +20,7 @@ class abeVersion {
 	 * update mode.
 	 * @var integer
 	 */
-	const Data = abeDataVersion::UsBank;
+	const Data = abeDataVersion::CapitalOne;
 }
 
 /**
@@ -47,6 +47,7 @@ class abeStructureVersion {
  * @author misterhaan
  */
 class abeDataVersion {
+	const CapitalOne = 3;
 	const UsBank = 2;
 	const Initial = 1;
 }
