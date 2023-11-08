@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ajax return class for responding to ajax requests with json.
  * @author misterhaan
@@ -13,7 +14,7 @@ class abeAjax {
 	/**
 	 * Initializes return data object.
 	 */
-	public function abeAjax() {
+	public function __construct() {
 		$this->Data = new stdClass();
 		$this->Data->fail = false;
 	}

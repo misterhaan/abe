@@ -9,7 +9,7 @@ define('DOCROOT', isset($_SERVER['CONTEXT_PREFIX']) && isset($_SERVER['CONTEXT_D
 
 // find the application path on the webserver for absolute URLs
 $install_path = dirname(dirname(substr(__DIR__, strlen(DOCROOT))));
-if($install_path == '/')
+if ($install_path == '/')
 	$install_path = '';
 define('INSTALL_PATH', $install_path);
 unset($install_path);
@@ -23,8 +23,8 @@ mb_internal_encoding('UTF-8');
  * the other files in this directory should be set up here.
  * @param string $class Name of the class to load.
  */
-function __autoload($class) {
-	switch($class) {
+spl_autoload_register(function ($class) {
+	switch ($class) {
 		case 'abeAjax':
 			require_once 'abeAjax.php';
 			break;
@@ -44,4 +44,4 @@ function __autoload($class) {
 			require_once 'abeVersion.php';
 			break;
 	}
-}
+});
