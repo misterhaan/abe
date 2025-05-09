@@ -2,7 +2,7 @@ const DragDrop = {
 	Data: false,
 	Type: false,
 	Draggable: {
-		bind(el, bind) {
+		created(el, bind) {
 			const element = $(el);
 			element.attr("draggable", true);
 			element.data("dragData", bind.value.data);
@@ -19,7 +19,7 @@ const DragDrop = {
 				element.removeClass("dragging");
 			});
 		},
-		update(el, bind) {
+		updated(el, bind) {
 			const element = $(el);
 			element.data("dragData", bind.value.data);
 			element.data("dragType", bind.value.type);
@@ -27,7 +27,7 @@ const DragDrop = {
 		}
 	},
 	DropTarget: {
-		bind(el, bind) {
+		created(el, bind) {
 			const element = $(el);
 			let dragLevel = 0;
 			element.data("dropData", bind.value.data);
@@ -57,7 +57,7 @@ const DragDrop = {
 				event.preventDefault();
 			});
 		},
-		update(el, bind) {
+		updated(el, bind) {
 			$(el).data("dropData", bind.value.data);
 			$(el).data("dropType", bind.value.type);
 		}

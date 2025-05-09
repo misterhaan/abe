@@ -1,4 +1,4 @@
-import Vue from "../external/vue.esm.browser.min.js";
+import { createApp } from "../external/vue.esm-browser.prod.js";
 import AppName from "./appname.js";
 import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";
@@ -11,15 +11,17 @@ import Import from "./component/import.js";
 import Saving from "./component/saving.js";
 import Settings from "./component/settings.js";
 
-new Vue({
-	el: "#abe",
-	data: {
-		view: Views.Home,
-		subView: false,
-		params: false,
-		actions: [],
-		titlePrefix: "",
-		error: false
+createApp({
+	name: "Abe",
+	data() {
+		return {
+			view: Views.Home,
+			subView: false,
+			params: false,
+			actions: [],
+			titlePrefix: "",
+			error: false
+		};
 	},
 	watch: {
 		view(val) {
@@ -97,16 +99,14 @@ new Vue({
 		OnAddAction(action) {
 			this.actions.push(action);
 		}
-	},
-	components: {
-		titlebar: TitleBar,
-		statusbar: StatusBar,
-		[Views.Home.Name]: Home,
-		[Views.Transactions.Name]: Transactions,
-		[Views.Budget.Name]: Budget,
-		[Views.Spending.Name]: Spending,
-		[Views.Import.Name]: Import,
-		[Views.Saving.Name]: Saving,
-		[Views.Settings.Name]: Settings
 	}
-});
+}).component("titlebar", TitleBar)
+	.component("statusbar", StatusBar)
+	.component(Views.Home.Name, Home)
+	.component(Views.Transactions.Name, Transactions)
+	.component(Views.Budget.Name, Budget)
+	.component(Views.Spending.Name, Spending)
+	.component(Views.Import.Name, Import)
+	.component(Views.Saving.Name, Saving)
+	.component(Views.Settings.Name, Settings)
+	.mount("#abe");

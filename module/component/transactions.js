@@ -373,7 +373,7 @@ export default {
 	},
 	directives: {
 		scrollTo: {
-			inserted(el) {
+			mounted(el) {
 				setTimeout(() => {
 					const rect = el.getBoundingClientRect();
 					const element = $(el);

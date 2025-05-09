@@ -2,4 +2,4 @@
 /.buildpath
 /.project
 /theme/*.map
-external/vue.esm.browser.js
+external/vue.esm-browser.js

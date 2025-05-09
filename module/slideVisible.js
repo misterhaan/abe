@@ -1,10 +1,10 @@
 export default {
-	bind(el, bind) {
+	created(el, bind) {
 		bind.value
 			? $(el).slideDown()
 			: $(el).hide();
 	},
-	update(el, bind) {
+	updated(el, bind) {
 		bind.value
 			? $(el).slideDown()
 			: $(el).slideUp();

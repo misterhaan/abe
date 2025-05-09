@@ -62,10 +62,10 @@ export default {
 	},
 	directives: {
 		toast: {
-			bind(el) {
+			created(el) {
 				$(el).hide();
 			},
-			update(el, bind, vnode) {
+			updated(el, bind) {
 				if(bind.value) {
 					if(toastTimeout) {
 						clearTimeout(toastTimeout);
@@ -74,9 +74,7 @@ export default {
 					$(el).fadeIn();
 					toastTimeout = setTimeout(() => {
 						toastTimeout = false;
-						$(el).fadeOut(1600, () => {
-							vnode.context[bind.expression] = false;
-						});
+						$(el).fadeOut(1600);
 					}, 5000);
 				} else
 					$(el).hide();
