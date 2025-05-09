@@ -13,43 +13,43 @@ class CategoryGroupApi extends abeApi {
 	 */
 	protected static function ShowDocumentation() {
 ?>
-			<h2 id=POSTadd>POST add</h2>
-			<p>
-				Add a new category group.
-			</p>
-			<dl class=parameters>
-				<dt>name</dt>
-				<dd>
-					Name of the new category group.  Category grouo names must be unique
-					so requests with a duplicate category name will fail.
-				</dd>
-			</dl>
+		<h2 id=POSTadd>POST add</h2>
+		<p>
+			Add a new category group.
+		</p>
+		<dl class=parameters>
+			<dt>name</dt>
+			<dd>
+				Name of the new category group. Category grouo names must be unique
+				so requests with a duplicate category name will fail.
+			</dd>
+		</dl>
 
-			<h2 id=POSTdelete>POST delete</h2>
-			<p>Delete an existing category group, provided nothing is using it.</p>
-			<dl class=parameters>
-				<dt>id</dt>
-				<dd>
-					ID of the category group to delete.
-				</dd>
-			</dl>
+		<h2 id=POSTdelete>POST delete</h2>
+		<p>Delete an existing category group, provided nothing is using it.</p>
+		<dl class=parameters>
+			<dt>id</dt>
+			<dd>
+				ID of the category group to delete.
+			</dd>
+		</dl>
 
-			<h2 id=GETlist>GET list</h2>
-			<p>Get the list of category groups with their categories.</p>
+		<h2 id=GETlist>GET list</h2>
+		<p>Get the list of category groups with their categories.</p>
 
-			<h2 id=POSTrename>POST rename</h2>
-			<p>Rename an existing category group.</p>
-			<dl class=parameters>
-				<dt>id</dt>
-				<dd>
-					ID of the category group to rename.
-				</dd>
-				<dt>name</dt>
-				<dd>
-					New name for the category group.  Category group names must be unique
-					so requests with a duplicate category group name will fail.
-				</dd>
-			</dl>
+		<h2 id=POSTrename>POST rename</h2>
+		<p>Rename an existing category group.</p>
+		<dl class=parameters>
+			<dt>id</dt>
+			<dd>
+				ID of the category group to rename.
+			</dd>
+			<dt>name</dt>
+			<dd>
+				New name for the category group. Category group names must be unique
+				so requests with a duplicate category group name will fail.
+			</dd>
+		</dl>
 <?php
 	}
 
@@ -58,11 +58,11 @@ class CategoryGroupApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function addAction(abeAjax $ajax) {
-		if(isset($_POST['name']) && $name = trim($_POST['name'])) {
+		if (isset($_POST['name']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
-			if($i = $db->prepare('insert into category_groups (name) values (?)'))
-				if($i->bind_param('s', $name))
-					if($i->execute()) {
+			if ($i = $db->prepare('insert into category_groups (name) values (?)'))
+				if ($i->bind_param('s', $name))
+					if ($i->execute()) {
 						$ajax->Data->name = $name;
 						$ajax->Data->id = $i->insert_id;
 					} else
@@ -80,25 +80,24 @@ class CategoryGroupApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function deleteAction(abeAjax $ajax) {
-		if(isset($_POST['id']) && $id = +$_POST['id']) {
+		if (isset($_POST['id']) && $id = +$_POST['id']) {
 			$db = self::RequireLatestDatabase($ajax);
-			if($chk = $db->prepare('select case when exists(select 1 from categories where grp=? limit 1) then 1 else 0 end'))
-				if($chk->bind_param('i', $id))
-					if($chk->execute())
-						if($chk->bind_result($inuse))
-							if($chk->fetch())
-								if(+$inuse == 0) {
+			if ($chk = $db->prepare('select case when exists(select 1 from categories where grp=? limit 1) then 1 else 0 end'))
+				if ($chk->bind_param('i', $id))
+					if ($chk->execute())
+						if ($chk->bind_result($inuse))
+							if ($chk->fetch())
+								if (+$inuse == 0) {
 									$chk->close();
-									if($del = $db->prepare('delete from category_groups where id=? limit 1'))
-										if($del->bind_param('i', $id))
-											if($del->execute())
-												; // success!
+									if ($del = $db->prepare('delete from category_groups where id=? limit 1'))
+										if ($del->bind_param('i', $id))
+											if ($del->execute()); // success!
 											else
 												$ajax->Fail('Error executing category group delete:  ' . $del->errno . ' ' . $del->error);
 										else
-											$ajax->Fail('Error binding parameters to delete category group:  ' . $del->errno .' ' . $del->error);
+											$ajax->Fail('Error binding parameters to delete category group:  ' . $del->errno . ' ' . $del->error);
 									else
-										$ajax->Fail('Error preparing to delete category group:  ' . $db->errno . ' ' . $error);
+										$ajax->Fail('Error preparing to delete category group:  ' . $db->errno . ' ' . $db->error);
 								} else
 									$ajax->Fail('Cannot delete category group because it is in use.');
 							else
@@ -121,13 +120,13 @@ class CategoryGroupApi extends abeApi {
 	 */
 	protected static function listAction(abeAjax $ajax) {
 		$db = self::RequireLatestDatabase($ajax);
-		if($groups = $db->query('select g.id, coalesce(g.name, \'(ungrouped)\') as name, group_concat(c.id order by c.name separator \'\\n\') as catids, group_concat(c.name order by c.name separator \'\\n\') as catnames from categories as c left join category_groups as g on g.id=c.grp group by g.id order by g.name')) {
+		if ($groups = $db->query('select g.id, coalesce(g.name, \'(ungrouped)\') as name, group_concat(c.id order by c.name separator \'\\n\') as catids, group_concat(c.name order by c.name separator \'\\n\') as catnames from categories as c left join category_groups as g on g.id=c.grp group by g.id order by g.name')) {
 			$ajax->Data->groups = [];
-			while($group = $groups->fetch_object()) {
+			while ($group = $groups->fetch_object()) {
 				$catids = explode("\n", $group->catids);
 				$catnames = explode("\n", $group->catnames);
 				$cats = [];
-				for($c = 0; $c < count($catids); $c++)
+				for ($c = 0; $c < count($catids); $c++)
 					$cats[] = ['id' => +$catids[$c], 'name' => $catnames[$c]];
 				$ajax->Data->groups[] = ['id' => +$group->id, 'name' => $group->name, 'categories' => $cats];
 			}
@@ -140,11 +139,11 @@ class CategoryGroupApi extends abeApi {
 	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function renameAction(abeAjax $ajax) {
-		if(isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
+		if (isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
 			$db = self::RequireLatestDatabase($ajax);
-			if($u = $db->prepare('update category_groups set name=? where id=? limit 1'))
-				if($u->bind_param('si', $name, $id))
-					if($u->execute())
+			if ($u = $db->prepare('update category_groups set name=? where id=? limit 1'))
+				if ($u->bind_param('si', $name, $id))
+					if ($u->execute())
 						$ajax->Data->name = $name;
 					else
 						$ajax->Fail('Error executing category group rename:  ' . $u->errno . ' ' . $u->error);
