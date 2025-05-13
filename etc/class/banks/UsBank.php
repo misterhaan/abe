@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Bank functions specific to State Farm.
  * @author misterhaan
  */
-class UsBank extends abeBank {
+class UsBank extends Bank {
 	/**
 	 * Parse transactions from a CSV for into a credit card account from State
 	 * Farm.
@@ -13,7 +14,7 @@ class UsBank extends abeBank {
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
 	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
-		if(false !== $fh = fopen($filename, 'r')) {
+		if (false !== $fh = fopen($filename, 'r')) {
 			// first line is headers
 			fgets($fh);
 
@@ -22,9 +23,9 @@ class UsBank extends abeBank {
 			$preview->net = 0;
 			$preview->dupeCount = 0;
 
-			if($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
-				if($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
-					while($line = fgetcsv($fh)) {
+			if ($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
+				if ($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
+					while ($line = fgetcsv($fh)) {
 						$tran = new stdClass();
 						// translate the data
 						$tran->extid = $extid = self::ParseExtId($line[3]);
@@ -39,10 +40,10 @@ class UsBank extends abeBank {
 						$tran->zip = null;
 						$tran->notes = '';
 
-						if($chkdupe->execute())
-							if($chkdupe->bind_result($dupe))
-								if($chkdupe->fetch())
-									if($tran->duplicate = $dupe)
+						if ($chkdupe->execute())
+							if ($chkdupe->bind_result($dupe))
+								if ($chkdupe->fetch())
+									if ($tran->duplicate = $dupe)
 										$preview->dupeCount++;
 
 						$preview->net += $tran->amount;
@@ -57,7 +58,7 @@ class UsBank extends abeBank {
 
 	private static function ParseExtId(string $csvValue) {
 		$extid = explode(';', $csvValue)[0];
-		if($extid == 'WEB FUTURE' || $extid == 'INTERNET')
+		if ($extid == 'WEB FUTURE' || $extid == 'INTERNET')
 			$extid = null;
 		return $extid;
 	}

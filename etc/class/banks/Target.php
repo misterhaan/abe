@@ -4,7 +4,7 @@
  * Bank functions specific to Target.
  * @author misterhaan
  */
-class Target extends abeBank {
+class Target extends Bank {
 	/**
 	 * Parse transactions from a CSV file for a credit card account from Target.
 	 * @param string $filename Full path to the CSV file on the server.

@@ -31,8 +31,8 @@ spl_autoload_register(function ($class) {
 		case 'abeApi':
 			require_once 'abeApi.php';
 			break;
-		case 'abeBank':
-			require_once 'abeBank.php';
+		case 'Bank':
+			require_once 'bank.php';
 			break;
 		case 'abeFormat':
 			require_once 'abeFormat.php';

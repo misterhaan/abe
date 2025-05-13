@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Bank functions specific to Capital One.
  * @author misterhaan
  */
-class CapitalOne extends abeBank {
+class CapitalOne extends Bank {
 	/**
 	 * Parse transactions from a CSV file for an account from Capital One.
 	 * @param string $filename Full path to the CSV file on the server.
@@ -12,7 +13,7 @@ class CapitalOne extends abeBank {
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
 	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
-		if(false !== $fh = fopen($filename, 'r')) {
+		if (false !== $fh = fopen($filename, 'r')) {
 			// first line is header
 			fgets($fh);
 
@@ -21,10 +22,10 @@ class CapitalOne extends abeBank {
 			$preview->net = 0;
 			$preview->dupeCount = 0;
 
-			if($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
-				if($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
-					while($line = fgetcsv($fh))
-						if(count($line) > 1) {  // only works for non-blank lines (technically lines that have at least two values)
+			if ($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
+				if ($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
+					while ($line = fgetcsv($fh))
+						if (count($line) > 1) {  // only works for non-blank lines (technically lines that have at least two values)
 							$tran = new stdClass();
 							// translate the data
 							$tran->transdate = $line[0];
@@ -33,9 +34,9 @@ class CapitalOne extends abeBank {
 							$tran->name = self::TitleCase($line[3]);
 							// fifth column is category
 							$tran->amount = 0;
-							if(is_numeric($line[5]))
+							if (is_numeric($line[5]))
 								$tran->amount -= +$line[5];
-							if(is_numeric($line[6]))
+							if (is_numeric($line[6]))
 								$tran->amount += +$line[6];
 
 							// fields not provided
@@ -45,10 +46,10 @@ class CapitalOne extends abeBank {
 							$tran->zip = null;
 							$tran->notes = '';
 
-							if($chkdupe->execute())
-								if($chkdupe->bind_result($dupe))
-									if($chkdupe->fetch())
-										if($tran->duplicate = $dupe)
+							if ($chkdupe->execute())
+								if ($chkdupe->bind_result($dupe))
+									if ($chkdupe->fetch())
+										if ($tran->duplicate = $dupe)
 											$preview->dupeCount++;
 
 							$preview->net += $tran->amount;

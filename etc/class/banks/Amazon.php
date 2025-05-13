@@ -5,7 +5,7 @@
  * @author misterhaan
  *
  */
-class Amazon extends abeBank {
+class Amazon extends Bank {
 	/**
 	 * Parse transactions from a CSV file for a credit card account from Amazon.
 	 * @param string $filename Full path to the CSV file on the server.

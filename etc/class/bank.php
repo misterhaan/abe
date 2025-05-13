@@ -5,7 +5,7 @@
  * @author misterhaan
  *
  */
-abstract class abeBank {
+abstract class Bank {
 	/**
 	 * Read transactions from a file into an array of objects that match the
 	 * transactions table in the database.

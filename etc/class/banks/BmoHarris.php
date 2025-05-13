@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Bank functions specific to BMO Harris Bank.
  * @author misterhaan
  */
-class BmoHarris extends abeBank {
+class BmoHarris extends Bank {
 	/**
 	 * Parse transactions from a CSV file for an account from BMO Harris Bank.
 	 * @param string $filename Full path to the CSV file on the server.
@@ -12,7 +13,7 @@ class BmoHarris extends abeBank {
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
 	public static function ParseCsvTransactions(string $filename, int $acctid, mysqli $db) {
-		if(false !== $fh = fopen($filename, 'r')) {
+		if (false !== $fh = fopen($filename, 'r')) {
 			// first line is header
 			fgets($fh);
 
@@ -21,16 +22,16 @@ class BmoHarris extends abeBank {
 			$preview->net = 0;
 			$preview->dupeCount = 0;
 
-			if($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
-				if($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
-					while($line = fgetcsv($fh)) {
+			if ($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
+				if ($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
+					while ($line = fgetcsv($fh)) {
 						$tran = new stdClass();
 						// translate the data
 						$tran->posted = $posted = date('Y-m-d', strtotime($line[0]));
 						$tran->name = self::TitleCase($line[1]);
 						$tran->amount = $amount = +$line[2];
 						// fourth column is currency which is probably always USD
-						if($line[4])
+						if ($line[4])
 							$tran->name .= ' ' . $line[4];
 						$tran->extid = $extid = $line[5];
 						// seventh column is credit/check/debit
@@ -43,10 +44,10 @@ class BmoHarris extends abeBank {
 						$tran->zip = null;
 						$tran->notes = '';
 
-						if($chkdupe->execute())
-							if($chkdupe->bind_result($dupe))
-								if($chkdupe->fetch())
-									if($tran->duplicate = $dupe)
+						if ($chkdupe->execute())
+							if ($chkdupe->bind_result($dupe))
+								if ($chkdupe->fetch())
+									if ($tran->duplicate = $dupe)
 										$preview->dupeCount++;
 
 						$preview->net += $tran->amount;
@@ -66,33 +67,35 @@ class BmoHarris extends abeBank {
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
 	public static function ParseOfxTransactions(string $filename, int $acctid, mysqli $db) {
-		if(false !== $fh = fopen($filename, 'r')) {
+		if (false !== $fh = fopen($filename, 'r')) {
 			$preview = new stdClass();
 			$preview->transactions = [];
 			$preview->net = 0;
 			$preview->dupeCount = 0;
+			$tran = new stdClass();
+			$checknum = false;
 
-			if($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
-				if($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
+			if ($chkdupe = $db->prepare('select IsDuplicateTransaction(?, ?, ?, ?)'))
+				if ($chkdupe->bind_param('isds', $acctid, $extid, $amount, $posted)) {
 					$intrans = false;
-					while(false !== $line = fgets($fh)) {
+					while (false !== $line = fgets($fh)) {
 						$line = trim($line);
-						if($intrans) {
-							if($line == '</STMTTRN>') {
+						if ($intrans) {
+							if ($line == '</STMTTRN>') {
 								$intrans = false;
-								if($checknum)
+								if ($checknum)
 									$tran->name .= ' ' . $checknum;
-								if($chkdupe->execute())
-									if($chkdupe->bind_result($dupe))
-										if($chkdupe->fetch())
-											if($tran->duplicate = $dupe)
+								if ($chkdupe->execute())
+									if ($chkdupe->bind_result($dupe))
+										if ($chkdupe->fetch())
+											if ($tran->duplicate = $dupe)
 												$preview->dupeCount++;
 
 								$preview->net += $tran->amount;
 								$preview->transactions[] = $tran;
 							} else {
 								list($tag, $data) = explode('>', $line, 2);
-								switch($tag) {
+								switch ($tag) {
 									case '<TRNTYPE':
 									case '<MEMO':
 										// not using these
@@ -114,7 +117,7 @@ class BmoHarris extends abeBank {
 										break;
 								}
 							}
-						} else if($line == '<STMTTRN>') {
+						} else if ($line == '<STMTTRN>') {
 							$intrans = true;
 							$checknum = false;
 							$tran = new stdClass();
