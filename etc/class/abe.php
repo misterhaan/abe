@@ -34,8 +34,8 @@ spl_autoload_register(function ($class) {
 		case 'Bank':
 			require_once 'bank.php';
 			break;
-		case 'abeFormat':
-			require_once 'abeFormat.php';
+		case 'Format':
+			require_once 'format.php';
 			break;
 		case 'abeHtml':
 			require_once 'abeHtml.php';
