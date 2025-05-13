@@ -248,11 +248,11 @@ class TransactionApi extends abeApi {
 	protected static function parseFileAction(abeAjax $ajax) {
 		// TODO:  accept bankclass or bankid instead of acctid
 		// TODO:  automatic categorization engine
-		if (isset($_POST['acctid']) && $_POST['acctid'] += 0)
+		if (isset($_POST['acctid']) && ($acctid = +$_POST['acctid']))
 			if (file_exists($_FILES['transfile']['tmp_name']) && is_uploaded_file($_FILES['transfile']['tmp_name'])) {
 				$db = self::RequireLatestDatabase($ajax);
-				if ($bankclass = self::LookupBank($_POST['acctid'], $ajax, $db)) {
-					if ($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $_POST['acctid'], $ajax, $db))
+				if ($bankclass = self::LookupBank($acctid, $ajax, $db)) {
+					if ($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $acctid, $ajax, $db))
 						$ajax->Data->preview = $preview;
 				}
 			} else
