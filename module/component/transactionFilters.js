@@ -61,7 +61,7 @@ export default {
 	created() {
 		AccountApi.List().done(accounts => {
 			this.accounts = accounts.map(a => {
-				return { id: a.id, name: a.name, typeClass: a.typeClass };
+				return { id: a.ID, name: a.Name, typeClass: a.Type.Class };
 			});
 			this.accounts.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 		});

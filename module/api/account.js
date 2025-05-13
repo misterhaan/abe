@@ -4,15 +4,10 @@ const urlbase = "api/account/";
 
 export default class AccountApi extends ApiBase {
 	static List() {
-		return super.GET(urlbase + "list", result => result.accounts);
+		return super.GET(urlbase + "list");
 	}
 	static Types() {
-		return super.GET(urlbase + "types", result => {
-			return {
-				banks: result.banks,
-				types: result.types
-			};
-		});
+		return super.GET(urlbase + "types");
 	}
 	static Add(name, type, bank, balance, closed) {
 		return super.POST(urlbase + "add", {
@@ -20,17 +15,16 @@ export default class AccountApi extends ApiBase {
 			type: type,
 			bank: bank,
 			balance: balance,
-			closed: closed ? 1 : 0
-		}, result => result.id);
+			closed: closed
+		});
 	}
 	static Save(id, name, type, bank, balance, closed) {
-		return super.POST(urlbase + "save", {
-			id: id,
+		return super.PUT(urlbase + "save/" + id, {
 			name: name,
 			type: type,
 			bank: bank,
 			balance: balance,
-			closed: closed ? 1 : 0
-		}, () => id);
+			closed: closed
+		});
 	}
 };

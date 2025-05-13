@@ -1,92 +1,47 @@
 <?php
-require_once dirname(__DIR__) . '/etc/class/abe.php';
+require_once dirname(__DIR__) . '/etc/class/environment.php';
+require_once 'api.php';
 
 /**
  * Handler for account API requests.
  * @author misterhaan
  */
-class AccountApi extends abeApi {
+class AccountApi extends Api {
 	/**
-	 * Write out the documentation for the account API controller.  The page is
-	 * already opened with an h1 header, and will be closed after the call
-	 * completes.
+	 * Return the documentation for the account API controller..
+	 * @return EndpointDocumentation[] Array of documentation for each endpoint of this API
 	 */
-	protected static function ShowDocumentation() {
-?>
-		<h2 id=POSTadd>POST add</h2>
-		<p>Add a new account.</p>
-		<dl class=parameters>
-			<dt>name</dt>
-			<dd>Name of account. Required.</dd>
-			<dt>bank</dt>
-			<dd>ID of the bank of the account. Required.</dd>
-			<dt>type</dt>
-			<dd>ID of the type of account. Required.</dd>
-			<dt>balance</dt>
-			<dd>Current account balance. Optional; default zero.</dd>
-			<dt>closed</dt>
-			<dd>Whether the account is closed. Optional; default false (not closed)</dd>
-		</dl>
+	public static function GetEndpointDocumentation(): array {
+		$endpoints = [];
 
-		<h2 id=GETlist>GET list</h2>
-		<p>Get the list of accounts.</p>
-		<dl class=parameters>
-			<dt>activeOnly</dt>
-			<dd>If specified, closed accounts will left out of results.</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('GET', 'list', 'Get the list of accounts.');
 
-		<h2 id=POSTsave>POST save</h2>
-		<p>Save changes to an account.</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>ID of the account being saved. Required.</dd>
-			<dt>name</dt>
-			<dd>Name of account. Required.</dd>
-			<dt>bank</dt>
-			<dd>ID of the bank of the account. Required.</dd>
-			<dt>type</dt>
-			<dd>ID of the type of account. Required.</dd>
-			<dt>balance</dt>
-			<dd>Current account balance. Optional; default zero.</dd>
-			<dt>closed</dt>
-			<dd>Whether the account is closed. Optional; default false (not closed)</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('GET', 'types', 'Gets available account types and supported banks.');
 
-		<h2 id=GETtypes>GET types</h2>
-		<p>Gets available account types and supported banks.</p>
-<?php
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'add', 'Add a new account.', 'multipart');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'Name of account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('bank', 'integer', 'ID of the bank of the account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('type', 'integer', 'ID of the type of the account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('balance', 'float', 'Current account balance.  Default zero.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('closed', 'boolean', 'Whether the account is closed.  Default false (not closed)');
+
+		$endpoints[] = $endpoint = new EndpointDocumentation('PUT', 'save', 'Save changes to an account.', 'multipart');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'integer', 'ID of the account being saved.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'Name of account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('bank', 'integer', 'ID of the bank of the account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('type', 'integer', 'ID of the type of the account.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('balance', 'float', 'Current account balance.  Default zero.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('closed', 'boolean', 'Whether the account is closed.  Default false (not closed)');
+
+		return $endpoints;
 	}
 
 	/**
-	 * Add a new account.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
+	 * Get the list of all accounts.
 	 */
-	protected static function addAction(abeAjax $ajax) {
-		if (isset($_POST['name'], $_POST['type'], $_POST['bank']) && ($name = trim($_POST['name'])) && ($type = +$_POST['type']) && ($bank = +$_POST['bank'])) {
-			$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
-			$closed = isset($_POST['closed']) && $_POST['closed'] ? 1 : 0;
-			$db = self::RequireLatestDatabase($ajax);
-			if ($ins = $db->prepare('insert into accounts (name, account_type, bank, balance, closed) values (?, ?, ?, ?, ?)'))
-				if ($ins->bind_param('siidi', $name, $type, $bank, $balance, $closed))
-					if ($ins->execute())
-						$ajax->Data->id = $ins->insert_id;
-					else
-						$ajax->Fail('Error saving account:  ' . $ins->errno . ' ' . $ins->error);
-				else
-					$ajax->Fail('Error binding account parameters:  ' . $ins->errno . ' ' . $ins->error);
-			else
-				$ajax->Fail('Error preparing to add account:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameters name, type, and bank are required.');
-	}
-
-	/**
-	 * Get the list of all funds.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function listAction(abeAjax $ajax) {
-		$db = self::RequireLatestDatabase($ajax);
-		$accts = <<<ACCTS
+	protected static function GET_list() {
+		$db = self::RequireLatestDatabase();
+		$select = <<<ACCTS
 			select a.id, a.name, a.closed, at.id as type, at.class as typeClass, b.id as bank, b.name as bankName, b.url as bankUrl, a.balance, max(t.posted) as newestSortable, date_format(max(t.posted), '%b %D') as newestDisplay
 			from accounts as a
 				left join banks as b on b.id=a.bank
@@ -94,70 +49,147 @@ class AccountApi extends abeApi {
 				left join transactions as t on t.account=a.id
 			group by a.id
 ACCTS;
-		$accts .= isset($_GET['activeOnly'])
-			? ' where a.closed=0 order by a.updated desc'
-			: ' order by a.closed, a.updated desc';
-
-		if ($accts = $db->query($accts)) {
-			$ajax->Data->accounts = [];
-			while ($acct = $accts->fetch_object()) {
-				$acct->id += 0;
-				$acct->closed = !!+$acct->closed;
-				$acct->type += 0;
-				$acct->bank += 0;
-				$acct->balance += 0;
-				$acct->balanceDisplay = Format::Amount($acct->balance);
-				$ajax->Data->accounts[] = $acct;
-			}
-		} else
-			$ajax->Fail('Error looking up account list:  ' . $db->errno . ' ' . $db->error);
-	}
-
-	/**
-	 * Save changes to an account.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function saveAction(abeAjax $ajax) {
-		if (isset($_POST['id'], $_POST['name'], $_POST['type'], $_POST['bank']) && ($id = +$_POST['id']) && ($name = trim($_POST['name'])) && ($type = +$_POST['type']) && ($bank = +$_POST['bank'])) {
-			$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
-			$closed = isset($_POST['closed']) && $_POST['closed'] ? 1 : 0;
-			$db = self::RequireLatestDatabase($ajax);
-			if ($update = $db->prepare('update accounts set name=?, account_type=?, bank=?, balance=?, closed=? where id=? limit 1'))
-				if ($update->bind_param('siidii', $name, $type, $bank, $balance, $closed, $id))
-					if ($update->execute());  // update successful
-					else
-						$ajax->Fail('Error saving account:  ' . $update->errno . ' ' . $update->error);
-				else
-					$ajax->Fail('Error binding account parameters:  ' . $update->errno . ' ' . $update->error);
-			else
-				$ajax->Fail('Error preparing to update account:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameters id, name, type, and bank are required.');
+		try {
+			$select = $db->prepare($select);
+			$select->execute();
+			$select->bind_result($id, $name, $closed, $type, $typeClass, $bank, $bankName, $bankURL, $balance, $newestSortable, $newestDisplay);
+			$accounts = [];
+			while ($select->fetch())
+				$accounts[] = new Account($id, $name, $closed, $type, $typeClass, $bank, $bankName, $bankURL, $balance, $newestSortable, $newestDisplay);
+			$select->close();
+			self::Success($accounts);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up account list', $mse);
+		}
 	}
 
 	/**
 	 * Get the lists of available account types and supported banks.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function typesAction(abeAjax $ajax) {
-		$db = self::RequireLatestDatabase($ajax);
-		$ajax->Data->banks = [];
-		$ajax->Data->types = [];
-		$ajax->Data->banks[] = (object)['id' => false, 'name' => ''];
-		if ($banks = $db->query('select id, name, url from banks order by name')) {
-			while ($bank = $banks->fetch_object()) {
-				$bank->id += 0;
-				$ajax->Data->banks[] = $bank;
-			}
-			if ($types = $db->query('select id, name, class from account_types order by name'))
-				while ($type = $types->fetch_object()) {
-					$type->id += 0;
-					$ajax->Data->types[] = $type;
-				}
-			else
-				$ajax->Fail('Error looking up account types:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Error looking up supported banks:  ' . $db->errno . ' ' . $db->error);
+	protected static function GET_types() {
+		$db = self::RequireLatestDatabase();
+		$result = new AccountTypesAndBanks();
+		$result->Banks[] = new Bank(0, '', '');
+
+		try {
+			$select = $db->prepare('select id, name, url from banks order by name');
+			$select->execute();
+			$select->bind_result($id, $name, $url);
+			while ($select->fetch())
+				$result->Banks[] = new Bank($id, $name, $url);
+			$select->close();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up supported banks', $mse);
+		}
+
+		try {
+			$select = $db->prepare('select id, name, class from account_types order by name');
+			$select->execute();
+			$select->bind_result($id, $name, $class);
+			while ($select->fetch())
+				$result->Types[] = new AccountType($id, $name, $class);
+			$select->close();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up account types', $mse);
+		}
+
+		self::Success($result);
+	}
+
+	/**
+	 * Add a new account.
+	 */
+	protected static function POST_add() {
+		if (!isset($_POST['name'], $_POST['type'], $_POST['bank']) || !($name = trim($_POST['name'])) || !($type = +$_POST['type']) || !($bank = +$_POST['bank']))
+			self::NeedMoreInfo('Parameters name, type, and bank are required.');
+		$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
+		$closed = isset($_POST['closed']) && $_POST['closed'] && $_POST['closed'] != 'false';
+		$db = self::RequireLatestDatabase();
+		try {
+			$insert = $db->prepare('insert into accounts (name, account_type, bank, balance, closed) values (?, ?, ?, ?, ?)');
+			$insert->bind_param('siidi', $name, $type, $bank, $balance, $closed);
+			$insert->execute();
+			$id = $insert->insert_id;
+			$insert->close();
+			self::Success($id);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error saving account', $mse);
+		}
+	}
+
+	/**
+	 * Save changes to an account.
+	 */
+	protected static function PUT_save(array $params) {
+		$id = +array_shift($params);
+		if (!$id || !isset($_POST['name'], $_POST['type'], $_POST['bank']) || !($name = trim($_POST['name'])) || !($type = +$_POST['type']) || !($bank = +$_POST['bank']))
+			self::NeedMoreInfo('Parameters id, name, type, and bank are required.');
+		$balance = isset($_POST['balance']) ? +$_POST['balance'] : 0;
+		$closed = isset($_POST['closed']) && $_POST['closed'] ? 1 : 0;
+		$db = self::RequireLatestDatabase();
+		try {
+			$update = $db->prepare('update accounts set name=?, account_type=?, bank=?, balance=?, closed=? where id=? limit 1');
+			$update->bind_param('siidii', $name, $type, $bank, $balance, $closed, $id);
+			$update->execute();
+			self::Success($id);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error saving account', $mse);
+		}
 	}
 }
+
+class Account {
+	public int $ID;
+	public string $Name;
+	public bool $Closed;
+	public AccountType $Type;
+	public Bank $Bank;
+	public float $Balance;
+	public string $BalanceDisplay;
+	public ?string $NewestSortable;
+	public ?string $NewestDisplay;
+
+	public function __construct(int $id, string $name, bool $closed, int $type, string $typeClass, int $bank, string $bankName, string $bankURL, float $balance, ?string $newestSortable, ?string $newestDisplay) {
+		$this->ID = $id;
+		$this->Name = $name;
+		$this->Closed = $closed;
+		$this->Type = new AccountType($type, null, $typeClass);
+		$this->Bank = new Bank($bank, $bankName, $bankURL);
+		$this->Balance = $balance;
+		require_once 'format.php';
+		$this->BalanceDisplay = Format::Amount($balance);
+		$this->NewestSortable = $newestSortable;
+		$this->NewestDisplay = $newestDisplay;
+	}
+}
+
+class AccountType {
+	public int $ID;
+	public ?string $Name;
+	public string $Class;
+
+	public function __construct(int $id, ?string $name, string $class) {
+		$this->ID = $id;
+		$this->Name = $name;
+		$this->Class = $class;
+	}
+}
+
+class Bank {
+	public int $ID;
+	public string $Name;
+	public string $URL;
+
+	public function __construct(int $id, string $name, string $url) {
+		$this->ID = $id;
+		$this->Name = $name;
+		$this->URL = $url;
+	}
+}
+
+class AccountTypesAndBanks {
+	public array $Types = [];
+	public array $Banks = [];
+}
+
 AccountApi::Respond();

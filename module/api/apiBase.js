@@ -1,12 +1,13 @@
 export default class ApiBase {
+	// TODO:  remove successTransform parameters once api conversion finishes
 	static GET(url, successTransform) {
 		return this.GETwithParams(url, {}, successTransform)
 	}
 	static GETwithParams(url, data, successTransform) {
-		return this.Ajax("GET", url, data, successTransform)
+		return ajax("GET", url, data, successTransform)
 	}
 	static POST(url, data, successTransform) {
-		return this.Ajax("POST", url, data, successTransform);
+		return ajax("POST", url, data, successTransform);
 	}
 	static POSTwithFile(url, data, successTransform) {
 		return $.ajax({
@@ -18,43 +19,50 @@ export default class ApiBase {
 			processData: false,
 			dataType: "json"
 		}).then(result => {
-			if(result.fail) {
-				if(result.redirect)
-					location = result.redirect;
-				throw new Error(result.message);
-			} else
-				return successTransform(result);
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
-		});
+			return handleOldRedirect(result, successTransform);
+		}).fail(handleError);
 	}
-	static Ajax(method, url, data, successTransform) {
-		return $.ajax({
-			method: method,
-			url: url,
-			data: data,
-			dataType: "json"
-		}).then(result => {
-			if(result.fail) {
-				if(result.redirect)
-					location = result.redirect;
-				throw new Error(result.message);  // needs to throw on this thread so it doesn't hit the done (success) handler
-			} else
-				return successTransform(result);
-		}).fail(request => {
-			if(request.status)
-				throwAsync(request.status + " " + request.statusText + " from " + url);
-			else
-				throwAsync(request);
-		});
+	static PUT(url, data) {
+		return ajax("PUT", url, data);
 	}
 };
 
-function throwAsync(message) {
+function ajax(method, url, data, successTransform) {
+	return $.ajax({
+		method: method,
+		url: url,
+		data: data,
+		dataType: "json"
+	}).then(result => {
+		return handleOldRedirect(result, successTransform);
+	}).fail(handleError);
+}
+
+function handleOldRedirect(result, successTransform) {
+	// TODO:  remove entire function after api conversion finishes
+	if(result.fail) {
+		if(result.redirect)
+			location = result.redirect;
+		throw new Error(result.message);  // needs to throw on this thread so it doesn't hit the done (success) handler
+	} else
+		return successTransform ? successTransform(result) : result;
+}
+
+function handleError(request) {
+	if(request.status == 533) {
+		const redirect = request.getResponseHeader("Location");
+		if(redirect)
+			location = redirect;
+	}
+	throwAsync(request);
+}
+
+function throwAsync(request) {
 	setTimeout(() => {
-		if(message instanceof Error)
-			throw message;
-		else
-			throw new Error(message);
+		// TODO:  remove Error case after api conversion finishes
+		if(request instanceof Error)
+			throw request;
+		else if(request.status)
+			throw new Error(request.status + " " + request.statusText + " from " + request.responseURL);
 	});
 }
