@@ -27,13 +27,16 @@ export default class ApiBase {
 	static PUT(url, data) {
 		return ajax("PUT", url, data);
 	}
+	static DELETE(url) {
+		return ajax("DELETE", url);
+	}
 };
 
 function ajax(method, url, data, successTransform) {
 	return $.ajax({
 		method: method,
 		url: url,
-		data: data,
+		data: data || {},
 		dataType: "json"
 	}).then(result => {
 		return handleOldRedirect(result, successTransform);

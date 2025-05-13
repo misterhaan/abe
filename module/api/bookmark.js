@@ -4,25 +4,25 @@ const urlbase = "api/bookmark/";
 
 export default class BookmarkApi extends ApiBase {
 	static List() {
-		return super.GET(urlbase + "list", result => result.bookmarks);
+		return super.GET(urlbase + "list");
 	}
 	static Add(bookmarkUrl, name) {
 		bookmarkUrl = bookmarkUrl.split("!");
-		const page = bookmarkUrl.shift();
+		const view = bookmarkUrl.shift();
 		const spec = bookmarkUrl.join("!");
 		return super.POST(urlbase + "add", {
-			page: page,
+			view: view,
 			spec: spec,
 			name: name
-		}, () => true);
+		});
 	}
 	static MoveDown(id) {
-		return super.POST(urlbase + "moveDown", { id: id }, () => true);
+		return super.POST(urlbase + "moveDown/" + id);
 	}
 	static MoveUp(id) {
-		return super.POST(urlbase + "moveUp", { id: id }, () => true);
+		return super.POST(urlbase + "moveUp/" + id);
 	}
 	static Delete(id) {
-		return super.POST(urlbase + "delete", { id: id }, () => true);
+		return super.DELETE(urlbase + "id/" + id);
 	}
 };
