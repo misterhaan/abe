@@ -40,8 +40,8 @@ spl_autoload_register(function ($class) {
 		case 'abeHtml':
 			require_once 'abeHtml.php';
 			break;
-		case 'abeVersion':
-			require_once 'abeVersion.php';
+		case 'Version':
+			require_once 'version.php';
 			break;
 	}
 });

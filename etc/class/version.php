@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Version information for Abe Personal Finance.
  * @author misterhaan
  */
-class abeVersion {
+class Version {
 	/**
 	 * The release number is not currently used.
 	 * @var string
@@ -14,7 +15,7 @@ class abeVersion {
 	 * the setup script in upgrade mode.
 	 * @var integer
 	 */
-	const Structure = abeStructureVersion::MySqlStrict;
+	const Structure = StructureVersion::MySqlStrict;
 	/**
 	 * Database data (rows) version.  Changing this triggers the setup script in
 	 * update mode.
@@ -29,7 +30,7 @@ class abeVersion {
  * InstallDatabase() and UpgradeDatabaseStructure() in setup.php.
  * @author misterhaan
  */
-class abeStructureVersion {
+class StructureVersion {
 	const MySqlStrict = 8;
 	const Budgets = 7;
 	const Funds = 6;

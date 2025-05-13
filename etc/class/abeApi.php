@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for API controllers.  Controllers should provide the
  * ShowDocumentation function as well as any ___Action functions they want to
@@ -11,12 +12,12 @@ abstract class abeApi {
 	 * Respond to an API request or show API documentation.
 	 */
 	public static function Respond() {
-		if(isset($_SERVER['PATH_INFO']) && substr($_SERVER['PATH_INFO'], 0, 1) == '/') {
+		if (isset($_SERVER['PATH_INFO']) && substr($_SERVER['PATH_INFO'], 0, 1) == '/') {
 			$ajax = new abeAjax();
 			$method = substr($_SERVER['PATH_INFO'], 1);
-			if(false === strpos($method, '/')) {
+			if (false === strpos($method, '/')) {
 				$method .= 'Action';
-				if(method_exists(static::class, $method))
+				if (method_exists(static::class, $method))
 					static::$method($ajax);
 				else
 					$ajax->Fail('Requested method does not exist.');
@@ -28,7 +29,7 @@ abstract class abeApi {
 			$name = substr($_SERVER['SCRIPT_NAME'], strlen(INSTALL_PATH) + 5, -4);  // five for '/api/' and -4 for '.php'
 			$html->Open($name . ' API');
 ?>
-			<h1><?=$name; ?> API</h1>
+			<h1><?= $name; ?> API</h1>
 <?php
 			static::ShowDocumentation($html);
 			$html->Close();
@@ -43,9 +44,9 @@ abstract class abeApi {
 	 * @return mysqli Database connection object.
 	 */
 	protected static function RequireDatabase(abeAjax $ajax) {
-		if(@include_once dirname(DOCROOT) . '/.abeKeys.php') {
+		if (@include_once dirname(DOCROOT) . '/.abeKeys.php') {
 			$db = @new mysqli(abeKeysDB::HOST, abeKeysDB::USER, abeKeysDB::PASS, abeKeysDB::NAME);
-			if(!$db->connect_errno) {
+			if (!$db->connect_errno) {
 				// not checking for failure here because it's probably okay to keep going
 				$db->real_query('set names \'utf8mb4\'');
 				$db->set_charset('utf8mb4');
@@ -65,8 +66,8 @@ abstract class abeApi {
 	 */
 	protected static function RequireDatabaseWithConfig(abeAjax $ajax) {
 		$db = self::RequireDatabase($ajax);
-		if($config = $db->query('select * from config limit 1'))
-			if($config = $config->fetch_object()) {
+		if ($config = $db->query('select * from config limit 1'))
+			if ($config = $config->fetch_object()) {
 				$db->config = $config;
 				return $db;
 			} else
@@ -84,7 +85,7 @@ abstract class abeApi {
 	 */
 	protected static function RequireLatestDatabase(abeAjax $ajax) {
 		$db = self::RequireDatabaseWithConfig($ajax);
-		if($db->config->structureVersion >= abeVersion::Structure && $db->config->dataVersion >= abeVersion::Data)
+		if ($db->config->structureVersion >= Version::Structure && $db->config->dataVersion >= Version::Data)
 			return $db;
 		else
 			self::FailToSetup($ajax, 'Database upgrade required.');
