@@ -1,5 +1,4 @@
 import AccountApi from "../api/account.js";
-import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import SlideVisible from "../slideVisible.js";
 import T from "../transactionShared.js";
@@ -65,7 +64,7 @@ export default {
 				return { id: a.id, name: a.name, typeClass: a.typeClass };
 			});
 			this.accounts.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-		}).fail(this.Error);
+		});
 		this.Reset();
 		this.GetDates();
 		setInterval(this.GetDates, DateCheckInterval);
@@ -210,10 +209,7 @@ export default {
 			}
 		}
 	},
-	mixins: [
-		ReportErrors,
-		FilterAmountKeys
-	],
+	mixins: [FilterAmountKeys],
 	directives: {
 		slideVisible: SlideVisible
 	},

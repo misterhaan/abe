@@ -32,8 +32,8 @@
 	<body>
 		<div id=abe>
 			<titlebar :view="{Title: 'Setup'}"></titlebar>
-			<component :is=step @set-level="level = $event" @error="error = $event"></component>
-			<statusbar :last-error=error></statusbar>
+			<component :is=step @set-level="level = $event"></component>
+			<statusbar></statusbar>
 		</div>
 	</body>
 </html>

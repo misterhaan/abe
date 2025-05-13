@@ -1,5 +1,4 @@
 import BookmarkApi from "../api/bookmark.js";
-import ReportErrors from "../reportErrors.js";
 
 export default {
 	data() {
@@ -10,24 +9,23 @@ export default {
 	created() {
 		BookmarkApi.List().done(bookmarks => {
 			this.bookmarks = bookmarks;
-		}).fail(this.Error);
+		});
 	},
-	mixins: [ReportErrors],
 	methods: {
 		MoveDown(bookmark, index) {
 			BookmarkApi.MoveDown(bookmark.id).done(() => {
 				this.bookmarks[index] = this.bookmarks.splice(index + 1, 1, bookmark)[0];
-			}).fail(this.Error);
+			});
 		},
 		MoveUp(bookmark, index) {
 			BookmarkApi.MoveUp(bookmark.id).done(() => {
 				this.bookmarks[index] = this.bookmarks.splice(index - 1, 1, bookmark)[0];
-			}).fail(this.Error);
+			});
 		},
 		Delete(bookmark, index) {
 			BookmarkApi.Delete(bookmark.id).done(() => {
 				this.bookmarks.splice(index, 1);
-			}).fail(this.Error);
+			});
 		}
 	},
 	template: /*html*/ `

@@ -1,5 +1,4 @@
 import FundApi from "../api/fund.js";
-import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import DragDrop from "../dragDrop.js";
 
@@ -15,7 +14,7 @@ export default {
 			this.funds = funds;
 			if(!this.funds.length)
 				this.Add();
-		}).fail(this.Error);
+		});
 		this.$emit("add-action", {
 			action: this.Add,
 			url: "#saving!add",
@@ -24,10 +23,7 @@ export default {
 			tooltip: "Add a new savings fund"
 		});
 	},
-	mixins: [
-		ReportErrors,
-		FilterAmountKeys,
-	],
+	mixins: [FilterAmountKeys],
 	methods: {
 		IsActive(fund) {
 			return fund.balance > 0 || fund.target > 0;
@@ -84,7 +80,7 @@ export default {
 				}
 				this.editFund = false;
 			} else
-				this.Error(new Error("Attempted to discard changes when nothing was being edited."));
+				throw new Error("Attempted to discard changes when nothing was being edited.");
 		},
 		Save() {
 			if(this.editFund) {
@@ -99,20 +95,18 @@ export default {
 						fund.id = update.id;
 						fund.balanceDisplay = update.balanceDisplay;
 						fund.targetDisplay = update.targetDisplay;
-					}).fail(error => {
+					}).fail(() => {
 						Edit(fund);
-						this.Error(error);
 					});
 				else
 					FundApi.Save(fund.id, fund.name, fund.balance, fund.target).done(update => {
 						fund.balanceDisplay = update.balanceDisplay;
 						fund.targetDisplay = update.targetDisplay;
-					}).fail(error => {
+					}).fail(() => {
 						Edit(fund);
-						this.Error(error);
 					});
 			} else
-				this.Error(new Error("Attempted to save changes when nothing was being edited."));
+				throw new Error("Attempted to save changes when nothing was being edited.");
 		},
 		Deactivate() {
 			if(this.editFund)
@@ -129,42 +123,41 @@ export default {
 						delete fund.clean;
 						if(oldIndex < newIndex)
 							this.funds.splice(newIndex, 0, this.funds.splice(oldIndex, 1)[0]);
-					}).fail(error => {
+					}).fail(() => {
 						Edit(fund);
-						this.Error(error);
 					});
 				} else
-					this.Error(new Error("Attempted to close a fund that hasn’t been saved yet."));
+					throw new Error("Attempted to close a fund that hasn’t been saved yet.");
 			else
-				this.Error(new Error("Attempted to close a fund when nothing was being edited."));
+				throw new Error("Attempted to close a fund when nothing was being edited.");
 		},
 		MoveUp(fund, index) {
 			if(index > 0)
 				if(this.IsActive(fund) || !this.IsActive(this.funds[index - 1]))
 					FundApi.MoveUp(fund.id).done(success => {
 						this.funds[index] = this.funds.splice(index - 1, 1, fund)[0];
-					}).fail(this.Error);
+					});
 				else
-					this.Error(new Error("Attempted to move inactive fund ahead of an active fund."));
+					throw new Error("Attempted to move inactive fund ahead of an active fund.");
 			else
-				this.Error(new Error("Attempted to move fund up when it is already first."));
+				throw new Error("Attempted to move fund up when it is already first.");
 		},
 		MoveDown(fund, index) {
 			if(index < this.funds.length - 1)
 				if(!this.IsActive(fund) || this.IsActive(this.funds[index + 1]))
 					FundApi.MoveDown(fund.id).done(success => {
 						this.funds[index] = this.funds.splice(index + 1, 1, fund)[0];
-					}).fail(this.Error);
+					});
 				else
-					this.Error(new Error("Attempted to move active fund below an inactive fund."));
+					throw new Error("Attempted to move active fund below an inactive fund.");
 			else
-				this.Error(new Error("Attempted to move fund down when it is already last."));
+				throw new Error("Attempted to move fund down when it is already last.");
 		},
 		MoveFund(movingFund, beforeFund) {
 			if(movingFund && beforeFund && movingFund != beforeFund && this.IsActive(movingFund) == this.IsActive(beforeFund)) {
 				FundApi.MoveTo(movingFund.id, beforeFund.id).done(() => {
 					this.funds.splice(this.funds.indexOf(beforeFund), 0, this.funds.splice(this.funds.indexOf(movingFund), 1)[0]);
-				}).fail(this.Error);
+				});
 			}
 		}
 	},

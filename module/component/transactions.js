@@ -1,6 +1,5 @@
 import TransactionApi from "../api/transaction.js";
 import CategoryApi from "../api/categoryGroup.js";
-import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import TransactionFilters from "./transactionFilters.js";
 import T from "../transactionShared.js";
@@ -125,16 +124,13 @@ export default {
 			}
 		}
 	},
-	mixins: [
-		ReportErrors,
-		FilterAmountKeys
-	],
+	mixins: [FilterAmountKeys],
 	methods: {
 		LoadCategories() {
 			return CategoryApi.List().done(groups => {
 				this.catGroups = groups;
 				this.catsLoaded = true;
-			}).fail(this.Error);
+			});
 		},
 		LoadTransactions(setloading = true) {
 			if(setloading)
@@ -149,7 +145,7 @@ export default {
 					this.oldid = lastdate.transactions[lastdate.transactions.length - 1].id;
 				}
 				this.more = transactions.more;
-			}).fail(this.Error).always(() => {
+			}).always(() => {
 				if(setloading)
 					this.loading = false;
 			});
@@ -351,16 +347,15 @@ export default {
 						this.errored.splice(errorIndex, 1);
 					TransactionApi.Save(transaction.id, transaction.name, transaction.notes, transaction.categories).done(() => {
 						this.LoadCategories();
-					}).fail(error => {
+					}).fail(() => {
 						this.errored.push(transaction);
-						this.Error(error);
 					}).always(() => {
 						this.saving.splice(this.saving.indexOf(transaction), 1);
 					});
 				} else {
 					if(errorIndex == -1)
 						this.errored.push(transaction);
-					this.Error(new Error("Can’t save transaction with mulitple categories unless amounts add to total and all amounts are categorized."));
+					throw new Error("Can’t save transaction with mulitple categories unless amounts add to total and all amounts are categorized.");
 				}
 			}
 		},
@@ -396,7 +391,7 @@ export default {
 	},
 	template: /*html*/ `
 		<div id=transactions class=transactions>
-			<transactionFilters :visible=showFilters :params=params :cat-groups=catGroups :cats-loaded=catsLoaded @error=Error($event) @close=ToggleFilters></transactionFilters>
+			<transactionFilters :visible=showFilters :params=params :cat-groups=catGroups :cats-loaded=catsLoaded @close=ToggleFilters></transactionFilters>
 			<main role=main>
 				<p class=info v-if="!loading && !dates.length">
 					No transactions found.  Try changing the search criteria or importing

@@ -1,5 +1,4 @@
 import BudgetApi from "../api/budget.js";
-import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 
 export default {
@@ -85,7 +84,7 @@ export default {
 			BudgetApi.LoadActive(this.month.sort).done(results => {
 				this.categories = results.categories;
 				this.funds = results.funds;
-			}).fail(this.Error);
+			});
 		},
 		Expand(item) {
 			if(item != this.expanded) {
@@ -106,14 +105,14 @@ export default {
 					const amount = this.add;
 					BudgetApi.SetActualFund(this.month.sort, item.id, amount, item.actual).done(() => {
 						item.actual = amount;
-					}).fail(this.Error);
+					});
 				} else if(this.add) {
 					const amount = item.planned < 0
 						? item.actual - this.add
 						: item.actual + this.add;
 					BudgetApi.SetActual(this.month.sort, item.catid, amount).done(() => {
 						item.actual = amount;
-					}).fail(this.Error);
+					});
 				}
 			}
 			this.add = 0;
@@ -122,7 +121,7 @@ export default {
 		SetSpent(item) {
 			BudgetApi.SetActual(this.month.sort, item.catid, item.amount).done(() => {
 				item.actual = item.amount;
-			}).fail(this.Error);
+			});
 		},
 		SetAllSpent() {
 			const ids = [];
@@ -141,7 +140,7 @@ export default {
 						id = ids.shift();
 						amount = amounts.shift();
 					}
-			}).fail(this.Error);
+			});
 		},
 		LastDayOfMonth(yyyymm) {
 			const ym = yyyymm.split("-");
@@ -149,10 +148,7 @@ export default {
 			return lastDay.getFullYear() + "-" + ("0" + (lastDay.getMonth() + 1)).slice(-2) + "-" + ("0" + (lastDay.getDate())).slice(-2);
 		}
 	},
-	mixins: [
-		ReportErrors,
-		FilterAmountKeys
-	],
+	mixins: [FilterAmountKeys],
 	template: /*html*/ `
 		<div id=activebudget>
 			<nav>

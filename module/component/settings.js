@@ -1,5 +1,4 @@
 import AllViews from "../views.js";
-import ReportErrors from "../reportErrors.js";
 import Accounts from "./accounts.js";
 import Categories from "./categories.js";
 
@@ -9,7 +8,6 @@ export default {
 	props: [
 		'view'
 	],
-	mixins: [ReportErrors],
 	components: {
 		accounts: Accounts,
 		categories: Categories
@@ -23,7 +21,7 @@ export default {
 					<span class=categories v-if="view.Name == '${Views.Categories.Name}'">${Views.Categories.Title}</span>
 					<a class=categories v-if="view.Name != '${Views.Categories.Name}'" href="#settings/categories">${Views.Categories.Title}</a>
 				</nav>
-				<component :is=view.Name @error=Error($event) @add-action="$emit('add-action', $event)" ></component>
+				<component :is=view.Name @add-action="$emit('add-action', $event)" ></component>
 			</div>
 		</main>
 	`

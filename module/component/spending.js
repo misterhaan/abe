@@ -2,7 +2,6 @@ import SummaryApi from "../api/summary.js";
 import SummaryNet from "./summaryNet.js";
 import SummaryCat from "./summaryCat.js";
 import SummaryDet from "./summaryDet.js";
-import ReportErrors from "../reportErrors.js";
 
 const DefaultSize = "monthly";
 const DefaultType = "net";
@@ -68,12 +67,11 @@ export default {
 			).done(results => {
 				this.dates = results.dates;
 				this.cats = results.cats;
-			}).fail(this.Error).always(() => {
+			}).always(() => {
 				this.loading = false;
 			});
 		}
 	},
-	mixins: [ReportErrors],
 	components: {
 		summaryNet: SummaryNet,
 		summaryCat: SummaryCat,

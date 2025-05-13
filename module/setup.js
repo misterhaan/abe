@@ -3,7 +3,6 @@ import AppName from "./appname.js";
 import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
 import SetupApi from "./api/setup.js";
-import ReportErrors from "./reportErrors.js";
 
 const SetupLevel = {
 	Unknown: -99,
@@ -18,8 +17,7 @@ createApp({
 	name: "AbeSetup",
 	data() {
 		return {
-			level: SetupLevel.Unknown,
-			error: false
+			level: SetupLevel.Unknown
 		};
 	},
 	computed: {
@@ -70,12 +68,11 @@ createApp({
 				this.working = true;
 				SetupApi.ConfigureDatabase(this.host, this.name, this.user, this.pass).done(() => {
 					this.$emit("set-level", SetupLevel.DatabaseConnectionDefined);
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			},
 		},
-		mixins: [ReportErrors],
 		template: /*html*/ `
 			<main role=main class=setup>
 				<h2>Database Configuration</h2>
@@ -118,12 +115,11 @@ createApp({
 				this.working = true;
 				SetupApi.CreateDatabase(this.password).done(() => {
 					this.$emit("set-level", SetupLevel.DatabaseExists);
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			}
 		},
-		mixins: [ReportErrors],
 		template: /*html*/ `
 			<main role=main class=setup>
 				<h2>Create Database</h2>
@@ -160,12 +156,11 @@ grant all on \`abe\`.* to 'USERNAME'@'localhost' identified by 'PASSWORD';</text
 				this.working = true;
 				SetupApi.InstallDatabase().done(() => {
 					this.$emit("set-level", SetupLevel.DatabaseUpToDate);  // install always goes straight to the latest version
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			}
 		},
-		mixins: [ReportErrors],
 		template: /*html*/ `
 		<main role=main class=setup>
 			<h2>Install Database</h2>
@@ -187,12 +182,11 @@ grant all on \`abe\`.* to 'USERNAME'@'localhost' identified by 'PASSWORD';</text
 				this.working = true;
 				SetupApi.UpgradeDatabase().done(() => {
 					this.$emit("set-level", SetupLevel.DatabaseUpToDate);
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			}
 		},
-		mixins: [ReportErrors],
 		template: /*html*/ `
 			<main role=main class=setup>
 				<h2>Upgrade Database</h2>

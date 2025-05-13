@@ -1,7 +1,6 @@
 import BudgetApi from "../api/budget.js";
 import SuggestBudget from "./budgetSuggestions.js";
 import ActiveBudget from "./budgetActive.js";
-import ReportErrors from "../reportErrors.js";
 
 export default {
 	props: [
@@ -33,7 +32,7 @@ export default {
 			this.months = months;
 			if(!this.months.length)
 				this.showGotoForm = true;
-		}).fail(this.Error);
+		});
 		this.$emit("add-action", {
 			action: this.ToggleGoto,
 			url: "#budget!goto",
@@ -56,9 +55,6 @@ export default {
 			location = "#budget!month=" + this.gotoMonth;
 		}
 	},
-	mixins: [
-		ReportErrors
-	],
 	components: {
 		activeBudget: ActiveBudget,
 		suggestBudget: SuggestBudget
@@ -75,8 +71,8 @@ export default {
 					<a href="#cancel" @click.prevent=ToggleGoto>Cancel</a>
 				</div>
 			</div>
-			<activeBudget v-if="month && months.includes(month)" :month=month :months=months @error=Error($event)></activeBudget>
-			<suggestBudget v-if="month && !months.includes(month)" :month=month @error=Error($event)></suggestBudget>
+			<activeBudget v-if="month && months.includes(month)" :month=month :months=months></activeBudget>
+			<suggestBudget v-if="month && !months.includes(month)" :month=month></suggestBudget>
 		</main>
 	`
 };

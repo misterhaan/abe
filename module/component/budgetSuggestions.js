@@ -1,6 +1,5 @@
 import BudgetApi from "../api/budget.js";
 import FundApi from "../api/fund.js";
-import ReportErrors from "../reportErrors.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 
 export default {
@@ -36,14 +35,14 @@ export default {
 			this.Load();
 		FundApi.List().done(funds => {
 			this.funds = funds.filter(f => f.target != 0 || f.balance != 0).map(f => Object.assign(f, { amount: "" }));
-		}).fail(this.Error);
+		});
 	},
 	methods: {
 		Load() {
 			BudgetApi.Suggestions(this.month.sort).done(result => {
 				this.names = result.columns;
 				this.categories = result.values.map(c => Object.assign(c, { amount: "" }));
-			}).fail(this.Error);
+			});
 		},
 		Remove(item) {
 			this.categories.splice(this.categories.indexOf(item), 1);
@@ -53,13 +52,10 @@ export default {
 			const funds = FlattenFunds(this.funds);
 			BudgetApi.Create(this.month.sort, categories.ids, categories.amounts, funds.ids, funds.amounts).done(() => {
 				location.reload();
-			}).fail(this.Error);
+			});
 		}
 	},
-	mixins: [
-		ReportErrors,
-		FilterAmountKeys
-	],
+	mixins: [FilterAmountKeys],
 	template: /*html*/ `
 		<table class="budget new">
 			<tbody class=income>

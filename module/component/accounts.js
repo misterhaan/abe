@@ -1,5 +1,4 @@
 import AccountApi from "../api/account.js";
-import ReportErrors from "../reportErrors.js";
 
 export default {
 	data() {
@@ -18,11 +17,11 @@ export default {
 				this.accounts = accounts;
 				if(!this.accounts.length)
 					this.Add();
-			}).fail(this.Error),
+			}),
 			AccountApi.Types().done(result => {
 				this.types = result.types;
 				this.banks = result.banks;
-			}).fail(this.Error)
+			})
 		]).then(() => {
 			this.loading = false;
 		});
@@ -34,7 +33,6 @@ export default {
 			tooltip: "Add another account"
 		});
 	},
-	mixins: [ReportErrors],
 	methods: {
 		Add() {
 			this.Save();
@@ -78,11 +76,10 @@ export default {
 						account.balanceDisplay = account.balance.toFixed(2);
 					}).fail(error => {
 						this.errored.push(account);
-						this.Error(error);
 					});
 				} else {
 					this.errored.push(account);
-					this.Error(new Error("Accounts must have a name, type, and bank."));
+					throw new Error("Accounts must have a name, type, and bank.");
 				}
 			}
 		}

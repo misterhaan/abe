@@ -19,8 +19,7 @@ createApp({
 			subView: false,
 			params: false,
 			actions: [],
-			titlePrefix: "",
-			error: false
+			titlePrefix: ""
 		};
 	},
 	watch: {

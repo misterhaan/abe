@@ -1,5 +1,4 @@
 import Views from "../views.js";
-import ReportErrors from "../reportErrors.js";
 import SlideVisible from "../slideVisible.js";
 import BookmarkApi from "../api/bookmark.js";
 
@@ -41,19 +40,16 @@ export default {
 			return "";
 		}
 	},
-	mixins: [
-		ReportErrors
-	],
 	methods: {
 		ToggleBookmark() {
 			this.showAddBookmark = !this.showAddBookmark;
 		},
 		AddBookmark() {
 			if(this.bookmarkName && this.bookmarkUrl) {
-				BookmarkApi.Add(this.bookmarkUrl, this.bookmarkName).fail(this.Error);
+				BookmarkApi.Add(this.bookmarkUrl, this.bookmarkName);
 				this.ToggleBookmark();
 			} else
-				this.Error(new Error("Bookmark title is required."));
+				throw new Error("Bookmark title is required.");
 		}
 	},
 	directives: {

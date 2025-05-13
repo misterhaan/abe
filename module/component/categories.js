@@ -1,6 +1,5 @@
 import GroupApi from "../api/categoryGroup.js";
 import CategoryApi from "../api/category.js";
-import ReportErrors from "../reportErrors.js";
 import DragDrop from "../dragDrop.js";
 
 const Unsaved = -1;
@@ -23,7 +22,7 @@ export default {
 				this.selected = this.groups[0];
 			else
 				this.AddGroup();
-		}).fail(this.Error).always(() => {
+		}).always(() => {
 			this.loading = false;
 		});
 		this.$emit("add-action", {
@@ -41,7 +40,6 @@ export default {
 			tooltip: "Add a new category"
 		});
 	},
-	mixins: [ReportErrors],
 	methods: {
 		Select(group, event = false) {
 			if(!this.editing && (!event || event.originalTarget.nodeName != "A"))
@@ -85,13 +83,13 @@ export default {
 						GroupApi.Add(this.working.name).done(id => {
 							this.working.id = id;
 							this.groups.sort(CompareGroup);
-						}).fail(this.Error).always(() => {
+						}).always(() => {
 							this.working = false;
 						});
 					else
 						GroupApi.Rename(this.working.id, this.working.name).done(() => {
 							this.groups.sort(CompareGroup);
-						}).fail(this.Error).always(() => {
+						}).always(() => {
 							this.working = false;
 						});
 				} else {
@@ -112,7 +110,7 @@ export default {
 				} else
 					GroupApi.Delete(this.working.id).done(() => {
 						this.groups.splice(index, 1);
-					}).fail(this.Error).always(() => {
+					}).always(() => {
 						this.working = false;
 					});
 			}
@@ -125,7 +123,7 @@ export default {
 					currentGroup.categories.splice(currentGroup.categories.indexOf(category), 1);
 					group.categories.push(category);
 					group.categories.sort(CompareCategory);
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			}
@@ -158,13 +156,13 @@ export default {
 						CategoryApi.Add(this.working.name, group.id).done(id => {
 							this.working.id = id;
 							group.categories.sort(CompareCategory);
-						}).fail(this.Error).always(() => {
+						}).always(() => {
 							this.working = false;
 						});
 					else
 						CategoryApi.Rename(this.working.id, this.working.name).done(() => {
 							group.categories.sort(CompareCategory);
-						}).fail(this.Error).always(() => {
+						}).always(() => {
 							this.working = false;
 						});
 				} else {
@@ -179,7 +177,7 @@ export default {
 				this.editing = false;
 				CategoryApi.Delete(this.working.id).done(() => {
 					group.categories.splice(group.categories.indexOf(this.working), 1);
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					this.working = false;
 				});
 			}

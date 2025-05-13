@@ -38,11 +38,23 @@ export default class ApiBase {
 			if(result.fail) {
 				if(result.redirect)
 					location = result.redirect;
-				throw new Error(result.message);
+				throw new Error(result.message);  // needs to throw on this thread so it doesn't hit the done (success) handler
 			} else
 				return successTransform(result);
-		}, request => {
-			throw new Error(request.status + " " + request.statusText + " from " + url);
+		}).fail(request => {
+			if(request.status)
+				throwAsync(request.status + " " + request.statusText + " from " + url);
+			else
+				throwAsync(request);
 		});
 	}
 };
+
+function throwAsync(message) {
+	setTimeout(() => {
+		if(message instanceof Error)
+			throw message;
+		else
+			throw new Error(message);
+	});
+}

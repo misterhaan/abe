@@ -3,9 +3,6 @@ import AppName from "../appname.js";
 let toastTimeout = false;
 
 export default {
-	props: [
-		"lastError"
-	],
 	data() {
 		return {
 			errors: [],
@@ -18,17 +15,25 @@ export default {
 		setInterval(() => {
 			this.now = new Date();
 		}, 1000);
+		window.addEventListener("error", e => {
+			this.NewError(e.error);
+			e.preventDefault();
+			e.stopPropagation();
+		});
+		window.addEventListener("unhandledrejection", e => {
+			this.NewError(e.reason);
+			e.preventDefault();
+			e.stopPropagation();
+		});
 	},
-	watch: {
-		lastError(error) {
+	methods: {
+		NewError(error) {
 			if(error) {
 				error.time = new Date();  // TODO:  use error.time and this.now to show how old each error is
 				this.errors.push(error);
 				this.toastError = error;
 			}
-		}
-	},
-	methods: {
+		},
 		ToggleErrors() {
 			if(!this.showErrors && this.toastError) {
 				if(toastTimeout) {

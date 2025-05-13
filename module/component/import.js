@@ -1,6 +1,5 @@
 import AccountApi from "../api/account.js";
 import TransactionApi from "../api/transaction.js";
-import ReportErrors from "../reportErrors.js";
 
 export default {
 	props: [
@@ -25,11 +24,10 @@ export default {
 				});
 			if(!this.selected && this.accounts.length)
 				this.selected = this.accounts[0];
-		}).fail(this.Error).always(() => {
+		}).always(() => {
 			this.loading = false;
 		});
 	},
-	mixins: [ReportErrors],
 	methods: {
 		SortAccounts() {
 			this.accounts.sort((a, b) => {
@@ -52,7 +50,7 @@ export default {
 				setTimeout(() => {
 					$(window).scrollTop($(".transactions.preview").first().offset().top);
 				});
-			}).fail(this.Error).always(() => {
+			}).always(() => {
 				this.uploading = false;
 			});
 			fileInput.val("");
@@ -91,7 +89,7 @@ export default {
 						account.newestDisplay = newest.display;
 						this.SortAccounts();
 					}
-				}).fail(this.Error).always(() => {
+				}).always(() => {
 					preview.working = false;
 				});
 			return promise;
