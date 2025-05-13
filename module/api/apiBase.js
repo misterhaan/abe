@@ -20,7 +20,9 @@ export default class ApiBase {
 			dataType: "json"
 		}).then(result => {
 			return handleOldRedirect(result, successTransform);
-		}).fail(handleError);
+		}).fail(request => {
+			handleError(request, url);
+		});
 	}
 	static PUT(url, data) {
 		return ajax("PUT", url, data);
@@ -35,7 +37,9 @@ function ajax(method, url, data, successTransform) {
 		dataType: "json"
 	}).then(result => {
 		return handleOldRedirect(result, successTransform);
-	}).fail(handleError);
+	}).fail(request => {
+		handleError(request, url);
+	});
 }
 
 function handleOldRedirect(result, successTransform) {
@@ -48,21 +52,21 @@ function handleOldRedirect(result, successTransform) {
 		return successTransform ? successTransform(result) : result;
 }
 
-function handleError(request) {
+function handleError(request, url) {
 	if(request.status == 533) {
 		const redirect = request.getResponseHeader("Location");
 		if(redirect)
 			location = redirect;
 	}
-	throwAsync(request);
+	throwAsync(request, url);
 }
 
-function throwAsync(request) {
+function throwAsync(request, url) {
 	setTimeout(() => {
 		// TODO:  remove Error case after api conversion finishes
 		if(request instanceof Error)
 			throw request;
 		else if(request.status)
-			throw new Error(request.status + " " + request.statusText + " from " + request.responseURL);
+			throw new Error(request.status + " " + (request.responseText || request.statusText) + " from " + url);
 	});
 }
