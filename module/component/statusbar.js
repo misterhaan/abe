@@ -17,13 +17,9 @@ export default {
 		}, 1000);
 		window.addEventListener("error", e => {
 			this.NewError(e.error);
-			e.preventDefault();
-			e.stopPropagation();
 		});
 		window.addEventListener("unhandledrejection", e => {
 			this.NewError(e.reason);
-			e.preventDefault();
-			e.stopPropagation();
 		});
 	},
 	methods: {
