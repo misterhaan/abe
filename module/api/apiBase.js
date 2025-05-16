@@ -27,6 +27,9 @@ export default class ApiBase {
 	static PUT(url, data) {
 		return ajax("PUT", url, data);
 	}
+	static PATCH(url, data) {
+		return ajax("PATCH", url, data);
+	}
 	static DELETE(url) {
 		return ajax("DELETE", url);
 	}

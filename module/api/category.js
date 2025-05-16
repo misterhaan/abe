@@ -7,21 +7,15 @@ export default class CategoryApi extends ApiBase {
 		return super.POST(urlbase + "add", {
 			name: name,
 			grp: groupId
-		}, result => result.id);
+		});
 	}
 	static Rename(id, name) {
-		return super.POST(urlbase + "rename", {
-			id: id,
-			name: name
-		}, () => true);
+		return super.PATCH(urlbase + "name/" + id, name);
 	}
 	static Move(id, groupId) {
-		return super.POST(urlbase + "move", {
-			id: id,
-			grp: groupId
-		}, () => true);
+		return super.PATCH(urlbase + "group/" + id, groupId.toString());
 	}
 	static Delete(id) {
-		return super.POST(urlbase + "delete", { id: id }, () => true);
+		return super.DELETE(urlbase + "delete/" + id);
 	}
 };
