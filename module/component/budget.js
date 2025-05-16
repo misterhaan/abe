@@ -16,12 +16,12 @@ export default {
 	computed: {
 		month() {
 			if(this.params.month)
-				return this.months.find(m => m.sort == this.params.month) || { sort: this.params.month, display: GetDisplayMonth(this.params.month) };
+				return this.months.find(m => m.Sort == this.params.month) || { Sort: this.params.month, Display: GetDisplayMonth(this.params.month) };
 			if(this.months.length) {
 				const now = new Date();
 				const currentMonth = now.getFullYear() + "-" + ('0' + (now.getMonth() + 1)).slice(-2);
 				for(let m = this.months.length - 1; m >= 0; m--)
-					if(this.months[m].sort <= currentMonth)
+					if(this.months[m].Sort <= currentMonth)
 						return this.months[m];
 				return this.months[this.months.length - 1];
 			}
@@ -67,7 +67,7 @@ export default {
 					<input type=month v-model.trim=gotoMonth>
 				</label>
 				<div class=calltoaction>
-					<button @click.prevent=Goto :disabled=!/[0-9]{4}\-[0-9]{2}/.test(gotoMonth)>{{months.some(m => m.sort == gotoMonth) ? "Go" : "Create"}}</button>
+					<button @click.prevent=Goto :disabled=!/[0-9]{4}\-[0-9]{2}/.test(gotoMonth)>{{months.some(m => m.Sort == gotoMonth) ? "Go" : "Create"}}</button>
 					<a href="#cancel" @click.prevent=ToggleGoto>Cancel</a>
 				</div>
 			</div>

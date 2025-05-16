@@ -41,6 +41,26 @@ abstract class Api {
 	public abstract static function GetEndpointDocumentation(): array;
 
 	/**
+	 * Read the request body as plain text.  Useful for PUT requests with a single data value.
+	 */
+	protected static function ReadRequestText(): string {
+		$fp = fopen("php://input", "r");
+		$text = '';
+		while ($data = fread($fp, 1024))
+			$text .= $data;
+		return $text;
+	}
+
+	/**
+	 * Parse the request body as a query string.  Useful for PUT requests with multiple data values.
+	 */
+	protected static function ParseRequestText(): array {
+		$rawData = self::ReadRequestText();
+		parse_str($rawData, $data);
+		return $data;
+	}
+
+	/**
 	 * Send a successful response.
 	 * @param mixed $data Response data (optional)
 	 */

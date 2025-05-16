@@ -4,45 +4,29 @@ const urlbase = "api/budget/";
 
 export default class BudgetApi extends ApiBase {
 	static List() {
-		return super.GET(urlbase + "list", result => result.months);
+		return super.GET(urlbase + "list");
 	}
 	static LoadActive(month) {
-		return super.GETwithParams(urlbase + "active", { month: month }, result => {
-			return {
-				categories: result.categories,
-				funds: result.funds
-			};
-		});
-	}
-	static SetActual(month, id, amount) {
-		return super.POST(urlbase + "actual", {
-			month: month,
-			id: id,
-			amount: amount
-		}, () => true);
-	}
-	static SetActualFund(month, id, amount) {
-		return super.POST(urlbase + "actualFund", {
-			month: month,
-			id: id,
-			amount: amount
-		}, () => true);
+		return super.GET(urlbase + "active/" + month);
 	}
 	static Suggestions(month) {
-		return super.GETwithParams(urlbase + "suggestions", { month: month }, result => {
-			return {
-				columns: result.columns,
-				values: result.values
-			};
-		});
+		return super.GET(urlbase + "suggestions/" + month);
 	}
 	static Create(month, categoryIds, categoryAmounts, fundIds, fundAmounts) {
-		return super.POST(urlbase + "create", {
-			month: month,
+		return super.PUT(urlbase + "active/" + month, {
 			catids: categoryIds,
 			catamounts: categoryAmounts,
 			fundids: fundIds,
 			fundamounts: fundAmounts
-		}, () => true);
+		});
+	}
+	static SetActual(month, id, amount) {
+		return super.POST(urlbase + "actual/" + month, {
+			id: id,
+			amount: amount
+		});
+	}
+	static SetActualFund(month, id, amount) {
+		return super.PUT(urlbase + "actualFund/" + month + "/" + id, amount);
 	}
 };
