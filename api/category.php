@@ -8,7 +8,7 @@ require_once 'api.php';
  */
 class CategoryApi extends Api {
 	/**
-	 * Return the documentation for the budget API controller..
+	 * Return the documentation for the category API controller..
 	 * @return EndpointDocumentation[] Array of documentation for each endpoint of this API
 	 */
 	public static function GetEndpointDocumentation(): array {
