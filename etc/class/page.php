@@ -70,7 +70,7 @@ abstract class Page {
 			<meta name="theme-color" content="#593">
 		</head>
 
-		<body>
+		<body id=abe>
 			<header>
 				<span class=back>
 					<a href="<?= $installPath; ?>/" title="Go to main menu"><span>home</span></a>

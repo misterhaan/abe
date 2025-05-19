@@ -7,13 +7,28 @@
 	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('Roboto-Mono-Regular.woff');
 }
 
-h2.api,
-h2[id^='POST'],
-h2[id^='GET'],
-code,
-.parameters dt {
-	font-family: 'roboto mono';
+.endpoint {
+	background-color: $lightgreyblue;
+	margin: .25em 0;
+	padding-bottom: .1px;
+
+	h2 {
+		padding-top: .75em;
+		margin-top: .25em;
+	}
 }
+
+code {
+	font-family: 'roboto mono';
+	background-color: $medgreyblue;
+	padding: 0 .2em;
+	border-radius: .2em;
+}
+
+dt {
+	margin-top: .5em;
+}
+
 dd {
 	margin-left: 1em;
 }
