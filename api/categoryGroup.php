@@ -1,158 +1,140 @@
 <?php
-require_once dirname(__DIR__) . '/etc/class/abe.php';
+require_once dirname(__DIR__) . '/etc/class/environment.php';
+require_once 'api.php';
 
 /**
  * Handler for categoryGroup API requests.
  * @author misterhaan
  */
-class CategoryGroupApi extends abeApi {
+class CategoryGroupApi extends Api {
 	/**
-	 * Write out the documentation for the categoryGroup API controller.  The page
-	 * is already opened with an h1 header, and will be closed after the call
-	 * completes.
+	 * Return the documentation for the categoryGroup API controller..
+	 * @return EndpointDocumentation[] Array of documentation for each endpoint of this API
 	 */
-	protected static function ShowDocumentation() {
-?>
-		<h2 id=POSTadd>POST add</h2>
-		<p>
-			Add a new category group.
-		</p>
-		<dl class=parameters>
-			<dt>name</dt>
-			<dd>
-				Name of the new category group. Category grouo names must be unique
-				so requests with a duplicate category name will fail.
-			</dd>
-		</dl>
+	public static function GetEndpointDocumentation(): array {
+		$endpoints = [];
 
-		<h2 id=POSTdelete>POST delete</h2>
-		<p>Delete an existing category group, provided nothing is using it.</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>
-				ID of the category group to delete.
-			</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('GET', 'list', 'Get the list of category groups with their categories.');
 
-		<h2 id=GETlist>GET list</h2>
-		<p>Get the list of category groups with their categories.</p>
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'add', 'Add a new category group.', 'multipart');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'Name of the new category group. Category group names must be unique so requests with a duplicate category name will fail.', true);
 
-		<h2 id=POSTrename>POST rename</h2>
-		<p>Rename an existing category group.</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>
-				ID of the category group to rename.
-			</dd>
-			<dt>name</dt>
-			<dd>
-				New name for the category group. Category group names must be unique
-				so requests with a duplicate category group name will fail.
-			</dd>
-		</dl>
-<?php
-	}
+		$endpoints[] = $endpoint = new EndpointDocumentation('PATCH', 'name', 'Rename an existing category group.', 'string', 'New name for the category group. Category group names must be unique so requests with a duplicate category group name will fail.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'integer', 'ID of the category group to rename.', true);
 
-	/**
-	 * Add a new category group.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function addAction(abeAjax $ajax) {
-		if (isset($_POST['name']) && $name = trim($_POST['name'])) {
-			$db = self::RequireLatestDatabase($ajax);
-			if ($i = $db->prepare('insert into category_groups (name) values (?)'))
-				if ($i->bind_param('s', $name))
-					if ($i->execute()) {
-						$ajax->Data->name = $name;
-						$ajax->Data->id = $i->insert_id;
-					} else
-						$ajax->Fail('Error executing category group add:  ' . $i->errno . ' ' . $i->error);
-				else
-					$ajax->Fail('Error binding parameters to add category group:  ' . $i->errno . ' ' . $i->error);
-			else
-				$ajax->Fail('Error preparing to add category:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameter \'name\' is required and cannot be blank.');
-	}
+		$endpoints[] = $endpoint = new EndpointDocumentation('DELETE', 'delete', 'Delete an existing category group, provided nothing is using it.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'integer', 'ID of the category group to delete.', true);
 
-	/**
-	 * Delete a category group.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function deleteAction(abeAjax $ajax) {
-		if (isset($_POST['id']) && $id = +$_POST['id']) {
-			$db = self::RequireLatestDatabase($ajax);
-			if ($chk = $db->prepare('select case when exists(select 1 from categories where grp=? limit 1) then 1 else 0 end'))
-				if ($chk->bind_param('i', $id))
-					if ($chk->execute())
-						if ($chk->bind_result($inuse))
-							if ($chk->fetch())
-								if (+$inuse == 0) {
-									$chk->close();
-									if ($del = $db->prepare('delete from category_groups where id=? limit 1'))
-										if ($del->bind_param('i', $id))
-											if ($del->execute()); // success!
-											else
-												$ajax->Fail('Error executing category group delete:  ' . $del->errno . ' ' . $del->error);
-										else
-											$ajax->Fail('Error binding parameters to delete category group:  ' . $del->errno . ' ' . $del->error);
-									else
-										$ajax->Fail('Error preparing to delete category group:  ' . $db->errno . ' ' . $db->error);
-								} else
-									$ajax->Fail('Cannot delete category group because it is in use.');
-							else
-								$ajax->Fail('Error fetching result of category group usage check:  ' . $chk->errno . ' ' . $chk->error);
-						else
-							$ajax->Fail('Error binding result of category group usage check:  ' . $chk->errno . ' ' . $chk->error);
-					else
-						$ajax->Fail('Error executing category group usage check:  ' . $chk->errno . ' ' . $chk->error);
-				else
-					$ajax->Fail('Error binding parameters to check category group usage:  ' . $chk->errno . ' ' . $chk->error);
-			else
-				$ajax->Fail('Error preparing to check category group usage:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameter \'id\' is required and must be numeric.');
+		return $endpoints;
 	}
 
 	/**
 	 * Get the list of all categories organized into their groups.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction(abeAjax $ajax) {
-		$db = self::RequireLatestDatabase($ajax);
-		if ($groups = $db->query('select g.id, coalesce(g.name, \'(ungrouped)\') as name, group_concat(c.id order by c.name separator \'\\n\') as catids, group_concat(c.name order by c.name separator \'\\n\') as catnames from categories as c left join category_groups as g on g.id=c.grp group by g.id order by g.name')) {
-			$ajax->Data->groups = [];
-			while ($group = $groups->fetch_object()) {
-				$catids = explode("\n", $group->catids);
-				$catnames = explode("\n", $group->catnames);
-				$cats = [];
-				for ($c = 0; $c < count($catids); $c++)
-					$cats[] = ['id' => +$catids[$c], 'name' => $catnames[$c]];
-				$ajax->Data->groups[] = ['id' => +$group->id, 'name' => $group->name, 'categories' => $cats];
-			}
-		} else
-			$ajax->Fail('Error looking up categories:  ' . $db->errno . ' ' . $db->error);
+	protected static function GET_list() {
+		$db = self::RequireLatestDatabase();
+		try {
+			$select = $db->prepare('select ifnull(g.id,0) as id, coalesce(g.name, \'(ungrouped)\') as name, group_concat(c.id order by c.name separator \'\\n\') as catids, group_concat(c.name order by c.name separator \'\\n\') as catnames from categories as c left join category_groups as g on g.id=c.grp group by g.id union select g.id, g.name, null as catids, null as catnames from category_groups as g left join categories as c on c.grp=g.id where c.id is null order by name');
+			$select->execute();
+			$select->bind_result($id, $name, $catids, $catnames);
+			$groups = [];
+			while ($select->fetch())
+				$groups[] = new Group($id, $name, $catids ? explode("\n", $catids) : [], $catnames ? explode("\n", $catnames) : []);
+			$select->close();
+			self::Success($groups);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up categories', $mse);
+		}
+	}
+
+	/**
+	 * Add a new category group.
+	 */
+	protected static function POST_add() {
+		if (!isset($_POST['name']) || !($name = trim($_POST['name'])))
+			self::NeedMoreInfo('Parameter “name” is required and cannot be blank.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$insert = $db->prepare('insert into category_groups (name) values (?)');
+			$insert->bind_param('s', $name);
+			$insert->execute();
+			$id = $insert->insert_id;
+			$insert->close();
+			self::Success($id);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error adding category group', $mse);
+		}
 	}
 
 	/**
 	 * Rename an existing category group.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function renameAction(abeAjax $ajax) {
-		if (isset($_POST['id']) && isset($_POST['name']) && ($id = +$_POST['id']) && $name = trim($_POST['name'])) {
-			$db = self::RequireLatestDatabase($ajax);
-			if ($u = $db->prepare('update category_groups set name=? where id=? limit 1'))
-				if ($u->bind_param('si', $name, $id))
-					if ($u->execute())
-						$ajax->Data->name = $name;
-					else
-						$ajax->Fail('Error executing category group rename:  ' . $u->errno . ' ' . $u->error);
-				else
-					$ajax->Fail('Error binding parameters to rename category group:  ' . $u->errno . ' ' . $u->error);
-			else
-				$ajax->Fail('Error preparing to rename category group:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameters \'id\' and \'name\' are required and cannot be zero or blank.');
+	protected static function PATCH_name(array $params) {
+		if (!($id = +array_shift($params)))
+			self::NeedMoreInfo('Parameter “id” is required and cannot be zero or blank.');
+		if (!($name = trim(self::ReadRequestText())))
+			self::NeedMoreInfo('Request body is required.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$update = $db->prepare('update category_groups set name=? where id=? limit 1');
+			$update->bind_param('si', $name, $id);
+			$update->execute();
+			$update->close();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error renaming category group', $mse);
+		}
+	}
+
+	/**
+	 * Delete a category group.
+	 */
+	protected static function DELETE_delete(array $params) {
+		if (!($id = +array_shift($params)))
+			self::NeedMoreInfo('Parameter “id” is required and cannot be zero or blank.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$select = $db->prepare('select case when exists(select 1 from categories where grp=? limit 1) then 1 else 0 end');
+			$select->bind_param('i', $id);
+			$select->execute();
+			$select->bind_result($inuse);
+			$select->fetch();
+			$select->close();
+			if ($inuse)
+				self::NeedMoreInfo('Cannot delete category group because it is in use.');
+			$delete = $db->prepare('delete from category_groups where id=? limit 1');
+			$delete->bind_param('i', $id);
+			$delete->execute();
+			$delete->close();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error deleting category group', $mse);
+		}
 	}
 }
+
+class Group {
+	public int $ID;
+	public string $Name;
+	public array $Categories;
+
+	public function __construct(int $id, string $name, array $catids, array $catnames) {
+		$this->ID = $id;
+		$this->Name = $name;
+		$this->Categories = array_map(function ($id, $name) {
+			return new Category(+$id, $name);
+		}, $catids, $catnames);
+	}
+}
+
+class Category {
+	public int $ID;
+	public string $Name;
+
+	public function __construct(int $id, string $name) {
+		$this->ID = $id;
+		$this->Name = $name;
+	}
+}
+
 CategoryGroupApi::Respond();

@@ -4,18 +4,15 @@ const urlbase = "api/categoryGroup/";
 
 export default class CategoryGroupApi extends ApiBase {
 	static List() {
-		return super.GET(urlbase + "list", result => result.groups);
+		return super.GET(urlbase + "list");
 	}
 	static Add(name) {
-		return super.POST(urlbase + "add", { name: name }, result => result.id);
+		return super.POST(urlbase + "add", { name: name });
 	}
 	static Rename(id, name) {
-		return super.POST(urlbase + "rename", {
-			id: id,
-			name: name
-		}, () => true);
+		return super.PATCH(urlbase + "name/" + id, name);
 	}
 	static Delete(id) {
-		return super.POST(urlbase + "delete", { id: id }, () => true);
+		return super.DELETE(urlbase + "delete/" + id);
 	}
 };

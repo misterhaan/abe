@@ -36,23 +36,23 @@ export default {
 				: [];
 			for(const group of this.catGroups) {
 				let catArr = false;
-				if(!search || group.name.toLowerCase().indexOf(search) > -1) {
-					for(const cat of group.categories)
-						if(!this.categories.some(c => c.id == cat.id)) {
+				if(!search || group.Name.toLowerCase().indexOf(search) > -1) {
+					for(const cat of group.Categories)
+						if(!this.categories.some(c => c.ID == cat.ID)) {
 							if(!catArr) {
 								catArr = [];
-								groups.push({ name: T.HighlightString(group.name, ""), categories: catArr });
+								groups.push({ name: T.HighlightString(group.Name, ""), categories: catArr });
 							}
-							catArr.push({ id: cat.id, value: cat.name, name: T.HighlightString(cat.name, search) });
+							catArr.push({ id: cat.ID, value: cat.Name, name: T.HighlightString(cat.Name, search) });
 						}
 				} else
-					for(const cat of group.categories)
-						if(!this.categories.some(c => c.id == cat.id) && (!search || cat.name.toLowerCase().indexOf(search) > -1)) {
+					for(const cat of group.Categories)
+						if(!this.categories.some(c => c.id == cat.ID) && (!search || cat.Name.toLowerCase().indexOf(search) > -1)) {
 							if(!catArr) {
 								catArr = [];
-								groups.push({ name: T.HighlightString(group.name, ""), categories: catArr });
+								groups.push({ name: T.HighlightString(group.Name, ""), categories: catArr });
 							}
-							catArr.push({ id: cat.id, value: cat.name, name: T.HighlightString(cat.name, search) });
+							catArr.push({ id: cat.ID, value: cat.Name, name: T.HighlightString(cat.Name, search) });
 						}
 			}
 			return groups;
@@ -109,9 +109,9 @@ export default {
 						this.AddCategory({ id: 0, value: T.UncategorizedName });
 					else
 						for(const group of this.catGroups)
-							for(const cat of group.categories)
-								if(cat.id == id)
-									this.AddCategory({ id: cat.id, value: cat.name });
+							for(const cat of group.Categories)
+								if(cat.ID == id)
+									this.AddCategory({ id: cat.ID, value: cat.Name });
 			}
 		},
 		Update() {

@@ -1,5 +1,5 @@
 import TransactionApi from "../api/transaction.js";
-import CategoryApi from "../api/categoryGroup.js";
+import CategoryGroupApi from "../api/categoryGroup.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import TransactionFilters from "./transactionFilters.js";
 import T from "../transactionShared.js";
@@ -35,19 +35,19 @@ export default {
 				const groups = [];
 				for(const group of this.catGroups) {
 					let catArr = false;
-					if(!search || group.name.toLowerCase().indexOf(search) > -1) {
+					if(!search || group.Name.toLowerCase().indexOf(search) > -1) {
 						catArr = [];
-						groups.push({ name: T.HighlightString(group.name, search), categories: catArr });
-						for(const cat of group.categories)
-							catArr.push({ value: cat.name, name: T.HighlightString(cat.name, search) });
+						groups.push({ name: T.HighlightString(group.Name, search), categories: catArr });
+						for(const cat of group.Categories)
+							catArr.push({ value: cat.Name, name: T.HighlightString(cat.Name, search) });
 					} else
-						for(const cat of group.categories)
-							if(!search || cat.name.toLowerCase().indexOf(search) > -1) {
+						for(const cat of group.Categories)
+							if(!search || cat.Name.toLowerCase().indexOf(search) > -1) {
 								if(!catArr) {
 									catArr = [];
-									groups.push({ name: T.HighlightString(group.name, ""), categories: catArr });
+									groups.push({ name: T.HighlightString(group.Name, ""), categories: catArr });
 								}
-								catArr.push({ value: cat.name, name: T.HighlightString(cat.name, search) });
+								catArr.push({ value: cat.Name, name: T.HighlightString(cat.Name, search) });
 							}
 				}
 				return groups;
@@ -92,7 +92,7 @@ export default {
 		});
 	},
 	watch: {
-		params(newParams) {
+		params() {
 			this.dates = [];
 			this.oldest = false;
 			this.oldid = false;
@@ -127,7 +127,7 @@ export default {
 	mixins: [FilterAmountKeys],
 	methods: {
 		LoadCategories() {
-			return CategoryApi.List().done(groups => {
+			return CategoryGroupApi.List().done(groups => {
 				this.catGroups = groups;
 				this.catsLoaded = true;
 			});
@@ -195,7 +195,7 @@ export default {
 		CategoryExists(name) {
 			if(name)
 				name = name.trim().toLowerCase();
-			return !name || this.catGroups.some(g => g.categories.some(c => c.name.trim().toLowerCase() == name));
+			return !name || this.catGroups.some(g => g.Categories.some(c => c.Name.trim().toLowerCase() == name));
 		},
 		CategoryInput(category, event) {
 			category.name = event.target.value;
