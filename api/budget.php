@@ -158,6 +158,7 @@ class BudgetApi extends Api {
 			$insert->close();
 
 			$db->commit();
+			self::Success();
 		} catch (mysqli_sql_exception $mse) {
 			self::DatabaseError('Error creating budget', $mse);
 		}
