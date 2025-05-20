@@ -4,7 +4,7 @@ const DragDrop = {
 	Draggable: {
 		created(el, bind) {
 			const element = $(el);
-			element.attr("draggable", true);
+			element.attr("draggable", bind.value.disabled ? null : "true");
 			element.data("dragData", bind.value.data);
 			element.data("dragType", bind.value.type);
 			element.data("dragName", bind.value.name);
@@ -21,6 +21,7 @@ const DragDrop = {
 		},
 		updated(el, bind) {
 			const element = $(el);
+			element.attr("draggable", bind.value.disabled ? null : "true");
 			element.data("dragData", bind.value.data);
 			element.data("dragType", bind.value.type);
 			element.data("dragName", bind.value.name);

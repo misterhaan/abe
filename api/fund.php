@@ -1,322 +1,260 @@
 <?php
-require_once dirname(__DIR__) . '/etc/class/abe.php';
+require_once dirname(__DIR__) . '/etc/class/environment.php';
+require_once 'api.php';
 
 /**
  * Handler for fund API requests.
  * @author misterhaan
  */
-class FundApi extends abeApi {
+class FundApi extends Api {
 	/**
-	 * Write out the documentation for the fund API controller.  The page is
-	 * already opened with an h1 header, and will be closed after the call
-	 * completes.
+	 * Return the documentation for the fund API controller..
+	 * @return EndpointDocumentation[] Array of documentation for each endpoint of this API
 	 */
-	protected static function ShowDocumentation() {
-?>
-		<h2 id=POSTadd>POST add</h2>
-		<p>
-			Add a new fund.
-		</p>
-		<dl class=parameters>
-			<dt>name</dt>
-			<dd>
-				Name of the new fund.
-			</dd>
-			<dt>balance</dt>
-			<dd>
-				Current balance of the fund.
-			</dd>
-			<dt>target</dt>
-			<dd>
-				Target balance for the fund.
-			</dd>
-		</dl>
+	public static function GetEndpointDocumentation(): array {
+		$endpoints = [];
 
-		<h2 id=POSTclose>POST close</h2>
-		<p>
-			Mark a fund closed, which means setting its balance and target to zero.
-		</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>
-				ID of the fund to close.
-			</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('GET', 'list', 'Get the list of funds.');
 
-		<h2 id=GETlist>GET list</h2>
-		<p>Get the list of funds.</p>
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'add', 'Add a new fund.', 'multipart');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'Name of the new fund.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('balance', 'float', 'Current balance of the fund.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('target', 'float', 'Target balance for the fund.');
 
-		<h2 id=POSTmoveDown>POST moveDown</h2>
-		<p>
-			Move a fund down in the sort order, switching with the fund
-			after it. All parameters are required.
-		</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>ID of the fund to move down.</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('PUT', 'save', 'Save changes to a fund.', 'query string');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'int', 'ID of the fund to save.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'New name of the fund.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('balance', 'float', 'Current balance of the fund.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('target', 'float', 'Target balance for the fund.');
 
-		<h2 id=POSTmoveTo>POST moveTo</h2>
-		<p>
-			Move a fund from its current sort position to just before another fund.
-		</p>
-		<dl class=parameters>
-			<dt>moveId</dt>
-			<dd>ID of the fund to move.</dd>
-			<dt>beforeId</dt>
-			<dd>ID of the fund the moveId fund should be moved before.</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'moveDown', 'Move a fund down in the sort order, switching with the fund after it.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'int', 'ID of the fund to move down.', true);
 
-		<h2 id=POSTmoveUp>POST moveUp</h2>
-		<p>
-			Move a fund up in the sort order, switching with the fund
-			before it. All parameters are required.
-		</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>ID of the fund to move up.</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'moveUp', 'Move a fund up in the sort order, switching with the fund before it.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'int', 'ID of the fund to move up.', true);
 
-		<h2 id=POSTsave>POST save</h2>
-		<p>
-			Save changes to a fund.
-		</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>
-				ID of the fund to save.
-			</dd>
-			<dt>name</dt>
-			<dd>
-				New name of the fund.
-			</dd>
-			<dt>balance</dt>
-			<dd>
-				Current balance of the fund.
-			</dd>
-			<dt>target</dt>
-			<dd>
-				Target balance for the fund.
-			</dd>
-		</dl>
-<?php
-	}
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'moveTo', 'Move a fund from its current sort position to just before another fund.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('moveId', 'int', 'ID of the fund to move.', true);
+		$endpoint->PathParameters[] = new ParameterDocumentation('beforeId', 'int', 'ID of the fund the <code>moveId</code> fund should be moved before.', true);
 
-	/**
-	 * Add a new fund.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function addAction(abeAjax $ajax) {
-		if (isset($_POST['name']) && isset($_POST['target']) && $name = trim($_POST['name'])) {
-			$target = round(+$_POST['target'], 2);
-			$balance = round(+$_POST['balance'], 2);
-			if ($target != 0 || $balance != 0) {
-				$db = self::RequireLatestDatabase($ajax);
-				$db->autocommit(false);
-				if ($db->real_query('update funds set sort=sort+1 where balance=0 and target=0'))
-					if ($ins = $db->prepare('insert into funds (name, balance, target, sort) values (?, ?, ?, (select coalesce(max(sort), 0) + 1 from (select sort from funds where balance!=0 or target!=0) as f))'))
-						if ($ins->bind_param('sdd', $name, $balance, $target))
-							if ($ins->execute()) {
-								$db->commit();
-								$ajax->Data->id = $ins->insert_id;
-								$ajax->Data->balanceDisplay = Format::Amount($balance);
-								$ajax->Data->targetDisplay = Format::Amount($target);
-							} else
-								$ajax->Fail('Error executing query to create fund:  ' . $ins->errno . ' ' . $ins->error);
-						else
-							$ajax->Fail('Error binding parameters to create fund:  ' . $ins->errno . ' ' . $ins->error);
-					else
-						$ajax->Fail('Error preparing to create fund:  ' . $db->errno . ' ' . $db->error);
-				else
-					$ajax->Fail('Error adjusting sort order of deactivated funds:  ' . $db->errno . ' ' . $db->error);
-			} else
-				$ajax->Fail('Funds must have nonzero current balance or target.');
-		} else
-			$ajax->Fail('Parameters \'name\', \'balance\', and \'target\' must be provided.');
-	}
+		$endpoints[] = $endpoint = new EndpointDocumentation('PATCH', 'close', 'Mark a fund closed, which means setting its balance and target to zero.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'int', 'ID of the fund to close.', true);
 
-	/**
-	 * Close a fund and sort it down to the beginning of the closed funds.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function closeAction(abeAjax $ajax) {
-		if (isset($_POST['id']) && ($id = +$_POST['id'])) {
-			$db = self::RequireLatestDatabase($ajax);
-			$db->autocommit(false);
-			if ($shiftsort = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=?) as f) and (balance>0 or target>0)'))
-				if ($shiftsort->bind_param('i', $id))
-					if ($shiftsort->execute())
-						if ($update = $db->prepare('update funds set balance=0, target=0, sort=(select coalesce(max(sort), 0) + 1 from (select sort from funds where (balance>0 or target>0) and id!=?) as f) where id=?'))
-							if ($update->bind_param('ii', $id, $id))
-								if ($update->execute())
-									$db->commit();
-								else
-									$ajax->Fail('Database error executing query to close fund:  ' . $update->errno . ' ' . $update->error);
-							else
-								$ajax->Fail('Database error binding parameter to close fund:  ' . $update->errno . ' ' . $update->error);
-						else
-							$ajax->Fail('Database error preparing to close fund:  ' . $db->errno . ' ' . $db->error);
-					else
-						$ajax->Fail('Database error executing query to adjust sort order:  ' . $shiftsort->errno . ' ' . $shiftsort->error);
-				else
-					$ajax->Fail('Database error binding parameter to adjust sort order:  ' . $shiftsort->errno . ' ' . $shiftsort->error);
-			else
-				$ajax->Fail('Database error preparing to adjust sort order:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameter \'id\' must be provided and non-empty.');
+		return $endpoints;
 	}
 
 	/**
 	 * Get the list of all funds.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction(abeAjax $ajax) {
-		$db = self::RequireLatestDatabase($ajax);
-		$ajax->Data->funds = [];
-		if ($funds = $db->query('select id, name, balance, target from funds order by sort'))
-			while ($fund = $funds->fetch_object()) {
-				$fund->id += 0;
-				$fund->balance += 0;
-				$fund->target += 0;
-				$fund->balanceDisplay = Format::Amount($fund->balance);
-				$fund->targetDisplay = Format::Amount($fund->target);
-				$ajax->Data->funds[] = $fund;
-			}
-		else
-			$ajax->Fail('Error looking up funds:  ' . $db->errno . ' ' . $db->error);
+	protected static function GET_list() {
+		$db = self::RequireLatestDatabase();
+		try {
+			$select = $db->prepare('select id, name, balance, target from funds order by sort');
+			$select->execute();
+			$select->bind_result($id, $name, $balance, $target);
+			$funds = [];
+			while ($select->fetch())
+				$funds[] = new Fund($id, $name, $balance, $target);
+			$select->close();
+			self::Success($funds);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up funds', $mse);
+		}
 	}
 
 	/**
-	 * Action to move a fund down in the sort order.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
+	 * Add a new fund.
 	 */
-	protected static function moveDownAction(abeAjax $ajax) {
-		if (isset($_POST['id']) && $id = +$_POST['id']) {
-			$db = self::RequireLatestDatabase($ajax);
-			$db->autocommit(false);
-			if ($swap = $db->prepare('update funds set sort=sort-1 where sort=(select sort+1 from (select sort from funds where id=? limit 1) as f) limit 1'))
-				if ($swap->bind_param('i', $id))
-					if ($swap->execute())
-						if ($swap = $db->prepare('update funds set sort=sort+1 where id=? limit 1'))
-							if ($swap->bind_param('i', $id))
-								if ($swap->execute())
-									$db->commit();
-								else
-									$ajax->Fail('Database error moving fund down:  ' . $db->errno . ' ' . $db->error);
-							else
-								$ajax->Fail('Database error binding parameter to move fund down:  ' . $db->errno . ' ' . $db->error);
-						else
-							$ajax->Fail('Database error preparing to move fund down:  ' . $db->errno . ' ' . $db->error);
-					else
-						$ajax->Fail('Database error moving next fund up:  ' . $db->errno . ' ' . $db->error);
-				else
-					$ajax->Fail('Database error binding parameter to move next fund up:  ' . $db->errno . ' ' . $db->error);
-			else
-				$ajax->Fail('Database error preparing to move next fund up:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to move.');
-	}
+	protected static function POST_add() {
+		if (!isset($_POST['name'], $_POST['balance'], $_POST['target']) || !($name = trim($_POST['name'])))
+			self::NeedMoreInfo('Parameters “name”, “balance”, and “target” must be provided.');
+		$target = round(+$_POST['target'], 2);
+		$balance = round(+$_POST['balance'], 2);
+		if ($target == 0 && $balance == 0)
+			self::NeedMoreInfo('Funds must have nonzero current balance or target.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
 
-	/**
-	 * Action to move a fund before another fund in the sort order.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function moveToAction(abeAjax $ajax) {
-		if (isset($_POST['moveId']) && isset($_POST['beforeId']) && ($moveid = +$_POST['moveId']) && $beforeid = +$_POST['beforeId']) {
-			$db = self::RequireLatestDatabase($ajax);
-			$db->autocommit(false);
-			if ($moveOthers = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=? limit 1) as f)'))
-				if ($moveOthers->bind_param('i', $moveid))
-					if ($moveOthers->execute())
-						if ($moveOthers = $db->prepare('update funds set sort=sort+1 where sort>=(select sort from (select sort from funds where id=? limit 1) as f)'))
-							if ($moveOthers->bind_param('i', $beforeid))
-								if ($moveOthers->execute())
-									if ($moveFund = $db->prepare('update funds set sort=(select sort-1 from (select sort as newsort from funds where id=? limit 1) as f) where id=? limit 1'))
-										if ($moveFund->bind_param('ii', $beforeid, $moveid))
-											if ($moveFund->execute())
-												$db->commit();
-											else
-												$ajax->Fail('Database error moving fund:  ' . $moveFund->errno . ' ' . $moveFund->error);
-										else
-											$ajax->Fail('Database error binding parameters to move fund:  ' . $moveFund->errno . ' ' . $moveFund->error);
-									else
-										$ajax->Fail('Database error preparing to move fund:  ' . $db->errno . ' ' . $db->error);
-								else
-									$ajax->Fail('Database error moving other funds down:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
-							else
-								$ajax->Fail('Database error binding parameter to move other funds down:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
-						else
-							$ajax->Fail('Database error preparing to other funds down:  ' . $db->errno . ' ' . $db->error);
-					else
-						$ajax->Fail('Database error moving other funds up:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
-				else
-					$ajax->Fail('Database error binding parameter to move other funds up:  ' . $moveOthers->errno . ' ' . $moveOthers->error);
-			else
-				$ajax->Fail('Database error preparing to move other funds up:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Required parameters \'moveId\' and \'beforeId\' must be present and nonzero numeric.');
-	}
+			$update = $db->prepare('update funds set sort=sort+1 where balance=0 and target=0');
+			$update->execute();
+			$update->close();
 
-	/**
-	 * Action to move a fund up in the sort order.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function moveUpAction(abeAjax $ajax) {
-		if (isset($_POST['id']) && $id = +$_POST['id']) {
-			$db = self::RequireLatestDatabase($ajax);
-			$db->autocommit(false);
-			if ($swap = $db->prepare('update funds set sort=sort+1 where sort=(select sort-1 from (select sort from funds where id=? limit 1) as f) limit 1'))
-				if ($swap->bind_param('i', $id))
-					if ($swap->execute())
-						if ($swap = $db->prepare('update funds set sort=sort-1 where id=? limit 1'))
-							if ($swap->bind_param('i', $id))
-								if ($swap->execute())
-									$db->commit();
-								else
-									$ajax->Fail('Database error moving fund up:  ' . $db->errno . ' ' . $db->error);
-							else
-								$ajax->Fail('Database error binding parameter to move fund up:  ' . $db->errno . ' ' . $db->error);
-						else
-							$ajax->Fail('Database error preparing to move fund up:  ' . $db->errno . ' ' . $db->error);
-					else
-						$ajax->Fail('Database error moving previous fund down:  ' . $db->errno . ' ' . $db->error);
-				else
-					$ajax->Fail('Database error binding parameter to move previous fund down:  ' . $db->errno . ' ' . $db->error);
-			else
-				$ajax->Fail('Database error preparing to move previous fund down:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Required parameter missing or invalid.  Provide a numeric id to move.');
+			$insert = $db->prepare('insert into funds (name, balance, target, sort) values (?, ?, ?, (select coalesce(max(sort), 0) + 1 from (select sort from funds where balance!=0 or target!=0) as f))');
+			$insert->bind_param('sdd', $name, $balance, $target);
+			$insert->execute();
+			$fund = new Fund($insert->insert_id, $name, $balance, $target);
+			$insert->close();
+
+			$db->commit();
+			self::Success($fund);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error creating fund', $mse);
+		}
 	}
 
 	/**
 	 * Save changes to a fund.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function saveAction(abeAjax $ajax) {
-		if (
-			isset($_POST['id']) && ($id = +$_POST['id'])
-			&& isset($_POST['name']) && ($name = trim($_POST['name']))
-			&& isset($_POST['balance']) && isset($_POST['target'])
-		) {
-			$balance = round(+$_POST['balance'], 2);
-			$target = round(+$_POST['target'], 2);
-			if ($balance != 0 || $target != 0) {
-				$db = self::RequireLatestDatabase($ajax);
-				if ($u = $db->prepare('update funds set name=?, balance=?, target=? where id=? limit 1'))
-					if ($u->bind_param('sddi', $name, $balance, $target, $id))
-						if ($u->execute()) {
-							$ajax->Data->balanceDisplay = Format::Amount($balance);
-							$ajax->Data->targetDisplay = Format::Amount($target);
-						} else
-							$ajax->Fail('Error executing query to save fund:  ' . $u->errno . ' ' . $u->error);
-					else
-						$ajax->Fail('Error binding parameters to save fund:  ' . $u->errno . ' ' . $u->error);
-				else
-					$ajax->Fail('Error preparing to save fund:  ' . $db->errno . ' ' . $db->error);
-			} else
-				$ajax->Fail('Funds must have nonzero current balance or target.');
-		} else
-			$ajax->Fail('Parameters \'id\', \'name\', \'balance\', and \'target\' must be provided and non-empty.');
+	protected static function PUT_save(array $params) {
+		$id = +array_shift($params);
+		$put = self::ParseRequestText();
+		if (!$id || !isset($put['name'], $put['balance'], $put['target']) || !($name = trim($put['name'])))
+			self::NeedMoreInfo('Parameters “id”, “name”, “balance”, and “target” must be provided and non-empty.');
+		$balance = round(+$put['balance'], 2);
+		$target = round(+$put['target'], 2);
+		if ($balance == 0 && $target == 0)
+			self::NeedMoreInfo('Funds must have nonzero current balance or target.');
+		$db = self::RequireLatestDatabase();
+
+		try {
+			$update = $db->prepare('update funds set name=?, balance=?, target=? where id=? limit 1');
+			$update->bind_param('sddi', $name, $balance, $target, $id);
+			$update->execute();
+			$update->close();
+			self::Success(new Fund($id, $name, $balance, $target));
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error saving fund', $mse);
+		}
+	}
+
+	/**
+	 * Action to move a fund down in the sort order.
+	 */
+	protected static function POST_moveDown(array $params) {
+		$id = +array_shift($params);
+		if (!$id)
+			self::NeedMoreInfo('Required parameter missing or invalid.  Provide a numeric id to move.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$update = $db->prepare('update funds set sort=sort-1 where sort=(select sort+1 from (select sort from funds where id=? limit 1) as f) limit 1');
+			$update->bind_param('i', $id);
+			$update->execute();
+			$update->close();
+
+			$update = $db->prepare('update funds set sort=sort+1 where id=? limit 1');
+			$update->bind_param('i', $id);
+			$update->execute();
+			$update->close();
+
+			$db->commit();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error moving fund down', $mse);
+		}
+	}
+
+	/**
+	 * Action to move a fund up in the sort order.
+	 */
+	protected static function POST_moveUp(array $params) {
+		$id = +array_shift($params);
+		if (!$id)
+			self::NeedMoreInfo('Required parameter missing or invalid.  Provide a numeric id to move.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$update = $db->prepare('update funds set sort=sort+1 where sort=(select sort-1 from (select sort from funds where id=? limit 1) as f) limit 1');
+			$update->bind_param('i', $id);
+			$update->execute();
+			$update->close();
+
+			$update = $db->prepare('update funds set sort=sort-1 where id=? limit 1');
+			$update->bind_param('i', $id);
+			$update->execute();
+			$update->close();
+
+			$db->commit();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error moving fund up', $mse);
+		}
+	}
+
+	/**
+	 * Action to move a fund before another fund in the sort order.
+	 */
+	protected static function POST_moveTo(array $params) {
+		$moveid = +array_shift($params);
+		$beforeid = +array_shift($params);
+		if (!$moveid || !$beforeid)
+			self::NeedMoreInfo('Required parameters “moveId” and “beforeId” must be present and nonzero numeric.');
+
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$update = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=? limit 1) as f)');
+			$update->bind_param('i', $moveid);
+			$update->execute();
+			$update->close();
+
+			$update = $db->prepare('update funds set sort=sort+1 where sort>=(select sort from (select sort from funds where id=? limit 1) as f)');
+			$update->bind_param('i', $beforeid);
+			$update->execute();
+			$update->close();
+
+			$update = $db->prepare('update funds set sort=(select sort-1 from (select sort as newsort from funds where id=? limit 1) as f) where id=? limit 1');
+			$update->bind_param('ii', $beforeid, $moveid);
+			$update->execute();
+			$update->close();
+
+			$db->commit();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error moving fund', $mse);
+		}
+	}
+
+	/**
+	 * Close a fund and sort it down to the beginning of the closed funds.
+	 */
+	protected static function PATCH_close(array $params) {
+		$id = +array_shift($params);
+		if (!$id)
+			self::NeedMoreInfo('Parameter “id” must be provided and non-empty.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$update = $db->prepare('update funds set sort=sort-1 where sort>(select sort from (select sort from funds where id=?) as f) and (balance>0 or target>0)');
+			$update->bind_param('i', $id);
+			$update->execute();
+			$update->close();
+
+			$update = $db->prepare('update funds set balance=0, target=0, sort=(select coalesce(max(sort), 0) + 1 from (select sort from funds where (balance>0 or target>0) and id!=?) as f) where id=?');
+			$update->bind_param('ii', $id, $id);
+			$update->execute();
+			$update->close();
+
+			$db->commit();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error closing fund', $mse);
+		}
 	}
 }
+
+class Fund {
+	public int $ID;
+	public string $Name;
+	public float $Balance;
+	public float $Target;
+	public string $BalanceDisplay;
+	public string $TargetDisplay;
+
+	public function __construct(int $id, string $name, float $balance, float $target) {
+		$this->ID = $id;
+		$this->Name = $name;
+		$this->Balance = $balance;
+		$this->Target = $target;
+		require_once 'format.php';
+		$this->BalanceDisplay = Format::Amount($balance);
+		$this->TargetDisplay = Format::Amount($target);
+	}
+}
+
 FundApi::Respond();

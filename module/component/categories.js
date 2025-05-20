@@ -214,7 +214,7 @@ export default {
 				</li>
 			</ol>
 			<ol id=groupcategories v-if="!loading && selected">
-				<li v-for="category in selected.Categories" :class="{working: category == working}" v-draggable="{data: category, name: category.Name}" @click.prevent="Edit(category)">
+				<li v-for="category in selected.Categories" :class="{working: category == working}" v-draggable="{disabled: editing || working, data: category, name: category.Name}" @click.prevent="Edit(category)">
 					<template v-if="category != editing">
 						{{category.Name}}
 					</template>

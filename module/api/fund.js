@@ -4,47 +4,32 @@ const urlbase = "api/fund/";
 
 export default class FundApi extends ApiBase {
 	static List() {
-		return super.GET(urlbase + "list", result => result.funds);
+		return super.GET(urlbase + "list");
 	}
 	static Add(name, balance, target) {
 		return super.POST(urlbase + "add", {
 			name: name,
 			balance: balance,
 			target: target
-		}, result => {
-			return {
-				id: result.id,
-				balanceDisplay: result.balanceDisplay,
-				targetDisplay: result.targetDisplay
-			};
 		});
 	}
 	static Save(id, name, balance, target) {
-		return super.POST(urlbase + "save", {
-			id: id,
+		return super.PUT(urlbase + "save/" + id, {
 			name: name,
 			balance: balance,
 			target: target
-		}, result => {
-			return {
-				balanceDisplay: result.balanceDisplay,
-				targetDisplay: result.targetDisplay
-			};
 		});
 	}
 	static MoveDown(id) {
-		return super.POST(urlbase + "moveDown", { id: id }, () => true);
+		return super.POST(urlbase + "moveDown/" + id);
 	}
 	static MoveUp(id) {
-		return super.POST(urlbase + "moveUp", { id: id }, () => true);
+		return super.POST(urlbase + "moveUp/" + id);
 	}
 	static MoveTo(moveId, beforeId) {
-		return super.POST(urlbase + "moveTo", {
-			moveId: moveId,
-			beforeId: beforeId
-		}, () => true);
+		return super.POST(urlbase + "moveTo/" + moveId + "/" + beforeId);
 	}
 	static Close(id) {
-		super.POST(urlbase + "close", { id: id }, () => true);
+		return super.PATCH(urlbase + "close/" + id);
 	}
 };

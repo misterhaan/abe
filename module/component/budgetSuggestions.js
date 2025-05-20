@@ -34,7 +34,7 @@ export default {
 		if(this.month)
 			this.Load();
 		FundApi.List().done(funds => {
-			this.funds = funds.filter(f => f.target != 0 || f.balance != 0).map(f => Object.assign(f, { amount: null }));
+			this.funds = funds.filter(f => f.Target != 0 || f.Balance != 0).map(f => Object.assign(f, { amount: null }));
 		});
 	},
 	methods: {
@@ -71,8 +71,8 @@ export default {
 							<span>{{income.Name}}</span>
 							<a class=remove href=#budget!remove :title="'Exclude ' + income.Name + ' from this budget'" @click.prevent=Remove(income)><span>X</span></a>
 						</td>
-						<td class=amount><input v-model.number.lazy=income.Amount type=number step=.01 @keypress=FilterAmountKeys></td>
-						<td class=amount v-for="(n, i) in names" @click="income.Amount = income.AmountColumns[i]">{{income.AmountColumns[i] ? income.AmountColumns[i].toFixed(2) : ""}}</td>
+						<td class=amount><input v-model.number.lazy=income.amount type=number step=.01 @keypress=FilterAmountKeys></td>
+						<td class=amount v-for="(n, i) in names" @click="income.amount = income.AmountColumns[i]">{{income.AmountColumns[i] ? income.AmountColumns[i].toFixed(2) : ""}}</td>
 					</tr>
 				</template>
 			</tbody>
@@ -89,17 +89,17 @@ export default {
 							<span>{{expense.Name}}</span>
 							<a class=remove href=#budget!remove :title="'Exclude ' + expense.Name + ' from this budget'" @click.prevent=Remove(expense)><span>X</span></a>
 						</td>
-						<td class=amount><input :value="expense.Amount ? -expense.Amount : ''" @change="expense.Amount = $event.target.value ? -$event.target.value : ''" type=number step=.01 @keybind=FilterAmountKeys></td>
-						<td class=amount v-for="(n, i) in names" @click="expense.Amount = expense.AmountColumns[i]">{{expense.AmountColumns[i] ? (-expense.AmountColumns[i]).toFixed(2) : ""}}</td>
+						<td class=amount><input :value="expense.amount ? -expense.amount : ''" @change="expense.amount = $event.target.value ? -$event.target.value : ''" type=number step=.01 @keybind=FilterAmountKeys></td>
+						<td class=amount v-for="(n, i) in names" @click="expense.amount = expense.AmountColumns[i]">{{expense.AmountColumns[i] ? (-expense.AmountColumns[i]).toFixed(2) : ""}}</td>
 					</tr>
 				</template>
 			</tbody>
 			<tbody class=saving>
 				<tr><th class=heading :colspan="names.length + 2">Saving</th></tr>
 				<tr v-for="fund in funds">
-					<td>{{fund.name}}</td>
+					<td>{{fund.Name}}</td>
 					<td class=amount><input v-model.number=fund.amount type=number step=.01 @keypress=FilterAmountKeys></td>
-					<td class=amount :colspan=names.length>{{fund.balanceDisplay}} of {{fund.targetDisplay}} ({{fund.target ? Math.round(Math.max(0, Math.min(100, 100 * fund.balance / fund.target))) : (fund.balance ? 100 : 0)}}%)</td>
+					<td class=amount :colspan=names.length>{{fund.BalanceDisplay}} of {{fund.TargetDisplay}} ({{fund.Target ? Math.round(Math.max(0, Math.min(100, 100 * fund.Balance / fund.Target))) : (fund.Balance ? 100 : 0)}}%)</td>
 				</tr>
 			</tbody>
 			<tfoot><tr>
@@ -113,9 +113,9 @@ export default {
 function FlattenCategories(categories) {
 	const cats = { ids: [], amounts: [] };
 	for(const cat of categories)
-		if(cat.Amount) {
+		if(cat.amount) {
 			cats.ids.push(cat.ID);
-			cats.amounts.push(-cat.Amount);
+			cats.amounts.push(-cat.amount);
 		}
 	return cats;
 }
@@ -124,7 +124,7 @@ function FlattenFunds(funds) {
 	const f = { ids: [], amounts: [] };
 	for(const fund of funds)
 		if(fund.amount) {
-			f.ids.push(fund.id);
+			f.ids.push(fund.ID);
 			f.amounts.push(fund.amount);
 		}
 	return f;
