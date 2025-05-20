@@ -60,7 +60,7 @@ function handleOldRedirect(result, successTransform) {
 
 function handleError(request, url) {
 	if(request.status == 533) {
-		const redirect = request.getResponseHeader("Location");
+		const redirect = request.getResponseHeader("X-Setup-Location");
 		if(redirect)
 			location = redirect;
 	}

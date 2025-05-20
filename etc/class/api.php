@@ -108,9 +108,9 @@ abstract class Api {
 	 * @param string $message Error message to report.
 	 */
 	private static function RedirectToSetup(string $message) {
-		http_response_code(533);  // this response code is not in the HTTP spec
+		header($_SERVER['SERVER_PROTOCOL'] . ' 533 Setup Required');  // this response code is not in the HTTP spec
 		header('Content-Type: text/plain');
-		header('Location: setup.html');
+		header('X-Setup-Location: setup.html');
 		die($message);
 	}
 
