@@ -16,8 +16,6 @@ class Target extends Bank {
 		if (false !== $fh = fopen($filename, 'r')) {
 			// first line is headers
 			fgets($fh);
-			// second line is blank
-			fgets($fh);
 
 			$preview = new stdClass();
 			$preview->transactions = [];
