@@ -4,6 +4,7 @@ DirectoryIndex abe.html
 RewriteEngine on
 RewriteBase /
 RewriteRule \.git/ - [F]
+RewriteRule \.vscode/ - [F]
 RewriteRule etc/ - [F]
 RewriteCond %{REQUEST_URI} ^(.*)transactions\.php
 RewriteRule transactions.php %1#transactions [R,NE]

@@ -12,11 +12,10 @@ abstract class Bank {
 	 * @param string $origname Original filename, used to infer file format from extension.
 	 * @param string $filename Full path to the file on the server.
 	 * @param int $acctid Account ID for duplicate checking.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 * @param mysqli $db Database connection for running queries.
 	 * @return array Parsed contents of the file, or false if unable to parse.
 	 */
-	public static function ParseTransactions(string $origname, string $filename, int $acctid, abeAjax $ajax, mysqli $db) {
+	public static function ParseTransactions(string $origname, string $filename, int $acctid, mysqli $db) {
 		$ext = explode('.', $origname);
 		$ext = $ext[count($ext) - 1];
 		$parse = 'Parse' . ucfirst(strtolower($ext)) . 'Transactions';
@@ -25,7 +24,7 @@ abstract class Bank {
 			$return->name = $origname;
 			return $return;
 		} else
-			$ajax->Fail('Abe does not support ' . $ext . ' file transaction import for this bank.');
+			throw new Exception('Abe does not support ' . $ext . ' file transaction import for this bank.');
 		return false;
 	}
 

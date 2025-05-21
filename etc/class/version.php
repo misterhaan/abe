@@ -15,7 +15,7 @@ class Version {
 	 * the setup script in upgrade mode.
 	 * @var integer
 	 */
-	const Structure = StructureVersion::MySqlStrict;
+	const Structure = StructureVersion::TransactionPaging;
 	/**
 	 * Database data (rows) version.  Changing this triggers the setup script in
 	 * update mode.
@@ -31,6 +31,7 @@ class Version {
  * @author misterhaan
  */
 class StructureVersion {
+	const TransactionPaging = 9;
 	const MySqlStrict = 8;
 	const Budgets = 7;
 	const Funds = 6;

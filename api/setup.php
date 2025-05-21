@@ -311,6 +311,19 @@ class abeKeysDB {
 			)
 		)
 			return false;
+
+		if (
+			$db->config->structureVersion < StructureVersion::TransactionPaging
+			&& !self::UpgradeDatabaseStructureStep(
+				StructureVersion::TransactionPaging,
+				$db,
+				$ajax,
+				'transitions/9-transaction-paging',
+				'routines/GetTransactions'
+			)
+		)
+			return false;
+
 		// add more upgrades here (older ones need to go first)
 		return true;
 	}

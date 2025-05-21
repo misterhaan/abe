@@ -1,4 +1,5 @@
 <?php
+require_once 'bank.php';
 
 /**
  * Bank functions specific to Target.

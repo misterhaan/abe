@@ -15,8 +15,6 @@ export default {
 			catGroups: [],
 			catsLoaded: false,
 			dates: [],
-			oldest: false,
-			oldid: false,
 			more: false,
 			editing: false,
 			editCategory: false,
@@ -94,8 +92,6 @@ export default {
 	watch: {
 		params() {
 			this.dates = [];
-			this.oldest = false;
-			this.oldid = false;
 			this.editing = false;
 			this.editCategory = false;
 			this.showSuggestions = false;
@@ -135,15 +131,11 @@ export default {
 		LoadTransactions(setloading = true) {
 			if(setloading)
 				this.loading = true;
-			return TransactionApi.List(this.oldest, this.oldid, this.params.accts, this.params.cats, this.params.datestart, this.params.dateend, this.params.minamount, this.params.search).done(transactions => {
+			const count = this.dates.reduce((s, d) => s + d.transactions.length, 0);
+			return TransactionApi.List(count, this.params.accts, this.params.cats, this.params.datestart, this.params.dateend, this.params.minamount, this.params.search).done(transactions => {
 				if(transactions.dates.length && this.dates.length && transactions.dates[0].date == this.dates[this.dates.length - 1].date)
 					this.dates[this.dates.length - 1].transactions = this.dates[this.dates.length - 1].transactions.concat(transactions.dates.shift().transactions);
 				this.dates = this.dates.concat(transactions.dates);
-				if(this.dates.length) {
-					let lastdate = this.dates[this.dates.length - 1];
-					this.oldest = lastdate.date;
-					this.oldid = lastdate.transactions[lastdate.transactions.length - 1].id;
-				}
 				this.more = transactions.more;
 			}).always(() => {
 				if(setloading)

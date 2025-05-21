@@ -23,6 +23,8 @@ abstract class Api {
 						static::$method($params);
 					} catch (mysqli_sql_exception $mse) {
 						self::DatabaseError('Unexpected error', $mse);
+					} catch (Exception $ex) {
+						self::NeedMoreInfo($ex->getMessage());
 					}
 				else
 					self::NotFound('Requested endpoint does not exist on this controller or requires a different request method.');
@@ -104,7 +106,6 @@ abstract class Api {
 	/**
 	 * Return an error message and redirect to setup to perform any required
 	 * updates.  Stops execution of the current script.
-	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @param string $message Error message to report.
 	 */
 	private static function RedirectToSetup(string $message) {
@@ -133,8 +134,7 @@ abstract class Api {
 	 * Gets the database connection object along with the configuration record.
 	 * Redirects to setup if anything is missing.  APIs other than setup should
 	 * use RequireLatestDatabase instead.
-	 * @param abeAjax $ajax Ajax object for reporting an error.
-	 * @return mysqli Database connection object.
+	 * @return DatabaseWithConfig Database connection object.
 	 */
 	protected static function RequireDatabaseWithConfig(): DatabaseWithConfig {
 		$db = self::RequireDatabase();
@@ -151,7 +151,6 @@ abstract class Api {
 	 * Gets the database connection object.  Redirects to setup if unable to
 	 * connect for any reason.  APIs other than setup should use
 	 * RequireLatestDatabase instead.
-	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @return mysqli Database connection object.
 	 */
 	protected static function RequireDatabase(): mysqli {

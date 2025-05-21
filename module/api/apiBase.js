@@ -1,10 +1,9 @@
 export default class ApiBase {
 	// TODO:  remove successTransform parameters once api conversion finishes
-	static GET(url, successTransform) {
-		return this.GETwithParams(url, {}, successTransform)
-	}
-	static GETwithParams(url, data, successTransform) {
-		return ajax("GET", url, data, successTransform)
+	static GET(url, data) {
+		if(data && typeof data === "function")
+			return ajax("GET", url, {}, data);
+		return ajax("GET", url, data);
 	}
 	static POST(url, data, successTransform) {
 		return ajax("POST", url, data, successTransform);

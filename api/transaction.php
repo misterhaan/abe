@@ -1,347 +1,245 @@
 <?php
-require_once dirname(__DIR__) . '/etc/class/abe.php';
+require_once dirname(__DIR__) . '/etc/class/environment.php';
+require_once 'api.php';
 
 /**
  * Handler for transaction API requests.
  * @author misterhaan
  */
-class TransactionApi extends abeApi {
-	const MAX = 50;
+class TransactionApi extends Api {
+	private const MAX = 50;
 
 	/**
-	 * Write out the documentation for the transaction file import API controller.
-	 * The page is already opened with an h1 header, and will be closed after the
-	 * call completes.
+	 * Return the documentation for the transaction API controller..
+	 * @return EndpointDocumentation[] Array of documentation for each endpoint of this API
 	 */
-	protected static function ShowDocumentation() {
-?>
-		<h2 id=POSTimport>POST import</h2>
-		<p>
-			Import transactions into an account. Used to save results of
-			<a href="#POSTparseFile"><code>parseFile</code></a>.
-		</p>
-		<dl class=parameters>
-			<dt>acctid</dt>
-			<dd>
-				ID of the bank account the transactions should import to.
-			</dd>
-			<dt>transactions</dt>
-			<dd>
-				Array of transactions to import. Each item should have the same set
-				of properties as the results from
-				<a href="#POSTparseFile"><code>parseFile</code></a>.
-			</dd>
-			<dt>net</dt>
-			<dd>
-				Amount to adjust the account balance. Should be the total of all
-				transactions. Optional; default zero.
-			</dd>
-		</dl>
+	public static function GetEndpointDocumentation(): array {
+		$endpoints = [];
 
-		<h2 id=GETlist>GET list</h2>
-		<p>
-			List transactions in order. Returns a limited set because there are
-			usually too many transactions to load all at once.
-		</p>
-		<dl class=parameters>
-			<dt>oldest</dt>
-			<dd>
-				Date of the oldest transaction already loaded. Transactions returned
-				will be from this date or earlier. YYYY-MM-DD format. Optional;
-				default is to start with the most recent transaction.
-			</dd>
-			<dt>oldid</dt>
-			<dd>
-				ID of the oldest transaction already loaded. Transactions from the
-				same day as <code>oldest</code> are only included if their ID is
-				older than this value. Ignored if <code>oldest</code> is provided.
-			</dd>
-			<dt>accts</dt>
-			<dd>
-				IDs of accounts to include as a comma-delimited string. Optional;
-				default is all accounts.
-			</dd>
-			<dt>cats</dt>
-			<dd>
-				IDs of categories to include as a comma-delimited string. Optional;
-				default is all categories.
-			</dd>
-			<dt>datestart</dt>
-			<dd>
-				Earliest transaction date to include. YYYY-MM-DD format. Optional;
-				default is earliest in database.
-			</dd>
-			<dt>dateend</dt>
-			<dd>
-				Latest transaction date to include. YYYY-MM-DD format. Optional;
-				default is latest in database.
-			</dd>
-			<dt>minamount</dt>
-			<dd>
-				Minimum transaction amount to include. Negative-amount transactions
-				are treated as positive amounts for this filter. Optional; default
-				is all amounts.
-			</dd>
-			<dt>search</dt>
-			<dd>
-				Optional. If specified, only transactions that include this text in
-				the name are included.
-			</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('GET', 'list', 'List transactions in order. Returns a limited set because there are usually too many transactions to load all at once.', 'query string', 'Filters specfying which transactions are elegible to list.');
+		$endpoint->PathParameters[] = new ParameterDocumentation('skip', 'int', 'Number of transactions to skip. Default 0.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('accts', 'string', 'IDs of accounts to include as a comma-delimited string. Default is all accounts.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('cats', 'string', 'IDs of categories to include as a comma-delimited string. Default is all categories.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('datestart', 'string', 'Earliest transaction date to include. YYYY-MM-DD format. Default is earliest in database.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('dateend', 'string', 'Latest transaction date to include. YYYY-MM-DD format. Default is latest in database.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('minamount', 'float', 'Minimum transaction amount to include. Negative-amount transactions are treated as positive amounts for this filter. Default is all amounts.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('search', 'string', 'If specified, only transactions that include this text in the name are included.');
 
-		<h2 id=POSTparseFile>POST parseFile</h2>
-		<p>
-			Parse the transactions in a file. The file must be provided as a form
-			upload named <code>transfile</code>.
-		</p>
-		<dl class=parameters>
-			<dt>acctid</dt>
-			<dd>
-				ID of the bank account the file belongs to. Used to look up which
-				bank it’s from in order to correctly parse the file.
-			</dd>
-		</dl>
+		$endpoints[] = $endpoint = new EndpointDocumentation('PATCH', 'save', 'Save changes to a transaction. May create new categories.', 'multipart');
+		$endpoint->PathParameters[] = new ParameterDocumentation('id', 'int', 'ID of the transaction to save.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('name', 'string', 'Name of the transaction.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('notes', 'string', 'Notes for the transaction. Default none.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('catnames', 'string', 'Names of categories for this transaction. Array parallel with <code>catamounts</code>. Default none.');
+		$endpoint->BodyParameters[] = new ParameterDocumentation('catamounts', 'float', 'Amounts for each category. Array parallel with <code>catnames</code> and should add up to the transaction amount. Default none.');
 
-		<h2 id=POSTsave>POST save</h2>
-		<p>
-			Save changes to a transaction. May create new categories.
-		</p>
-		<dl class=parameters>
-			<dt>id</dt>
-			<dd>ID of the transaction to save.</dd>
-			<dt>name</dt>
-			<dd>Name of the transaction.</dd>
-			<dt>notes</dt>
-			<dd>Notes for the transaction. Optional; default none.</dd>
-			<dt>catnames</dt>
-			<dd>
-				Names of categories for this transaction. Array parallel with
-				<code>catamounts</code>. Optional; default none.
-			</dd>
-			<dt>catamounts</dt>
-			<dd>
-				Amounts for each category. Array parallel with <code>catnames</code>
-				and should add up to the transaction amount. Optional; default none.
-			</dd>
-		</dl>
-<?php
-	}
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'parseFile', 'Parse the transactions in a file.', 'multipart');
+		$endpoint->PathParameters[] = new ParameterDocumentation('acctid', 'int', 'ID of the bank account the file belongs to. Used to look up which bank it’s from in order to correctly parse the file.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('transfile', 'file', 'File containing transactions to parse.', true);
 
-	/**
-	 * Save previewed transactions.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function importAction(abeAjax $ajax) {
-		if (isset($_POST['acctid']) && $account = +$_POST['acctid'])
-			if (isset($_POST['transactions']) && is_array($_POST['transactions']) && $count = count($_POST['transactions'])) {
-				$db = self::RequireLatestDatabase($ajax);
-				$db->autocommit(false);
-				if ($ins = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-					if ($ins->bind_param('issssdssss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip, $notes)) {
-						$ajax->Data->newestSortable = '';
-						foreach ($_POST['transactions'] as $trans) {
-							$trans = (object)$trans;
-							$extid = $trans->extid ? $trans->extid : null;
-							$transdate = $trans->transdate ? $trans->transdate : null;
-							$posted = $trans->posted;
-							if ($posted > $ajax->Data->newestSortable)
-								$ajax->Data->newestSortable = $posted;
-							$name = $trans->name;
-							$amount = $trans->amount;
-							$city = $trans->city ? $trans->city : null;
-							$state = $trans->state ? $trans->state : null;
-							$zip = $trans->zip ? $trans->zip : null;
-							$notes = $trans->notes;
-							if ($ins->execute())
-								$count--;
-						}
-						$ajax->Data->newestDisplay = date('M jS', strtotime($ajax->Data->newestSortable));
-						if ($count)
-							$ajax->Fail('Error saving ' . $count . ' of ' . count($_POST['transactions']) . ' transactions:  ' . $ins->errno . ' ' . $ins->error);
-						$ins->close();
-						if ($db->real_query('update accounts set updated=\'' . +time() . '\', balance=balance+\'' . +$_POST['net'] . '\' where id=\'' . +$account . '\' limit 1'))
-							$db->commit();
-						else
-							$ajax->Fail('Error updating account:  ' . $db->errno . ' ' . $db->error);
-					} else
-						$ajax->Fail('Error binding import parameters:  ' . $ins->errno . ' ' . $ins->error);
-				else
-					$ajax->Fail('Database error preparing to import transactions:  ' . $db->errno . ' ' . $db->error);
-			} else
-				$ajax->Fail('No transactions to save.');
-		else
-			$ajax->Fail('Account not specified.');
+		$endpoints[] = $endpoint = new EndpointDocumentation('POST', 'import', 'Import transactions into an account. Used to save results of <a href="#POST-parseFile"><code>parseFile</code></a>.', 'multipart');
+		$endpoint->PathParameters[] = new ParameterDocumentation('acctid', 'int', 'ID of the bank account the transactions should import to.', true);
+		$endpoint->BodyParameters[] = new ParameterDocumentation('transactions', 'array', 'Array of transactions to import. Each item should have the same set of properties as the results from <a href="#POST-parseFile"><code>parseFile</code></a>.', true);
+
+		return $endpoints;
 	}
 
 	/**
 	 * Get transactions in order according to filter parameters.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function listAction(abeAjax $ajax) {
-		$db = self::RequireLatestDatabase($ajax);
-		if ($select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-			if ($select->bind_param('isissssds', $maxcount, $oldest, $oldid, $accountids, $categoryids, $datestart, $dateend, $minamount, $search)) {
-				$maxcount = self::MAX;
-				$oldest = isset($_GET['oldest']) ? $_GET['oldest'] : null;
-				$oldid = isset($_GET['oldid']) ? $_GET['oldid'] : null;
-				$accountids = isset($_GET['accts']) && $_GET['accts'] ? $_GET['accts'] : null;
-				$categoryids = isset($_GET['cats']) && ($_GET['cats'] || $_GET['cats'] === '0') ? $_GET['cats'] : null;
-				$datestart = isset($_GET['datestart']) && $_GET['datestart'] ? $_GET['datestart'] : null;
-				$dateend = isset($_GET['dateend']) && $_GET['dateend'] ? $_GET['dateend'] : null;
-				$minamount = isset($_GET['minamount']) && $_GET['minamount'] ? $_GET['minamount'] : null;
-				$search = isset($_GET['search']) && $_GET['search'] ? trim($_GET['search']) : null;
-				if ($select->execute())
-					if ($transactions = $select->get_result()) {
-						$ajax->Data->dates = [];
-						while ($transaction = $transactions->fetch_object()) {
-							if (!count($ajax->Data->dates) || $ajax->Data->dates[count($ajax->Data->dates) - 1]->date != $transaction->posted)
-								$ajax->Data->dates[] = (object)['date' => $transaction->posted, 'displayDate' => date('F j, Y (D)', strtotime($transaction->posted . ' 12:00 PM')), 'transactions' => []];
+	protected static function GET_list(array $params): void {
+		$limit = self::MAX + 1;
+		$skip = +array_shift($params);
 
-							$transaction->id += 0;
-							$transaction->amount += 0;
+		$accountids = isset($_GET['accts']) && $_GET['accts'] ? $_GET['accts'] : null;
+		$categoryids = isset($_GET['cats']) && ($_GET['cats'] || $_GET['cats'] === '0') ? $_GET['cats'] : null;
+		$datestart = isset($_GET['datestart']) && $_GET['datestart'] ? $_GET['datestart'] : null;
+		$dateend = isset($_GET['dateend']) && $_GET['dateend'] ? $_GET['dateend'] : null;
+		$minamount = isset($_GET['minamount']) && $_GET['minamount'] ? $_GET['minamount'] : null;
+		$search = isset($_GET['search']) && $_GET['search'] ? trim($_GET['search']) : null;
 
-							$transaction->categories = [];
-							if (+$transaction->splitcat) {
-								$sc_names = explode("\n", $transaction->sc_names);
-								$sc_amounts = explode("\n", $transaction->sc_amounts);
-								$remaining = $transaction->amount;
-								for ($i = 0; $i < count($sc_names); $i++) {
-									$transaction->categories[] = (object)['name' => $sc_names[$i], 'amount' => +$sc_amounts[$i]];
-									$remaining -= +$sc_amounts[$i];
-								}
-								if (round($remaining, 2) != 0)  // save should prevent this case
-									$transaction->categories[] = (object)['name' => null, 'amount' => $remaining];
-							} else
-								$transaction->categories[] = (object)['name' => $transaction->category, 'amount' => +$transaction->amount];
-							unset($transaction->splitcat, $transaction->sc_names, $transaction->sc_amounts, $transaction->category);
+		$db = self::RequireLatestDatabase();
+		$data = new stdClass();
+		try {
+			$select = $db->prepare('call GetTransactions(?, ?, ?, ?, ?, ?, ?, ?)');
+			$select->bind_param('iissssds', $limit, $skip, $accountids, $categoryids, $datestart, $dateend, $minamount, $search);
+			$select->execute();
+			$transactions = $select->get_result();
+			$data->dates = [];
+			$count = 0;
+			while ($transaction = $transactions->fetch_object())
+				if (++$count > self::MAX)
+					$data->more = true;
+				else {
+					if (!count($data->dates) || $data->dates[count($data->dates) - 1]->date != $transaction->posted)
+						$data->dates[] = (object)['date' => $transaction->posted, 'displayDate' => date('F j, Y (D)', strtotime($transaction->posted . ' 12:00 PM')), 'transactions' => []];
 
-							$transaction->amountDisplay = Format::Amount($transaction->amount);
-							$ajax->Data->dates[count($ajax->Data->dates) - 1]->transactions[] = $transaction;
-							$oldest = $transaction->posted;
-							$oldid = $transaction->id;
+					$transaction->id += 0;
+					$transaction->amount += 0;
+
+					$transaction->categories = [];
+					if (+$transaction->splitcat) {
+						$sc_names = explode("\n", $transaction->sc_names);
+						$sc_amounts = explode("\n", $transaction->sc_amounts);
+						$remaining = $transaction->amount;
+						for ($i = 0; $i < count($sc_names); $i++) {
+							$transaction->categories[] = (object)['name' => $sc_names[$i], 'amount' => +$sc_amounts[$i]];
+							$remaining -= +$sc_amounts[$i];
 						}
-						$ajax->Data->more = false;
-						$maxcount = 1;
-						$db->next_result();  // get past the extra stored procedure result, otherwise there's a segmentation fault!?!?
-						if ($select->execute())
-							if ($ajax->Data->more = $select->get_result())
-								$ajax->Data->more = !!$ajax->Data->more->num_rows;
-							else
-								$ajax->Fail('Error getting result checking for more:  ' . $select->errno . ' ' . $select->error);
-						else
-							$ajax->Fail('Error executing check for more:  ' . $select->errno . ' ' . $select->error);
+						if (round($remaining, 2) != 0)  // save should prevent this case
+							$transaction->categories[] = (object)['name' => null, 'amount' => $remaining];
 					} else
-						$ajax->Fail('Error getting result of looking up transactions:  ' . $select->errno . ' ' . $select->error);
-				else
-					$ajax->Fail('Error executing statement to look up transactions:  ' . $select->errno . ' ' . $select->error);
-				$select->close();
-			} else
-				$ajax->Fail('Error binding parameters to look up transactions:  ' . $select->errno . ' ' . $select->error);
-		else
-			$ajax->Fail('Error preparing to look up transactions:  ' . $db->errno . ' ' . $db->error);
-	}
+						$transaction->categories[] = (object)['name' => $transaction->category, 'amount' => +$transaction->amount];
+					unset($transaction->splitcat, $transaction->sc_names, $transaction->sc_amounts, $transaction->category);
 
-	/**
-	 * Translate uploaded file into a list of transactions for preview.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
-	 */
-	protected static function parseFileAction(abeAjax $ajax) {
-		// TODO:  accept bankclass or bankid instead of acctid
-		// TODO:  automatic categorization engine
-		if (isset($_POST['acctid']) && ($acctid = +$_POST['acctid']))
-			if (file_exists($_FILES['transfile']['tmp_name']) && is_uploaded_file($_FILES['transfile']['tmp_name'])) {
-				$db = self::RequireLatestDatabase($ajax);
-				if ($bankclass = self::LookupBank($acctid, $ajax, $db)) {
-					if ($preview = $bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $acctid, $ajax, $db))
-						$ajax->Data->preview = $preview;
+					require_once 'format.php';
+					$transaction->amountDisplay = Format::Amount($transaction->amount);
+					$data->dates[count($data->dates) - 1]->transactions[] = $transaction;
 				}
-			} else
-				$ajax->Fail('Transaction file not provided.');
-		else
-			$ajax->Fail('Account not specified.');
-		unlink($_FILES['transfile']['tmp_name']);
+			$select->close();
+			self::Success($data);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error looking up transactions', $mse);
+		}
 	}
 
 	/**
 	 * Save changes to a transaction.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
-	protected static function saveAction(abeAjax $ajax) {
-		if (isset($_POST['id'], $_POST['name']) && ($id = +$_POST['id']) && ($name = trim($_POST['name']))) {
-			$db = self::RequireLatestDatabase($ajax);
-			$db->autocommit(false);
-			if ($update = $db->prepare('update transactions set name=?, notes=?, category=GetCategoryID(?), splitcat=?, reviewed=1 where id=? limit 1'))
-				if ($update->bind_param('sssii', $name, $notes, $catname, $splitcat, $id)) {
-					$notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
-					$catname = null;
-					$splitcat = false;
-					if (isset($_POST['catnames'], $_POST['catamounts']) && is_array($_POST['catnames']) && is_array($_POST['catamounts']) && count($_POST['catnames']) == count($_POST['catamounts'])) {
-						$splitcat = count($_POST['catnames']) > 1;
-						if (!$splitcat)
-							$catname = trim($_POST['catnames'][0]);
-					}
-					if ($update->execute()) {
-						$update->close();
-						if ($del = $db->prepare('delete from splitcats where transaction=?'))
-							if ($del->bind_param('i', $id))
-								if ($del->execute()) {
-									$del->close();
-									if ($splitcat)
-										if ($ins = $db->prepare('insert into splitcats (transaction, category, amount) values (?, GetCategoryID(?), ?)'))
-											if ($ins->bind_param('isd', $id, $name, $amount)) {
-												$failedcats = [];
-												for ($i = 0; $i < count($_POST['catnames']); $i++) {
-													$name = trim($_POST['catnames'][$i]);
-													if ($amount = +$_POST['catamounts'][$i])
-														if (!$ins->execute())
-															$failetcats[] = $name;
-												}
-												if (!count($failedcats)) {
-													$ins->close();
-													$db->commit();
-												} else
-													$ajax->Fail('Error saving categories ' . implode(', ', $failedcats) . ':  ' . $ins->errno . ' ' . $ins->error);
-											} else
-												$ajax->Fail('Error binding to insert split categories:  ' . $ins->errno . ' ' . $ins->error);
-										else
-											$ajax->Fail('Error preparing to insert split categories:  ' . $db->errno . ' ' . $db->error);
-									else
-										$db->commit();
-								} else
-									$ajax->Fail('Error executing delete old split categories:  ' . $del->errno . ' ' . $del->error);
-							else
-								$ajax->Fail('Error binding transaction id to delete old split categories:  ' . $del->errno . ' ' . $del->error);
-						else
-							$ajax->Fail('Error preparing to delete old split categories:  ' . $db->errno . ' ' . $db->error);
-					} else
-						$ajax->Fail('Error executing update for transaction:  ' . $update->errno . ' ' . $update->error);
-				} else
-					$ajax->Fail('Error binding transaction parameters:  ' . $update->errno . ' ' . $update->error);
-			else
-				$ajax->Fail('Error preparing to update transactions:  ' . $db->errno . ' ' . $db->error);
-		} else
-			$ajax->Fail('Parameters \'id\' and \'name\' are required.');
+	protected static function PATCH_save(array $params): void {
+		$id = +array_shift($params);
+		$patch = self::ParseRequestText();
+		if (!$id || !isset($patch['name']) || !($name = trim($patch['name'])))
+			self::NeedMoreInfo('Parameters “id” and “name” are required.');
+		$catname = null;
+		$splitcat = false;
+		$notes = isset($patch['notes']) ? trim($patch['notes']) : '';
+		if (isset($patch['catnames'], $patch['catamounts']) && is_array($patch['catnames']) && is_array($patch['catamounts']) && count($patch['catnames']) == count($patch['catamounts'])) {
+			$splitcat = count($patch['catnames']) > 1;
+			if (!$splitcat)
+				$catname = trim($patch['catnames'][0]);
+		}
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$update = $db->prepare('update transactions set name=?, notes=?, category=GetCategoryID(?), splitcat=?, reviewed=1 where id=? limit 1');
+			$update->bind_param('sssii', $name, $notes, $catname, $splitcat, $id);
+			$update->execute();
+			$update->close();
+
+			$delete = $db->prepare('delete from splitcats where transaction=?');
+			$delete->bind_param('i', $id);
+			$delete->execute();
+			$delete->close();
+
+			if ($splitcat) {
+				$insert = $db->prepare('insert into splitcats (transaction, category, amount) values (?, GetCategoryID(?), ?)');
+				$insert->bind_param('isd', $id, $name, $amount);
+				for ($i = 0; $i < count($patch['catnames']); $i++) {
+					$name = trim($patch['catnames'][$i]);
+					if ($amount = +$patch['catamounts'][$i])
+						$insert->execute();
+				}
+				$insert->close();
+			}
+
+			$db->commit();
+			self::Success();
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error saving transaction', $mse);
+		}
+	}
+
+	/**
+	 * Translate uploaded file into a list of transactions for preview.
+	 */
+	protected static function POST_parseFile(array $params): void {
+		// TODO:  accept bankclass or bankid instead of acctid
+		// TODO:  automatic categorization engine
+		$acctid = +array_shift($params);
+		if (!$acctid)
+			self::NeedMoreInfo('Account ID is required.');
+		if (!file_exists($_FILES['transfile']['tmp_name']) || !is_uploaded_file($_FILES['transfile']['tmp_name']))
+			self::NeedMoreInfo('Transaction file is required.');
+		$db = self::RequireLatestDatabase();
+		try {
+			$bankclass = self::LookupBank($acctid, $db);
+			self::Success($bankclass::ParseTransactions($_FILES['transfile']['name'], $_FILES['transfile']['tmp_name'], $acctid, $db));
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error parsing transaction file', $mse);
+		} finally {
+			unlink($_FILES['transfile']['tmp_name']);
+		}
+	}
+
+	/**
+	 * Save previewed transactions.
+	 */
+	protected static function POST_import(array $params): void {
+		$account = +array_shift($params);
+		if (!$account)
+			self::NeedMoreInfo('Account ID is required.');
+		if (!isset($_POST['transactions']) || !is_array($_POST['transactions']) || !count($_POST['transactions']))
+			self::NeedMoreInfo('No transactions to save.');
+
+		$newest = new stdClass();
+		$net = 0;
+		$db = self::RequireLatestDatabase();
+		try {
+			$db->begin_transaction();
+
+			$insert = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+			$insert->bind_param('issssdssss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip, $notes);
+			$newest->sortable = '';
+			foreach ($_POST['transactions'] as $trans) {
+				$trans = (object)$trans;
+				$extid = $trans->extid ?: null;
+				$transdate = $trans->transdate ?: null;
+				$posted = $trans->posted;
+				if ($posted > $newest->sortable)
+					$newest->sortable = $posted;
+				$name = $trans->name;
+				$amount = $trans->amount;
+				$city = $trans->city ?: null;
+				$state = $trans->state ?: null;
+				$zip = $trans->zip ?: null;
+				$notes = $trans->notes;
+				$insert->execute();
+				$net += $amount;
+			}
+			$insert->close();
+
+			$update = $db->prepare('update accounts set updated=unix_timestamp(now()), balance=balance+? where id=? limit 1');
+			$update->bind_param('di', $net, $account);
+			$update->execute();
+			$update->close();
+
+			$db->commit();
+			$newest->display = date('M jS', strtotime($newest->sortable));
+			self::Success($newest);
+		} catch (mysqli_sql_exception $mse) {
+			self::DatabaseError('Error importing transactions', $mse);
+		}
 	}
 
 	/**
 	 * Look up the class for the account's bank.
 	 * @param integer $acctid Account ID
-	 * @param abeAjax $ajax Ajax object for reporting an error.
 	 * @param mysqli $db Database connection object
 	 * @return string Class name for account's bank class
 	 */
-	private static function LookupBank(int $acctid, abeAjax $ajax, mysqli $db) {
-		$acct = 'select b.class from accounts as a left join banks as b on b.id=a.bank where a.id=\'' . +$acctid . '\' limit 1';
-		if ($acct = $db->query($acct))
-			if ($acct = $acct->fetch_object()) {
-				$acct = $acct->class;
-				require_once $acct . '.php';
-				return $acct;
-			} else
-				$ajax->Fail('Account not found.');
-		else
-			$ajax->Fail('Error looking up account:  ' . $db->errno . ' ' . $db->error);
-		return false;
+	private static function LookupBank(int $acctid, mysqli $db): string {
+		$select = $db->prepare('select b.class from accounts as a left join banks as b on b.id=a.bank where a.id=? limit 1');
+		$select->bind_param('i', $acctid);
+		$select->execute();
+		$select->bind_result($class);
+		if ($select->fetch()) {
+			$select->close();
+			require_once "$class.php";
+			return $class;
+		}
+		$select->close();
+		self::NotFound('Account not found.');
 	}
 }
 TransactionApi::Respond();

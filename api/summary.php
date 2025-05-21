@@ -42,7 +42,6 @@ class SummaryApi extends Api {
 
 	/**
 	 * Action to lookup yearly spending totals.
-	 * @param abeAjax $ajax Ajax object for returning data or reporting an error.
 	 */
 	protected static function GET_yearlyCategories() {
 		$db = self::RequireLatestDatabase();

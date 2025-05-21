@@ -65,8 +65,7 @@ export default {
 			preview.working = true;
 			const last = next + TransactionApi.MaxTransactions;
 			const transactions = preview.transactions.slice(next, last);
-			const net = next ? 0 : preview.net;  // only adjust net the first time
-			const promise = TransactionApi.Import(preview.acctid, transactions, net).then(newNewest => {
+			const promise = TransactionApi.Import(preview.acctid, transactions).then(newNewest => {
 				const newest = oldNewest && oldNewest.sortable > newNewest.sortable ? oldNewest : newNewest;
 				return last >= preview.transactions.length
 					? newest
