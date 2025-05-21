@@ -21,6 +21,7 @@ $gentlecorner: .25em;
 	src: local('Roboto'), local('Roboto-Regular'), url(Roboto-Regular.woff);
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
 @font-face {
 	font-family: roboto;
 	font-style: normal;
@@ -28,6 +29,7 @@ $gentlecorner: .25em;
 	src: local('Roboto Bold'), local('Roboto-Bold'), url(Roboto-Bold.woff);
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
 @font-face {
 	font-family: roboto;
 	font-style: italic;
@@ -35,61 +37,50 @@ $gentlecorner: .25em;
 	src: local('Roboto Italic'), local('Roboto-Italic'), url(Roboto-Italic.woff);
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
 @font-face {
 	font-family: fontawesome;
 	src: url(fontawesome-webfont.woff);
 }
-@-webkit-keyframes fa-spin {
-	0% {
-		-webkit-transform: rotate(0deg);
-		transform: rotate(0deg);
-	}
-	100% {
-		-webkit-transform: rotate(359deg);
-		transform: rotate(359deg);
-	}
-}
+
 @keyframes fa-spin {
 	0% {
-		-webkit-transform: rotate(0deg);
 		transform: rotate(0deg);
 	}
+
 	100% {
-		-webkit-transform: rotate(359deg);
 		transform: rotate(359deg);
 	}
 }
 
 %flex-container {
-	display: -webkit-flex;
 	display: flex;
 }
+
 %flex-container-center {
 	@extend %flex-container;
-	-webkit-align-items: center;
 	align-items: center;
 }
+
 %flex-container-baseline {
 	@extend %flex-container;
-	-webkit-align-items: baseline;
 	align-items: baseline;
 }
+
 %flex-container-vertical {
 	@extend %flex-container;
-	-webkit-flex-direction: column;
 	flex-direction: column;
 }
 
 %flex-item-fixed {
-	-webkit-flex: 0 0 auto;
 	flex: 0 0 auto;
 }
+
 %flex-item-grow {
-	-webkit-flex: 1 0 auto;
 	flex: 1 0 auto;
 }
+
 %flex-item-fill {
-	-webkit-flex: 1 1 auto;
 	flex: 1 1 auto;
 }
 
@@ -98,33 +89,41 @@ $gentlecorner: .25em;
 	display: inline-block;
 	font-weight: normal;
 }
+
 %fa-label {
 	@extend %fontawesome;
 	font-size: .9em;
 	color: $darkgrey;
 	margin-right: .5em;
 }
+
 %fa-replaced {
 	span {
 		display: none;
 	}
+
 	&:before {
 		@extend %fontawesome;
 	}
 }
+
 %icon-visa {
 	content: "\f1f0";
 }
+
 %icon-mastercard {
 	content: "\f1f1";
 }
+
 %icon-credit {
 	content: "\f283";
 }
+
 %icon-checking {
 	content: "\f0d6";
 	font-size: 1em;
 }
+
 %icon-savings {
 	content: "\f0b1";
 	font-size: 1.05em;

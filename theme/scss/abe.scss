@@ -28,7 +28,6 @@ dl {
 }
 
 *[draggable] {
-	cursor: -webkit-grab;
 	cursor: grab;
 }
 
@@ -104,7 +103,6 @@ button.add {
 .working:after {
 	@extend %fa-label;
 	content: "\f110";
-	-webkit-animation: fa-spin 1s infinite steps(8);
 	animation: fa-spin 1s infinite steps(8);
 }
 
@@ -142,17 +140,13 @@ button.add {
 
 @media (min-width: 35em) {
 	.tabbed {
-		display: -webkit-flex;
 		display: flex;
 
 		.tabs {
 			margin: 0 .5em 0 0;
 			padding: .75em 0 0 .5em;
-			-webkit-flex: 0 0 auto;
 			flex: 0 0 auto;
-			display: -webkit-flex;
 			display: flex;
-			-webkit-flex-direction: column;
 			flex-direction: column;
 			background-color: $green;
 			border-radius: 0 0 $gentlecorner;
@@ -182,7 +176,6 @@ button.add {
 		}
 
 		section:last-child {
-			-webkit-flex: 1 1 auto;
 			flex: 1 1 auto;
 		}
 	}
@@ -218,7 +211,6 @@ button.add {
 		color: #fff;
 		margin: .125em;
 		padding: .125em .25em;
-		-webkit-border-radius: $gentlecorner;
 		border-radius: $gentlecorner;
 
 		&.accounts:before,

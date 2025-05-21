@@ -1,71 +1,90 @@
 .transactions {
-	ol, ul {
+
+	ol,
+	ul {
 		list-style-type: none;
 		padding: 0;
 		margin: 0;
 	}
+
 	header {
 		text-align: right;
 		padding: .25em .5em 0;
 	}
+
 	li.transaction:not(.selected) {
 		background-color: $lightgreyblue;
 		margin: 1px 0;
 	}
+
 	.saveerror {
 		border-left: 7px solid $red;
 	}
+
 	.transaction {
 		@extend %flex-container;
 		padding: .25em .5em .5em;
+
 		div {
 			@extend %flex-item-fill;
 			@extend %ellipsis;
 		}
+
 		div.full {
 			overflow: visible;
 		}
+
 		div.amount {
 			@extend %flex-item-fixed;
 			margin-left: .75em;
 		}
 	}
-	li > .amount:after {
+
+	li>.amount:after {
 		@extend %fa-label;
 		margin-left: .25em;
 		margin-right: 0;
 	}
+
 	.accounts {
 		display: block;
+
 		.account {
 			display: block;
 			@extend %ellipsis;
 		}
 	}
+
 	.account:before {
 		@extend %fa-label;
 		margin-left: 0;
 	}
-	li.creditvisa > .amount:after,
+
+	li.creditvisa>.amount:after,
 	.account.creditvisa:before {
 		@extend %icon-visa;
 	}
-	li.creditmc > .amount:after,
+
+	li.creditmc>.amount:after,
 	.account.creditmc:before {
 		@extend %icon-mastercard;
 	}
-	li.credit > .amount:after,
+
+	li.credit>.amount:after,
 	.account.credit:before {
 		@extend %icon-credit;
 	}
-	li.checking > .amount:after,
+
+	li.checking>.amount:after,
 	.account.checking:before {
 		@extend %icon-checking;
 	}
-	li.savings > .amount:after,
+
+	li.savings>.amount:after,
 	.account.savings:before {
 		@extend %icon-savings;
 	}
+
 	.full {
 		padding: .25em .5em;
 		background-color: $lightgreyblue;
@@ -73,38 +92,47 @@
 		border-radius: $gentlecorner;
 		box-shadow: 2px 2px 2px $darkgrey;
 		margin-top: .125em;
-		.details > div,
-		.details > label {
+
+		.details>div,
+		.details>label {
 			margin: .25em 0;
 		}
 	}
-	.full > div {
+
+	.full>div {
 		padding: 0;
 	}
+
 	a.close {
 		@extend %fa-replaced;
+
 		&:before {
 			color: $red;
 			content: "\f00d";
 			margin-left: .25em;
 			padding: 0 .125em .07em;
 		}
+
 		&:hover:before {
 			background-color: $red;
 			color: #fff;
 			border-radius: $gentlecorner;
 		}
 	}
+
 	ol label {
 		@extend %flex-container-baseline;
 		margin: 0;
 	}
+
 	input {
 		@extend %flex-item-fill;
 		min-width: 0;
+
 		&.newcat {
 			background-color: $lightyellow;
 		}
+
 		&.catamount {
 			@extend %flex-item-fixed;
 			width: 5em;
@@ -112,6 +140,7 @@
 			text-align: right;
 		}
 	}
+
 	.category,
 	.account,
 	.transdate,
@@ -120,6 +149,7 @@
 	.location {
 		font-size: .85em;
 	}
+
 	.category:before,
 	.transdate:before,
 	.posted:before,
@@ -130,33 +160,42 @@
 		width: 1.125em;
 		text-align: center;
 	}
+
 	.category:before {
 		content: "\f02b";
 	}
+
 	.category.multi:before,
 	.category.all:before {
 		content: "\f02c";
 	}
-	div.quick > .category:before {
+
+	div.quick>.category:before {
 		margin-right: .25em;
 		width: auto;
 	}
+
 	.transdate:before {
 		content: "\f133";
 	}
+
 	.posted:before {
 		content: "\f274";
 		transform: translate(.04em);
 	}
+
 	.note:before {
 		content: "\f24a";
 	}
+
 	.location:before {
 		content: "\f041";
 	}
+
 	li.loading {
 		padding: .25em .5em;
 	}
+
 	.suggestions {
 		position: absolute;
 		margin-top: 1.45em;
@@ -166,60 +205,73 @@
 		box-shadow: 2px 2px 1px $darkgrey;
 		border-radius: 0 0 $gentlecorner $gentlecorner;
 		list-style-type: none;
+
 		ol {
 			margin: 0;
 			padding: 0;
 			list-style-type: none;
 		}
+
 		li {
 			background-color: #fff;
 			padding: .125em .5em .125em .25em;
 			margin: 1px;
 			font-size: 1em;
+
 			&.choice {
 				color: #000;
 				padding-left: 1em;
 			}
+
 			&.choice:hover,
 			&.kbcursor {
 				cursor: pointer;
 				background-color: $green;
 				color: #fff;
 			}
+
 			&.grouper {
 				font-style: italic;
 				color: $darkgrey;
 			}
+
 			em {
 				font-weight: bold;
 			}
+
 			&.choice em {
 				font-style: normal;
 			}
 		}
 	}
-	.suggestions > li:last-child > div:last-child,
-	.suggestions > li:last-child li:last-child > div:last-child {
+
+	.suggestions>li:last-child>div:last-child,
+	.suggestions>li:last-child li:last-child>div:last-child {
 		border-radius: 0 0 $gentlecorner $gentlecorner;
 	}
+
 	.subamounts {
 		@extend %flex-container;
 		justify-content: flex-end;
+
 		span {
 			margin: 0 .25em;
 			word-wrap: none;
+
 			&.active,
 			&.multiplier,
 			&.sum {
 				@extend %flex-container;
 				margin: 0;
 			}
+
 			&.active {
 				background-color: #fff;
 				border-radius: $gentlecorner;
 			}
 		}
 	}
+
 	#filters {
 		display: none;
 		position: absolute;
@@ -232,15 +284,16 @@
 		border-right: none;
 		border-radius: 0 0 0 $gentlecorner;
 		padding: 0 .25em .25em;
+
 		.category {
-			display: -webkit-inline-flex;
 			display: inline-flex;
-			-webkit-align-items: center;
 			align-items: center;
+
 			&:before {
 				margin-left: .25em;
 				margin-right: .25em;
 			}
+
 			a:before {
 				@extend %fontawesome;
 				content: "\f00d";
@@ -250,31 +303,38 @@
 				cursor: pointer;
 			}
 		}
+
 		input:not[type='checkbox'] {
 			display: block;
 			margin: .25em 0;
 			width: calc(100% - .5em);
 		}
+
 		.suggestions {
 			margin-top: -.6em;
 			margin-left: .9em;
 		}
+
 		label.date,
 		label.amount,
 		label.search {
 			@extend %flex-container-center;
+
 			span {
 				@extend %flex-item-fixed;
 				width: 3.75em;
 			}
+
 			input[type=number] {
 				text-align: right;
 			}
 		}
+
 		.calltoaction {
 			@extend %flex-container;
 			justify-content: space-around;
 			margin: 1em .125em .5em;
+
 			button {
 				margin: 0;
 			}
