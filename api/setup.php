@@ -146,7 +146,7 @@ class abeKeysDB {
 	/**
 	 * Run all applicable upgrade scripts to bring the database up to the current version.
 	 */
-	protected static function upgradeDatabaseAction(): void {
+	protected static function POST_upgradeDatabase(): void {
 		$db = self::RequireDatabaseWithConfig();
 		require_once 'version.php';
 		if ($db->StructureVersion < Version::Structure)
