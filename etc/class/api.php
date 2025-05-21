@@ -87,7 +87,7 @@ abstract class Api {
 	 * @param string $message short message describing what's missing and how to provide it.
 	 */
 	protected static function NeedMoreInfo(string $message) {
-		http_response_code(422);
+		header($_SERVER['SERVER_PROTOCOL'] . ' 422 Unprocessable Content');
 		header('Content-Type: text/plain');
 		die($message);
 	}
@@ -109,7 +109,7 @@ abstract class Api {
 	 * @param string $message Error message to report.
 	 */
 	private static function RedirectToSetup(string $message) {
-		header($_SERVER['SERVER_PROTOCOL'] . ' 533 Setup Required');  // this response code is not in the HTTP spec
+		header($_SERVER['SERVER_PROTOCOL'] . ' 533 Setup Required');  // custom status code for abe
 		header('Content-Type: text/plain');
 		header('X-Setup-Location: setup.html');
 		die($message);
