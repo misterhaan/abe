@@ -91,6 +91,7 @@ class abeKeysDB {
 			$rdb->set_charset('utf8mb4');
 			$rdb->real_query('create database if not exists `' . $rdb->escape_string(abeKeysDB::NAME) . '` character set utf8mb4 collate utf8mb4_unicode_ci');
 			$rdb->real_query('grant all on `' . $rdb->escape_string(abeKeysDB::NAME) . '`.* to \'' . $rdb->escape_string(abeKeysDB::USER) . '\'@\'localhost\' identified by \'' . $rdb->escape_string(abeKeysDB::PASS) . '\'');
+			self::Success();
 		} catch (mysqli_sql_exception $mse) {
 			self::DatabaseError('Error creating database', $mse);
 		}
@@ -153,6 +154,7 @@ class abeKeysDB {
 			self::UpgradeDatabaseStructure($db);
 		if ($db->DataVersion < Version::Data)
 			self::UpgradeDatabaseData($db);
+		self::Success();
 	}
 
 	/**
