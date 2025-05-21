@@ -21,7 +21,7 @@ class Version {
 	 * update mode.
 	 * @var integer
 	 */
-	const Data = abeDataVersion::CapitalOne;
+	const Data = DataVersion::CapitalOne;
 }
 
 /**
@@ -48,7 +48,7 @@ class StructureVersion {
  * InstallDatabase() and UpgradeDatabaseData() in setup.php.
  * @author misterhaan
  */
-class abeDataVersion {
+class DataVersion {
 	const CapitalOne = 3;
 	const UsBank = 2;
 	const Initial = 1;

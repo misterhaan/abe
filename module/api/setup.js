@@ -4,7 +4,7 @@ const urlbase = "api/setup/";
 
 export default class SetupApi extends ApiBase {
 	static Level() {
-		return super.GET(urlbase + "level", result => result.level);
+		return super.GET(urlbase + "level");
 	}
 	static ConfigureDatabase(host, name, user, pass) {
 		return super.POST(urlbase + "configureDatabase", {
@@ -12,15 +12,15 @@ export default class SetupApi extends ApiBase {
 			name: name,
 			user: user,
 			pass: pass
-		}, () => true);
+		});
 	}
 	static CreateDatabase(rootpw) {
-		return super.POST(urlbase + "createDatabase", { rootpw: rootpw }, () => true);
+		return super.POST(urlbase + "createDatabase", { rootpw: rootpw });
 	}
 	static InstallDatabase() {
-		return super.POST(urlbase + "installDatabase", {}, () => true);
+		return super.POST(urlbase + "installDatabase");
 	}
 	static UpgradeDatabase() {
-		return super.POST(urlbase + "upgradeDatabase", {}, () => true);
+		return super.POST(urlbase + "upgradeDatabase");
 	}
 };

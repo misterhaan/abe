@@ -1,14 +1,11 @@
 export default class ApiBase {
-	// TODO:  remove successTransform parameters once api conversion finishes
 	static GET(url, data) {
-		if(data && typeof data === "function")
-			return ajax("GET", url, {}, data);
 		return ajax("GET", url, data);
 	}
-	static POST(url, data, successTransform) {
-		return ajax("POST", url, data, successTransform);
+	static POST(url, data) {
+		return ajax("POST", url, data);
 	}
-	static POSTwithFile(url, data, successTransform) {
+	static POSTwithFile(url, data) {
 		return $.ajax({
 			method: "POST",
 			url: url,
@@ -17,8 +14,6 @@ export default class ApiBase {
 			contentType: false,
 			processData: false,
 			dataType: "json"
-		}).then(result => {
-			return handleOldRedirect(result, successTransform);
 		}).fail(request => {
 			handleError(request, url);
 		});
@@ -34,27 +29,15 @@ export default class ApiBase {
 	}
 };
 
-function ajax(method, url, data, successTransform) {
+function ajax(method, url, data) {
 	return $.ajax({
 		method: method,
 		url: url,
 		data: data || {},
 		dataType: "json"
-	}).then(result => {
-		return handleOldRedirect(result, successTransform);
 	}).fail(request => {
 		handleError(request, url);
 	});
-}
-
-function handleOldRedirect(result, successTransform) {
-	// TODO:  remove entire function after api conversion finishes
-	if(result.fail) {
-		if(result.redirect)
-			location = result.redirect;
-		throw new Error(result.message);  // needs to throw on this thread so it doesn't hit the done (success) handler
-	} else
-		return successTransform ? successTransform(result) : result;
 }
 
 function handleError(request, url) {
@@ -68,10 +51,6 @@ function handleError(request, url) {
 
 function throwAsync(request, url) {
 	setTimeout(() => {
-		// TODO:  remove Error case after api conversion finishes
-		if(request instanceof Error)
-			throw request;
-		else if(request.status)
-			throw new Error(request.status + " " + (request.responseText || request.statusText) + " from " + url);
+		throw new Error(request.status + " " + (request.responseText || request.statusText) + " from " + url);
 	});
 }
