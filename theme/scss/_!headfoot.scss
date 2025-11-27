@@ -5,8 +5,8 @@
 	min-height: 100vh;
 }
 
-body > header,
-#abe > header {
+body>header,
+#abe>header {
 	background-color: $green;
 	color: #fff;
 	@extend %flex-container-center;
@@ -26,6 +26,7 @@ body > header,
 			}
 		}
 	}
+
 	.actions {
 		@extend %flex-item-fixed;
 
@@ -39,21 +40,27 @@ body > header,
 				content: "\f29c";
 			}
 		}
+
 		a.add:before {
 			content: "\f067";
 		}
+
 		a.addAlt:before {
 			content: "\f0fe";
 		}
+
 		a.bookmark:before {
 			content: "\f02e";
 		}
+
 		a.filter:before {
 			content: "\f05b";
 		}
+
 		a.import:before {
 			content: "\f093";
 		}
+
 		a.month:before {
 			content: "\f073";
 		}
@@ -75,7 +82,6 @@ h1 {
 }
 
 #newBookmark {
-	display: none;
 	position: absolute;
 	width: 14.25em;
 	z-index: 1;
@@ -88,6 +94,7 @@ h1 {
 	border-right: none;
 	border-radius: 0 0 0 $gentlecorner;
 	padding: 0 .25em .25em;
+
 	input {
 		display: block;
 		margin: .25em 0;
@@ -95,19 +102,21 @@ h1 {
 	}
 }
 
-#abe > footer {
+#abe>footer {
 	@extend %flex-container;
 	margin: auto .5em .25em;
 	padding-top: 1em;
 	font-size: .8em;
+
 	#errorToast {
 		bottom: 2em;
 		border: 3px solid $red;
 		border-left: none;
-		background: linear-gradient(90deg, $red 1.85em, #fff 1.85em);  // makes the red behind the icon look like it goes all the way down
+		background: linear-gradient(90deg, $red 1.85em, #fff 1.85em); // makes the red behind the icon look like it goes all the way down
 		border-radius: $gentlecorner;
 		padding: .125em .25em;
 		@extend %flex-container-baseline;
+
 		&:before {
 			@extend %fontawesome;
 			color: #fff;
@@ -117,28 +126,34 @@ h1 {
 			margin: -.125em .375em -.125em -.25em;
 			padding: .125em .5em;
 		}
+
 		a {
 			color: $darkgrey;
+
 			&:hover {
 				color: $red;
 			}
 		}
 	}
+
 	div.errors {
 		bottom: 1.3em;
 		border: 3px solid $red;
 		border-top: none;
 		border-radius: $gentlecorner $gentlecorner $gentlecorner 0;
 		background-color: #fff;
+
 		header {
 			@extend %flex-container-baseline;
 			padding: 0 .25em;
 			background-color: $red;
 			color: #fff;
+
 			a {
 				color: #fff;
 			}
 		}
+
 		ol {
 			list-style-type: none;
 			margin: 0;
@@ -146,40 +161,50 @@ h1 {
 			max-height: calc(100vh - 3.5em);
 			overflow-y: auto;
 		}
+
 		li {
 			@extend %flex-container-baseline;
 			padding: .125em .25em;
+
 			&:not(:first-child) {
 				border-top: 1px solid $red;
 			}
+
 			a {
 				color: $darkgrey;
+
 				&:hover {
 					color: $red;
 				}
 			}
 		}
 	}
+
 	#errorToast,
 	div.errors {
 		position: fixed;
 		margin-right: .5em;
+
 		a {
 			@extend %fa-replaced;
 			@extend %flex-item-fixed;
+
 			&:first-child {
 				margin-left: auto;
 			}
+
 			&.minimize:before {
 				content: "\f2d1";
 				padding: 0 .25em;
 			}
+
 			&.close:before {
 				content: "\f00d";
 				padding-left: .25em;
 			}
 		}
 	}
+
 	a.errors {
 		position: fixed;
 		bottom: .25em;
@@ -188,6 +213,7 @@ h1 {
 		background-color: $red;
 		border-radius: $gentlecorner;
 		padding: 0 .25em;
+
 		&:before {
 			@extend %fontawesome;
 			content: "\f06a";

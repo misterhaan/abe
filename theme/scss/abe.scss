@@ -99,6 +99,33 @@ button.add {
 	}
 }
 
+.slide-enter-from,
+.slide-leave-to {
+	height: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+	transition: all 300ms ease;
+	overflow-y: hidden;
+}
+
+#newBookmark {
+
+	&.slide-enter-to,
+	&.slide-leave-from {
+		height: 200px;
+	}
+}
+
+#filters {
+
+	&.slide-enter-to,
+	&.slide-leave-from {
+		height: 400px;
+	}
+}
+
 .loading:before,
 .working:after {
 	@extend %fa-label;

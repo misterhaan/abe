@@ -1,5 +1,4 @@
 import Views from "../views.js";
-import SlideVisible from "../slideVisible.js";
 import BookmarkApi from "../api/bookmark.js";
 
 export default {
@@ -52,9 +51,6 @@ export default {
 				throw new Error("Bookmark title is required.");
 		}
 	},
-	directives: {
-		slideVisible: SlideVisible
-	},
 	template: /*html*/ `
 		<header>
 			<span class=back>
@@ -65,19 +61,21 @@ export default {
 				<a v-for="action in actions" :class=action.class :href=action.url @click.prevent=action.action :title=action.tooltip><span>{{action.text}}</span></a>
 			</span>
 			<h1>{{titlePrefix}} {{view.Title}}</h1>
-			<div id=newBookmark v-slideVisible=showAddBookmark @keydown.esc=ToggleBookmark>
-				<label>
-					<span>Title:</span>
-					<input required maxlength=60 v-model=bookmarkName>
-				</label>
-				<label>
-					<span>Page:</span>
-					<input readonly maxlength=146 :value="'#' + bookmarkUrl">
-				</label>
-				<div class=calltoaction>
-					<button id=saveBookmark @click.prevent=AddBookmark>Save</button><a href=#cancelBookmark title="Close the bookmark window" @click.prevent=ToggleBookmark>Cancel</a>
+			<Transition name=slide>
+				<div id=newBookmark v-if=showAddBookmark @keydown.esc=ToggleBookmark>
+					<label>
+						<span>Title:</span>
+						<input required maxlength=60 v-model=bookmarkName>
+					</label>
+					<label>
+						<span>Page:</span>
+						<input readonly maxlength=146 :value="'#' + bookmarkUrl">
+					</label>
+					<div class=calltoaction>
+						<button id=saveBookmark @click.prevent=AddBookmark>Save</button><a href=#cancelBookmark title="Close the bookmark window" @click.prevent=ToggleBookmark>Cancel</a>
+					</div>
 				</div>
-			</div>
+			</Transition>
 		</header>
 `
 }
