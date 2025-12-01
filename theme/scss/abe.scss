@@ -126,6 +126,28 @@ button.add {
 	}
 }
 
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.fade-enter-active {
+	transition: all 300ms ease;
+}
+
+.fade-leave-active {
+	transition: all 1600ms ease;
+
+	&.closing {
+		transition: none;
+	}
+}
+
+.fade-enter-to,
+.fade-leave-from {
+	opacity: 1;
+}
+
 .loading:before,
 .working:after {
 	@extend %fa-label;
