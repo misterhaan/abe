@@ -33,43 +33,49 @@ export default {
 			return "";
 		},
 		FreezeTableHeaders() {
-			const div = $("#spendmonthcat > div");
-			div.animate({ scrollLeft: 0 }, 250);
-			const width = div.find("thead tr td")[0].getBoundingClientRect().width + "px";
-			const height = div.find("thead tr td")[0].getBoundingClientRect().height + "px";
-			div.find("header").remove();
-			const scroll = { top: div.scrollTop(), left: div.scrollLeft() };
-			const top = $("<header class=top>")
-				.css({ top: scroll.top, left: width, height: height });
-			const left = $("<header class=left>")
-				.css({ top: height, left: scroll.left, width: width });
-			const corner = $("<header class=corner>")
-				.css({ top: scroll.top, left: scroll.left, width: width, height: height });
+			const div = document.querySelector("#spendmonthcat > div");
+			const width = div.querySelector("thead tr td").getBoundingClientRect().width + "px";
+			const height = div.querySelector("thead tr td").getBoundingClientRect().height + "px";
+			div.querySelectorAll("header").forEach(h => h.remove());
+			const scroll = { top: div.scrollTop, left: div.scrollLeft };
+			const top = document.createElement("header");
+			top.className = "top";
+			Object.assign(top.style, { top: scroll.top, left: width, height: height });
+			const left = document.createElement("header");
+			left.className = "left";
+			Object.assign(left.style, { top: height, left: scroll.left, width: width });
+			const corner = document.createElement("header");
+			corner.className = "corner";
+			Object.assign(corner.style, { top: scroll.top, left: scroll.left, width: width, height: height });
 			div.append(top);
 			div.append(left);
 			div.append(corner);
-			div.find("thead th").each(function() {
-				top.append($("<div class=h>").text($(this).text()).css("width", $(this).width() + "px"));
+			div.querySelectorAll("thead th").forEach(th => {
+				const h = document.createElement("div");
+				h.className = "h";
+				h.innerText = th.innerText;
+				h.style.width = th.width + "px";
+				top.append(h);
 			});
-			div.find("tbody th").each(function() {
-				var h = $("<div class=h>").text($(this).text());
-				if($(this).parent().hasClass("total"))
-					h.addClass("total");
-				if($(this).parent().hasClass("group"))
-					h.addClass("group");
-				if($(this).parent().hasClass("subcat"))
-					h.addClass("subcat");
+			div.querySelectorAll("tbody th").forEach(th => {
+				const h = document.createElement("div");
+				h.className = "h";
+				h.innerText = th.innerText;
+				if(th.parentElement.classList.contains("total"))
+					h.classList.add("total");
+				if(th.parentElement.classList.contains("group"))
+					h.classList.add("group");
+				if(th.parentElement.classList.contains("subcat"))
+					h.classList.add("subcat");
 				left.append(h);
 			});
-			// scroll table to right on first load
-			if(!div[0].initialized) {
-				div.scroll(TableScroll);
-				div.animate({ scrollLeft: div.find("table").width() }, 250);
-				div[0].initialized = true;
+			if(!div.initialized) {
+				div.addEventListener("scroll", TableScroll);
+				div.initialized = true;
 			} else
 				// when the contents change it scrolls all the way left, so scroll back to where it was
 				setTimeout(function() {
-					div.scrollLeft(scroll.left);
+					div.scrollTo({ left: scroll.left });
 				}, 250);
 		}
 	},
@@ -108,8 +114,8 @@ export default {
 };
 
 function TableScroll() {
-	const s = { top: $(this).scrollTop(), left: $(this).scrollLeft() };
-	$(this).find("header.top").css("top", s.top);
-	$(this).find("header.left").css("left", s.left);
-	$(this).find("header.corner").css(s);
+	const s = { top: this.scrollTop + "px", left: this.scrollLeft + "px" };
+	this.querySelector("header.top").style.top = s.top;
+	this.querySelector("header.left").style.left = s.left;
+	Object.assign(this.querySelector("header.corner").style, s);
 }

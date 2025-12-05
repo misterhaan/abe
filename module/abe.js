@@ -1,4 +1,4 @@
-import { createApp } from "../external/vue.esm-browser.prod.js";
+import { createApp } from "vue";
 import AppName from "./appname.js";
 import Views from "./views.js";
 import TitleBar from "./component/titlebar.js";
@@ -42,7 +42,7 @@ createApp({
 	},
 	created() {
 		this.ParseHash();
-		$(window).on("hashchange", this.ParseHash);
+		window.addEventListener("hashchange", this.ParseHash);
 	},
 	methods: {
 		ParseHash() {

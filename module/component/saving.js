@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import FundApi from "../api/fund.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import DragDrop from "../dragDrop.js";
@@ -9,12 +10,7 @@ export default {
 			editFund: false
 		};
 	},
-	created() {
-		FundApi.List().done(funds => {
-			this.funds = funds;
-			if(!this.funds.length)
-				this.Add();
-		});
+	async created() {
 		this.$emit("add-action", {
 			action: this.Add,
 			url: "#saving!add",
@@ -22,13 +18,16 @@ export default {
 			text: "+",
 			tooltip: "Add a new savings fund"
 		});
+		this.funds = await FundApi.List();
+		if(!this.funds.length)
+			this.Add();
 	},
 	mixins: [FilterAmountKeys],
 	methods: {
 		IsActive(fund) {
 			return fund.Balance > 0 || fund.Target > 0;
 		},
-		Add() {
+		async Add() {
 			if(this.CheckSaveOpen()) {
 				let index = 0;
 				while(index < this.funds.length && (this.funds[index].Balance > 0 || this.funds[index].Target > 0))
@@ -43,9 +42,11 @@ export default {
 				};
 				this.funds.splice(index, 0, newFund);
 				this.editFund = newFund;
-				setTimeout(() => $("input.name").focus());
+				await nextTick();
+				document.querySelector("input.name").focus();
 			} else if(this.editFund && this.editFund.ID == -1) {
-				setTimeout(() => $("input.name").focus());
+				await nextTick();
+				document.querySelector("input.name").focus();
 			} else
 				alert("Finish editing " + (this.editFund.Name || "(unnamed)") + " before creating a new savings fund.");
 		},
@@ -57,7 +58,7 @@ export default {
 			this.Save();
 			return true;
 		},
-		Edit(fund) {
+		async Edit(fund) {
 			if(this.editFund != fund && this.CheckSaveOpen()) {
 				this.editFund = fund;
 				fund.clean = fund.clean || {
@@ -65,7 +66,8 @@ export default {
 					Balance: fund.Balance,
 					Target: fund.Target
 				};
-				setTimeout(() => $("input.balance").focus());
+				await nextTick();
+				document.querySelector("input.balance").focus();
 			}
 		},
 		Revert() {
@@ -82,7 +84,7 @@ export default {
 			} else
 				throw new Error("Attempted to discard changes when nothing was being edited.");
 		},
-		Save() {
+		async Save() {
 			if(this.editFund) {
 				const fund = this.editFund;
 				fund.Balance = +fund.Balance;
@@ -91,29 +93,32 @@ export default {
 				fund.TargetDisplay = fund.Target.toFixed(2);
 				this.editFund = false;
 				if(fund.ID == -1)
-					FundApi.Add(fund.Name, fund.Balance, fund.Target).done(update => {
+					try {
+						const update = await FundApi.Add(fund.Name, fund.Balance, fund.Target);
 						fund.ID = update.ID;
 						fund.BalanceDisplay = update.BalanceDisplay;
 						fund.TargetDisplay = update.TargetDisplay;
-					}).fail(() => {
+					} catch {
 						Edit(fund);
-					});
+					}
 				else
-					FundApi.Save(fund.ID, fund.Name, fund.Balance, fund.Target).done(update => {
+					try {
+						const update = await FundApi.Save(fund.ID, fund.Name, fund.Balance, fund.Target);
 						fund.BalanceDisplay = update.BalanceDisplay;
 						fund.TargetDisplay = update.TargetDisplay;
-					}).fail(() => {
-						Edit(fund);
-					});
+					} catch {
+						this.Edit(fund);
+					}
 			} else
 				throw new Error("Attempted to save changes when nothing was being edited.");
 		},
-		Deactivate() {
+		async Deactivate() {
 			if(this.editFund)
 				if(this.editFund.ID != -1) {
 					const fund = this.editFund;
 					this.editFund = false;
-					FundApi.Close(fund.ID).done(() => {
+					try {
+						await FundApi.Close(fund.ID);
 						const oldIndex = this.funds.indexOf(fund);
 						let newIndex = 0;
 						while(newIndex < this.funds.length - 1 && this.IsActive(this.funds[newIndex + 1]))
@@ -123,41 +128,38 @@ export default {
 						delete fund.clean;
 						if(oldIndex < newIndex)
 							this.funds.splice(newIndex, 0, this.funds.splice(oldIndex, 1)[0]);
-					}).fail(() => {
+					} catch {
 						Edit(fund);
-					});
+					}
 				} else
 					throw new Error("Attempted to close a fund that hasn’t been saved yet.");
 			else
 				throw new Error("Attempted to close a fund when nothing was being edited.");
 		},
-		MoveUp(fund, index) {
+		async MoveUp(fund, index) {
 			if(index > 0)
-				if(this.IsActive(fund) || !this.IsActive(this.funds[index - 1]))
-					FundApi.MoveUp(fund.ID).done(() => {
-						this.funds[index] = this.funds.splice(index - 1, 1, fund)[0];
-					});
-				else
+				if(this.IsActive(fund) || !this.IsActive(this.funds[index - 1])) {
+					await FundApi.MoveUp(fund.ID);
+					this.funds[index] = this.funds.splice(index - 1, 1, fund)[0];
+				} else
 					throw new Error("Attempted to move inactive fund ahead of an active fund.");
 			else
 				throw new Error("Attempted to move fund up when it is already first.");
 		},
-		MoveDown(fund, index) {
+		async MoveDown(fund, index) {
 			if(index < this.funds.length - 1)
-				if(!this.IsActive(fund) || this.IsActive(this.funds[index + 1]))
-					FundApi.MoveDown(fund.ID).done(() => {
-						this.funds[index] = this.funds.splice(index + 1, 1, fund)[0];
-					});
-				else
+				if(!this.IsActive(fund) || this.IsActive(this.funds[index + 1])) {
+					await FundApi.MoveDown(fund.ID);
+					this.funds[index] = this.funds.splice(index + 1, 1, fund)[0];
+				} else
 					throw new Error("Attempted to move active fund below an inactive fund.");
 			else
 				throw new Error("Attempted to move fund down when it is already last.");
 		},
-		MoveFund(movingFund, beforeFund) {
+		async MoveFund(movingFund, beforeFund) {
 			if(movingFund && beforeFund && movingFund != beforeFund && this.IsActive(movingFund) == this.IsActive(beforeFund)) {
-				FundApi.MoveTo(movingFund.ID, beforeFund.ID).done(() => {
-					this.funds.splice(this.funds.indexOf(beforeFund), 0, this.funds.splice(this.funds.indexOf(movingFund), 1)[0]);
-				});
+				await FundApi.MoveTo(movingFund.ID, beforeFund.ID);
+				this.funds.splice(this.funds.indexOf(beforeFund), 0, this.funds.splice(this.funds.indexOf(movingFund), 1)[0]);
 			}
 		}
 	},

@@ -2,65 +2,62 @@ const DragDrop = {
 	Data: false,
 	Type: false,
 	Draggable: {
-		created(el, bind) {
-			const element = $(el);
-			element.attr("draggable", bind.value.disabled ? null : "true");
-			element.data("dragData", bind.value.data);
-			element.data("dragType", bind.value.type);
-			element.data("dragName", bind.value.name);
-			element.on("dragstart", event => {
-				element.addClass("dragging");
-				DragDrop.Data = element.data("dragData");
-				DragDrop.Type = element.data("dragType");
-				event.originalEvent.dataTransfer.effectAllowed = "move";
-				event.originalEvent.dataTransfer.setData("text/plain", element.data("dragName"));
+		created(element, bind) {
+			element.draggable = bind.value.disabled ? null : "true";
+			element.dragData = bind.value.data;
+			element.dataset.dragType = bind.value.type;
+			element.dataset.dragName = bind.value.name;
+			element.addEventListener("dragstart", event => {
+				element.classList.add("dragging");
+				DragDrop.Data = element.dragData;
+				DragDrop.Type = element.dataset.dragType;
+				event.dataTransfer.effectAllowed = "move";
+				event.dataTransfer.setData("text/plain", element.dataset.dragName);
 			});
-			element.on("dragend", () => {
-				element.removeClass("dragging");
+			element.addEventListener("dragend", () => {
+				element.classList.remove("dragging");
 			});
 		},
-		updated(el, bind) {
-			const element = $(el);
-			element.attr("draggable", bind.value.disabled ? null : "true");
-			element.data("dragData", bind.value.data);
-			element.data("dragType", bind.value.type);
-			element.data("dragName", bind.value.name);
+		updated(element, bind) {
+			element.draggable = bind.value.disabled ? null : "true";
+			element.dragData = bind.value.data;
+			element.dataset.dragType = bind.value.type;
+			element.dataset.dragName = bind.value.name;
 		}
 	},
 	DropTarget: {
-		created(el, bind) {
-			const element = $(el);
+		created(element, bind) {
 			let dragLevel = 0;
-			element.data("dropData", bind.value.data);
-			element.data("dropType", bind.value.type);
-			element.on("dragover", event => {
+			element.dropData = bind.value.data;
+			element.dataset.dropType = bind.value.type;
+			element.addEventListener("dragover", event => {
 				event.preventDefault();
-				if(element.data("dropData") != DragDrop.Data && element.data("dropType") == DragDrop.Type)
-					event.originalEvent.dataTransfer.dropEffect = "move";
+				if(element.dropData != DragDrop.Data && element.dataset.dropType == DragDrop.Type && event.dataTransfer)
+					event.dataTransfer.dropEffect = "move";
 			});
-			element.on("dragenter", () => {
-				if(element.data("dropData") != DragDrop.Data && element.data("dropType") == DragDrop.Type) {
+			element.addEventListener("dragenter", () => {
+				if(element.dropData != DragDrop.Data && element.dataset.dropType == DragDrop.Type) {
 					dragLevel++;
-					element.addClass("droptarget");
+					element.classList.add("droptarget");
 				}
 			});
-			element.on("dragleave", () => {
-				if(element.data("dropData") != DragDrop.Data && element.data("dropType") == DragDrop.Type && !--dragLevel)
-					element.removeClass("droptarget");
+			element.addEventListener("dragleave", () => {
+				if(element.dropData != DragDrop.Data && element.dataset.dropType == DragDrop.Type && !--dragLevel)
+					element.classList.remove("droptarget");
 			});
-			element.on("drop", event => {
-				if(element.data("dropData") != DragDrop.Data && element.data("dropType") == DragDrop.Type) {
+			element.addEventListener("drop", event => {
+				if(element.dropData != DragDrop.Data && element.dataset.dropType == DragDrop.Type) {
 					dragLevel = 0;
-					element.removeClass("droptarget");
-					bind.value.onDrop(DragDrop.Data, element.data("dropData"));
+					element.classList.remove("droptarget");
+					bind.value.onDrop(DragDrop.Data, element.dropData);
 				}
 				event.stopPropagation();
 				event.preventDefault();
 			});
 		},
-		updated(el, bind) {
-			$(el).data("dropData", bind.value.data);
-			$(el).data("dropType", bind.value.type);
+		updated(element, bind) {
+			element.dropData = bind.value.data;
+			element.dataset.dropType = bind.value.type;
 		}
 	}
 };

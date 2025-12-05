@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import CategoryGroupApi from "../api/categoryGroup.js";
 import CategoryApi from "../api/category.js";
 import DragDrop from "../dragDrop.js";
@@ -15,16 +16,7 @@ export default {
 			loading: true
 		};
 	},
-	created() {
-		CategoryGroupApi.List().done(groups => {
-			this.groups = groups;
-			if(this.groups.length)
-				this.selected = this.groups[0];
-			else
-				this.AddGroup();
-		}).always(() => {
-			this.loading = false;
-		});
+	async created() {
 		this.$emit("add-action", {
 			action: this.AddGroup,
 			url: "#settings/categories!addGroup",
@@ -39,6 +31,15 @@ export default {
 			text: "+",
 			tooltip: "Add a new category"
 		});
+		try {
+			this.groups = await CategoryGroupApi.List();
+			if(this.groups.length)
+				this.selected = this.groups[0];
+			else
+				this.AddGroup();
+		} finally {
+			this.loading = false;
+		}
 	},
 	methods: {
 		Select(group) {
@@ -53,7 +54,7 @@ export default {
 				this.selected = group;
 			}
 		},
-		Edit(item) {
+		async Edit(item) {
 			if(item.ID) {
 				if(this.editing && this.editing != item)
 					if(this.editing == this.selected)
@@ -61,7 +62,8 @@ export default {
 					else
 						this.SaveCategory();
 				this.editing = item;
-				setTimeout(() => $("input.name").focus());
+				await nextTick();
+				document.querySelector("input.name").focus();
 			}
 		},
 		AddGroup() {
@@ -84,30 +86,31 @@ export default {
 				this.Edit(newGroup);
 			}
 		},
-		SaveGroup() {
+		async SaveGroup() {
 			if(this.editing && this.selected == this.editing)
 				if(this.editing.Name = this.editing.Name.trim()) {
 					this.working = this.editing;
 					this.editing = false;
 					if(this.working.ID == Unsaved)
-						CategoryGroupApi.Add(this.working.Name).done(id => {
-							this.working.ID = id;
+						try {
+							this.working.ID = await CategoryGroupApi.Add(this.working.Name);
 							this.groups.sort(CompareGroup);
-						}).always(() => {
+						} finally {
 							this.working = false;
-						});
+						}
 					else
-						CategoryGroupApi.Rename(this.working.ID, this.working.Name).done(() => {
+						try {
+							await CategoryGroupApi.Rename(this.working.ID, this.working.Name);
 							this.groups.sort(CompareGroup);
-						}).always(() => {
+						} finally {
 							this.working = false;
-						});
+						}
 				} else {
 					alert("Category groups must have a name.");
-					$("input.name").focus();
+					document.querySelector("input.name").focus();
 				}
 		},
-		DeleteGroup() {
+		async DeleteGroup() {
 			if(this.editing && this.selected == this.editing && !this.editing.Categories.length) {
 				this.working = this.editing;
 				this.editing = false;
@@ -118,24 +121,26 @@ export default {
 					this.groups.splice(index, 1);
 					this.working = false;
 				} else
-					CategoryGroupApi.Delete(this.working.ID).done(() => {
+					try {
+						await CategoryGroupApi.Delete(this.working.ID);
 						this.groups.splice(index, 1);
-					}).always(() => {
+					} finally {
 						this.working = false;
-					});
+					}
 			}
 		},
-		MoveCategory(category, group) {
+		async MoveCategory(category, group) {
 			if(category != this.selected && !this.editing && !this.working) {
 				const currentGroup = this.selected;
 				this.working = category;
-				CategoryApi.Move(category.ID, group.ID).done(() => {
+				try {
+					await CategoryApi.Move(category.ID, group.ID);
 					currentGroup.Categories.splice(currentGroup.Categories.indexOf(category), 1);
 					group.Categories.push(category);
 					group.Categories.sort(CompareCategory);
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			}
 		},
 		AddCategory() {
@@ -156,40 +161,42 @@ export default {
 				this.Edit(newCategory);
 			}
 		},
-		SaveCategory() {
+		async SaveCategory() {
 			if(this.editing)
 				if(this.editing.Name = this.editing.Name.trim()) {
 					const group = this.selected;
 					this.working = this.editing;
 					this.editing = false;
 					if(this.working.ID == Unsaved)
-						CategoryApi.Add(this.working.Name, group.ID).done(id => {
-							this.working.ID = id;
+						try {
+							this.working.ID = await CategoryApi.Add(this.working.Name, group.ID);
 							group.Categories.sort(CompareCategory);
-						}).always(() => {
+						} finally {
 							this.working = false;
-						});
+						}
 					else
-						CategoryApi.Rename(this.working.ID, this.working.Name).done(() => {
+						try {
+							await CategoryApi.Rename(this.working.ID, this.working.Name);
 							group.Categories.sort(CompareCategory);
-						}).always(() => {
+						} finally {
 							this.working = false;
-						});
+						}
 				} else {
 					alert("Categories must have a name.");
-					$("input.name").focus();
+					document.querySelector("input.name").focus();
 				}
 		},
-		DeleteCategory() {
+		async DeleteCategory() {
 			if(this.editing) {
 				const group = this.selected;
 				this.working = this.editing;
 				this.editing = false;
-				CategoryApi.Delete(this.working.ID).done(() => {
+				try {
+					await CategoryApi.Delete(this.working.ID);
 					group.Categories.splice(group.Categories.indexOf(this.working), 1);
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			}
 		}
 	},

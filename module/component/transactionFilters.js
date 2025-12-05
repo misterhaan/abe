@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import AccountApi from "../api/account.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 import T from "../transactionShared.js";
@@ -57,13 +58,12 @@ export default {
 			return groups;
 		}
 	},
-	created() {
-		AccountApi.List().done(accounts => {
-			this.accounts = accounts.map(a => {
-				return { id: a.ID, name: a.Name, typeClass: a.Type.Class };
-			});
-			this.accounts.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+	async created() {
+		const accounts = await AccountApi.List();
+		this.accounts = accounts.map(a => {
+			return { id: a.ID, name: a.Name, typeClass: a.Type.Class };
 		});
+		this.accounts.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 		this.Reset();
 		this.GetDates();
 		setInterval(this.GetDates, DateCheckInterval);
@@ -72,9 +72,11 @@ export default {
 		params() {
 			this.Reset();
 		},
-		visible(visible) {
-			if(visible)
-				setTimeout(() => $("label.search").focus());
+		async visible(visible) {
+			if(visible) {
+				await nextTick();
+				document.querySelector("label.search").focus();
+			}
 		},
 		catsLoaded(loaded) {
 			if(loaded)

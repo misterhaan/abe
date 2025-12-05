@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import AccountApi from "../api/account.js";
 import TransactionApi from "../api/transaction.js";
 
@@ -14,9 +15,9 @@ export default {
 			uploading: false
 		};
 	},
-	created() {
-		AccountApi.List(true).done(accounts => {
-			this.accounts = accounts;
+	async created() {
+		try {
+			this.accounts = await AccountApi.List(true);
 			this.SortAccounts();
 			if(this.params.acct)
 				this.selected = this.accounts.find(a => {
@@ -24,9 +25,9 @@ export default {
 				});
 			if(!this.selected && this.accounts.length)
 				this.selected = this.accounts[0];
-		}).always(() => {
+		} finally {
 			this.loading = false;
-		});
+		}
 	},
 	methods: {
 		SortAccounts() {
@@ -37,23 +38,23 @@ export default {
 		Select(account) {
 			this.selected = account;
 		},
-		Preview() {
+		async Preview() {
 			this.uploading = true;
 			const account = this.selected;
-			const fileInput = $("input[type='file']");
-			TransactionApi.ParseFile(account.ID, fileInput[0]).done(preview => {
+			const fileInput = document.querySelector("input[type='file']");
+			try {
+				const preview = await TransactionApi.ParseFile(account.ID, fileInput);
 				preview.acctname = account.Name;
 				preview.acctid = account.ID;
 				preview.saved = false;
 				preview.working = false;
 				this.previews.unshift(preview);
-				setTimeout(() => {
-					$(window).scrollTop($(".transactions.preview").first().offset().top);
-				});
-			}).always(() => {
+				await nextTick();
+				window.scrollTo({ top: document.querySelector(".transactions.preview").offsetTop, behavior: "smooth" });
+			} finally {
 				this.uploading = false;
-			});
-			fileInput.val("");
+				fileInput.value = "";
+			}
 		},
 		Ignore(preview, transaction) {
 			preview.net -= transaction.amount;
@@ -61,37 +62,28 @@ export default {
 				preview.dupeCount--;
 			preview.transactions.splice(preview.transactions.indexOf(transaction), 1);
 		},
-		Save(preview, next = 0, oldNewest = false) {
+		async Save(preview) {
 			preview.working = true;
-			const last = next + TransactionApi.MaxTransactions;
-			const transactions = preview.transactions.slice(next, last);
-			const promise = TransactionApi.Import(preview.acctid, transactions).then(newNewest => {
-				const newest = oldNewest && oldNewest.sortable > newNewest.sortable ? oldNewest : newNewest;
-				return last >= preview.transactions.length
-					? newest
-					: this.Save(preview, last, newest);
-			});
-			if(!next)
-				return promise.done(newest => {
-					preview.saved = true;
-					let account;
-					if(preview.acctid == this.selected.id)
-						account = this.selected;
-					else
-						for(let a in this.accounts)
-							if(this.accounts[a].ID == preview.acctid) {
-								account = this.accounts[a];
-								break;
-							}
-					if(account && account.NewestSortable < newest.sortable) {
-						account.NewestSortable = newest.sortable;
-						account.NewestDisplay = newest.display;
-						this.SortAccounts();
-					}
-				}).always(() => {
-					preview.working = false;
-				});
-			return promise;
+			try {
+				const newest = await TransactionApi.Import(preview.acctid, preview.transactions);
+				preview.saved = true;
+				let account;
+				if(preview.acctid == this.selected.id)
+					account = this.selected;
+				else
+					for(let a in this.accounts)
+						if(this.accounts[a].ID == preview.acctid) {
+							account = this.accounts[a];
+							break;
+						}
+				if(account && account.NewestSortable < newest.sortable) {
+					account.NewestSortable = newest.sortable;
+					account.NewestDisplay = newest.display;
+					this.SortAccounts();
+				}
+			} finally {
+				preview.working = false;
+			}
 		},
 		Done(preview) {
 			this.previews.splice(this.previews.indexOf(preview), 1);

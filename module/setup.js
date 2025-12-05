@@ -1,4 +1,4 @@
-import { createApp } from "../external/vue.esm-browser.prod.js";
+import { createApp } from "vue";
 import AppName from "./appname.js";
 import TitleBar from "./component/titlebar.js";
 import StatusBar from "./component/statusbar.js";
@@ -32,10 +32,8 @@ createApp({
 			}
 		}
 	},
-	created() {
-		SetupApi.Level().done(level => {
-			this.level = level;
-		});  // this API call has no failure cases
+	async created() {
+		this.level = await SetupApi.Level();
 	}
 }).component("titlebar", TitleBar)
 	.component("statusbar", StatusBar)
@@ -64,13 +62,14 @@ createApp({
 			}
 		},
 		methods: {
-			Save() {
+			async Save() {
 				this.working = true;
-				SetupApi.ConfigureDatabase(this.host, this.name, this.user, this.pass).done(() => {
+				try {
+					await SetupApi.ConfigureDatabase(this.host, this.name, this.user, this.pass);
 					this.$emit("set-level", SetupLevel.DatabaseConnectionDefined);
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			},
 		},
 		template: /*html*/ `
@@ -111,13 +110,14 @@ createApp({
 			};
 		},
 		methods: {
-			Create() {
+			async Create() {
 				this.working = true;
-				SetupApi.CreateDatabase(this.password).done(() => {
+				try {
+					await SetupApi.CreateDatabase(this.password);
 					this.$emit("set-level", SetupLevel.DatabaseExists);
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			}
 		},
 		template: /*html*/ `
@@ -152,13 +152,14 @@ grant all on \`abe\`.* to 'USERNAME'@'localhost' identified by 'PASSWORD';</text
 			};
 		},
 		methods: {
-			Install() {
+			async Install() {
 				this.working = true;
-				SetupApi.InstallDatabase().done(() => {
+				try {
+					await SetupApi.InstallDatabase();
 					this.$emit("set-level", SetupLevel.DatabaseUpToDate);  // install always goes straight to the latest version
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			}
 		},
 		template: /*html*/ `
@@ -178,13 +179,14 @@ grant all on \`abe\`.* to 'USERNAME'@'localhost' identified by 'PASSWORD';</text
 			};
 		},
 		methods: {
-			Upgrade() {
+			async Upgrade() {
 				this.working = true;
-				SetupApi.UpgradeDatabase().done(() => {
+				try {
+					await SetupApi.UpgradeDatabase();
 					this.$emit("set-level", SetupLevel.DatabaseUpToDate);
-				}).always(() => {
+				} finally {
 					this.working = false;
-				});
+				}
 			}
 		},
 		template: /*html*/ `

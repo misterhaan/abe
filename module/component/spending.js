@@ -59,17 +59,18 @@ export default {
 			else
 				location = "#spending";
 		},
-		Load() {
+		async Load() {
 			this.loading = true;
-			(this.size == "yearly"
-				? SummaryApi.YearlyCategories()
-				: SummaryApi.MonthlyCategories()
-			).done(results => {
-				this.dates = results.dates;
-				this.cats = results.cats;
-			}).always(() => {
+			try {
+				const result = await (this.size == "yearly"
+					? SummaryApi.YearlyCategories()
+					: SummaryApi.MonthlyCategories()
+				);
+				this.dates = result.dates;
+				this.cats = result.cats;
+			} finally {
 				this.loading = false;
-			});
+			}
 		}
 	},
 	components: {

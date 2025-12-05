@@ -1,22 +1,11 @@
 export default class ApiBase {
 	static GET(url, data) {
-		return ajax("GET", url, data);
+		if(data)
+			url += "?" + new URLSearchParams(data);
+		return ajax("GET", url);
 	}
 	static POST(url, data) {
 		return ajax("POST", url, data);
-	}
-	static POSTwithFile(url, data) {
-		return $.ajax({
-			method: "POST",
-			url: url,
-			data: data,
-			cache: false,
-			contentType: false,
-			processData: false,
-			dataType: "json"
-		}).fail(request => {
-			handleError(request, url);
-		});
 	}
 	static PUT(url, data) {
 		return ajax("PUT", url, data);
@@ -29,28 +18,31 @@ export default class ApiBase {
 	}
 };
 
-function ajax(method, url, data) {
-	return $.ajax({
-		method: method,
-		url: url,
-		data: data || {},
-		dataType: "json"
-	}).fail(request => {
-		handleError(request, url);
-	});
+async function ajax(method, url, data) {
+	const init = { method: method };
+	if(data)
+		if(typeof data == "string" || data instanceof FormData || data instanceof URLSearchParams)
+			init.body = data;
+		else
+			init.body = new URLSearchParams(data);
+	const response = await fetch(url, init);
+	if(!response.ok)
+		handleError(response);
+	return await response.json();
 }
 
-function handleError(request, url) {
-	if(request.status == 533) {
-		const redirect = request.getResponseHeader("X-Setup-Location");
+function handleError(response) {
+	if(response.status == 533) {
+		const redirect = response.headers.get("X-Setup-Location");
 		if(redirect)
 			location = redirect;
 	}
-	throwAsync(request, url);
+	throwAsync(response);
 }
 
-function throwAsync(request, url) {
+async function throwAsync(response) {
+	const responseText = await response.text();
 	setTimeout(() => {
-		throw new Error(request.status + " " + (request.responseText || request.statusText) + " from " + url);
+		throw new Error(response.status + " " + (responseText || response.statusText) + " from " + response.url);
 	});
 }

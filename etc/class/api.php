@@ -54,6 +54,14 @@ abstract class Api {
 	}
 
 	/**
+	 * Read the request body as JSON.  Useful for POST requests with muli-level data.
+	 */
+	protected static function ReadRequestJson(): object|array {
+		$json = self::ReadRequestText();
+		return json_decode($json);
+	}
+
+	/**
 	 * Parse the request body as a query string.  Useful for PUT requests with multiple data values.
 	 */
 	protected static function ParseRequestText(): array {

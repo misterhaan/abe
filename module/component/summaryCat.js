@@ -93,8 +93,8 @@ export default {
 					.append("g").attr("class", "legcat").attr("transform", (c, i) => `translate(${pad},${14 * (i + 1)})`).on("click", function(c) {
 						// toggle whether this category is hidden
 						c.hidden = !c.hidden;
-						$(this).toggleClass("deselected")
-							.find("title").text(c.hidden ? `Include ${c.name}` : `Exclude ${c.name}`);
+						this.classList.toggle("deselected");
+						this.querySelector("title").textContent = c.hidden ? `Include ${c.name}` : `Exclude ${c.name}`;
 						// update amount scale and redraw lines with it
 						amount.range([Height, 0]).domain([d3.min(data, c => c.hidden ? 0 : d3.min(c.values, v => v.amount)), d3.max(data, c => c.hidden ? 0 : d3.max(c.values, v => v.amount))]);
 						amount.range([Height, Math.max(0, axisheight - amount(0))]);

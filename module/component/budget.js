@@ -27,12 +27,7 @@ export default {
 			}
 		}
 	},
-	created() {
-		BudgetApi.List().done(months => {
-			this.months = months;
-			if(!this.months.length)
-				this.showGotoForm = true;
-		});
+	async created() {
 		this.$emit("add-action", {
 			action: this.ToggleGoto,
 			url: "#budget!goto",
@@ -40,6 +35,9 @@ export default {
 			text: "Go to",
 			tooltip: "Create or go to a month’s budget"
 		});
+		this.months = await BudgetApi.List();
+		if(!this.months.length)
+			this.showGotoForm = true;
 	},
 	watch: {
 		month(month) {

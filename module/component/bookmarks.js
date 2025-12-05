@@ -6,26 +6,21 @@ export default {
 			bookmarks: []
 		};
 	},
-	created() {
-		BookmarkApi.List().done(bookmarks => {
-			this.bookmarks = bookmarks;
-		});
+	async created() {
+		this.bookmarks = await BookmarkApi.List();
 	},
 	methods: {
-		MoveDown(bookmark, index) {
-			BookmarkApi.MoveDown(bookmark.ID).done(() => {
-				this.bookmarks[index] = this.bookmarks.splice(index + 1, 1, bookmark)[0];
-			});
+		async MoveDown(bookmark, index) {
+			await BookmarkApi.MoveDown(bookmark.ID);
+			this.bookmarks[index] = this.bookmarks.splice(index + 1, 1, bookmark)[0];
 		},
-		MoveUp(bookmark, index) {
-			BookmarkApi.MoveUp(bookmark.ID).done(() => {
-				this.bookmarks[index] = this.bookmarks.splice(index - 1, 1, bookmark)[0];
-			});
+		async MoveUp(bookmark, index) {
+			await BookmarkApi.MoveUp(bookmark.ID);
+			this.bookmarks[index] = this.bookmarks.splice(index - 1, 1, bookmark)[0];
 		},
-		Delete(bookmark, index) {
-			BookmarkApi.Delete(bookmark.ID).done(() => {
-				this.bookmarks.splice(index, 1);
-			});
+		async Delete(bookmark, index) {
+			await BookmarkApi.Delete(bookmark.ID)
+			this.bookmarks.splice(index, 1);
 		}
 	},
 	template: /*html*/ `

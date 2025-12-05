@@ -179,7 +179,7 @@ class TransactionApi extends Api {
 		$account = +array_shift($params);
 		if (!$account)
 			self::NeedMoreInfo('Account ID is required.');
-		if (!isset($_POST['transactions']) || !is_array($_POST['transactions']) || !count($_POST['transactions']))
+		if (!is_array($transactions = self::ReadRequestJson()) || !count($transactions))
 			self::NeedMoreInfo('No transactions to save.');
 
 		$newest = new stdClass();
@@ -191,7 +191,7 @@ class TransactionApi extends Api {
 			$insert = $db->prepare('insert into transactions (account, extid, transdate, posted, name, amount, city, state, zip, notes) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 			$insert->bind_param('issssdssss', $account, $extid, $transdate, $posted, $name, $amount, $city, $state, $zip, $notes);
 			$newest->sortable = '';
-			foreach ($_POST['transactions'] as $trans) {
+			foreach ($transactions as $trans) {
 				$trans = (object)$trans;
 				$extid = $trans->extid ?: null;
 				$transdate = $trans->transdate ?: null;
@@ -240,6 +240,7 @@ class TransactionApi extends Api {
 		}
 		$select->close();
 		self::NotFound('Account not found.');
+		return "";
 	}
 }
 TransactionApi::Respond();

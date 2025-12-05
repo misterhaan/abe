@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import TransactionApi from "../api/transaction.js";
 import CategoryGroupApi from "../api/categoryGroup.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
@@ -67,13 +68,9 @@ export default {
 			return (0).toFixed(2);
 		}
 	},
-	created() {
-		Promise.all([
-			this.LoadCategories(),
-			this.LoadTransactions(false)
-		]).then(() => {
-			this.loading = false;
-		});
+	async created() {
+		const categoryLoad = this.LoadCategories();
+		const transactionLoad = this.LoadTransactions(false);
 		this.$emit("add-action", {
 			action: this.ToggleFilters,
 			url: "#transactions!filters",
@@ -88,6 +85,9 @@ export default {
 			text: "Import",
 			tooltip: "Import transactions"
 		});
+		await categoryLoad;
+		await transactionLoad;
+		this.loading = false;
 	},
 	watch: {
 		params() {
@@ -122,36 +122,34 @@ export default {
 	},
 	mixins: [FilterAmountKeys],
 	methods: {
-		LoadCategories() {
-			return CategoryGroupApi.List().done(groups => {
-				this.catGroups = groups;
-				this.catsLoaded = true;
-			});
+		async LoadCategories() {
+			this.catGroups = await CategoryGroupApi.List();
+			this.catsLoaded = true;
 		},
-		LoadTransactions(setloading = true) {
+		async LoadTransactions(setloading = true) {
 			if(setloading)
 				this.loading = true;
 			const count = this.dates.reduce((s, d) => s + d.transactions.length, 0);
-			return TransactionApi.List(count, this.params.accts, this.params.cats, this.params.datestart, this.params.dateend, this.params.minamount, this.params.search).done(transactions => {
+			try {
+				const transactions = await TransactionApi.List(count, this.params.accts, this.params.cats, this.params.datestart, this.params.dateend, this.params.minamount, this.params.search);
 				if(transactions.dates.length && this.dates.length && transactions.dates[0].date == this.dates[this.dates.length - 1].date)
 					this.dates[this.dates.length - 1].transactions = this.dates[this.dates.length - 1].transactions.concat(transactions.dates.shift().transactions);
 				this.dates = this.dates.concat(transactions.dates);
 				this.more = transactions.more;
-			}).always(() => {
+			} finally {
 				if(setloading)
 					this.loading = false;
-			});
+			}
 		},
-		Select(transaction) {
+		async Select(transaction) {
 			this.Save();
 			this.editCategory = false;
 			this.editing = transaction;
 			const labelSelector = transaction.categories.length > 1 || transaction.categories[0].name
 				? "label.name"
 				: "label.category";
-			setTimeout(() => {
-				$(labelSelector).focus();
-			});
+			await nextTick();
+			document.querySelector(labelSelector)?.focus();
 		},
 		Previous() {
 			if(this.editing) {
@@ -281,7 +279,7 @@ export default {
 			if(this.editing && this.editCategory && !this.subAmountMultiplier) {
 				this.PushSubAmount();
 				this.editCategory.amount = +this.subAmounts.splice(index, 1)[0];
-				const amountField = $(".subamounts").prev().find("input.catamount");
+				const amountField = document.querySelector(".subamounts").previousElementSibling.querySelector("input.catamount");
 				amountField.focus();
 				amountField.select();
 			}
@@ -290,7 +288,7 @@ export default {
 			if(!this.subAmountMultiplier) {
 				this.PushSubAmount();
 				this.subAmountMultiplier = true;
-				$(".subamounts").prev().find("input.catamount").focus();
+				document.querySelector(".subamounts").previousElementSibling.querySelector("input.catamount").focus();
 			}
 		},
 		SumSubAmounts(event) {
@@ -307,7 +305,7 @@ export default {
 			this.editCategory = false;
 			this.editing = false;
 		},
-		Save() {
+		async Save() {
 			if(this.editing) {
 				const transaction = this.editing;
 				let anyEmptyCats = false;
@@ -337,13 +335,14 @@ export default {
 					this.saving.push(transaction);
 					if(errorIndex > -1)
 						this.errored.splice(errorIndex, 1);
-					TransactionApi.Save(transaction.id, transaction.name, transaction.notes, transaction.categories).done(() => {
+					try {
+						await TransactionApi.Save(transaction.id, transaction.name, transaction.notes, transaction.categories);
 						this.LoadCategories();
-					}).fail(() => {
+					} catch {
 						this.errored.push(transaction);
-					}).always(() => {
+					} finally {
 						this.saving.splice(this.saving.indexOf(transaction), 1);
-					});
+					}
 				} else {
 					if(errorIndex == -1)
 						this.errored.push(transaction);
@@ -360,21 +359,19 @@ export default {
 	},
 	directives: {
 		scrollTo: {
-			mounted(el) {
-				setTimeout(() => {
-					const rect = el.getBoundingClientRect();
-					const element = $(el);
-					if(rect.top < 0)
-						$("html, body").animate({ scrollTop: element.offset().top }, 100);
-					else {
-						const winHeight = $(window).height();
-						if(rect.bottom > winHeight)
-							if(rect.height + 3 > winHeight)
-								$("html, body").animate({ scrollTop: element.offset().top }, 100);
-							else
-								$("html, body").animate({ scrollTop: element.offset().top - winHeight + rect.height + 3 }, 100);
-					}
-				});
+			async mounted(el) {
+				await nextTick();
+				const rect = el.getBoundingClientRect();
+				if(rect.top < 0)
+					window.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+				else {
+					const winHeight = window.innerHeight;
+					if(rect.bottom > winHeight)
+						if(rect.height + 3 > winHeight)
+							window.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+						else
+							window.scrollTo({ top: el.offsetTop - winHeight + rect.height + 3, behavior: "smooth" });
+				}
 			}
 		}
 	},

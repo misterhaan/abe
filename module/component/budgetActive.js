@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import BudgetApi from "../api/budget.js";
 import FilterAmountKeys from "../filterAmountKeys.js";
 
@@ -80,50 +81,47 @@ export default {
 		}
 	},
 	methods: {
-		Load() {
-			BudgetApi.LoadActive(this.month.Sort).done(results => {
-				this.categories = results.Categories;
-				this.funds = results.Funds;
-			});
+		async Load() {
+			const result = await BudgetApi.LoadActive(this.month.Sort);
+			this.categories = result.Categories;
+			this.funds = result.Funds;
 		},
-		Expand(item) {
+		async Expand(item) {
 			if(item != this.expanded) {
 				this.Save();
 				this.expanded = item;
 				this.add = "";
-				setTimeout(() => $("input.amount").focus());
+				await nextTick();
+				document.querySelector("input.amount").focus();
 			}
 		},
 		ExpandFund(fund) {
 			this.Expand(fund);
 			this.add = fund.Actual;
 		},
-		Save() {
+		async Save() {
 			if(this.expanded) {
 				const item = this.expanded;
 				if(this.funds.includes(item)) {
 					const amount = this.add;
-					BudgetApi.SetActualFund(this.month.Sort, item.ID, amount, item.Actual).done(() => {
-						item.Actual = amount;
-					});
+					await BudgetApi.SetActualFund(this.month.Sort, item.ID, amount, item.Actual);
+					item.Actual = amount;
 				} else if(this.add) {
 					const amount = item.Planned < 0
 						? item.Actual - this.add
 						: item.Actual + this.add;
-					BudgetApi.SetActual(this.month.Sort, item.ID, amount).done(() => {
-						item.Actual = amount;
-					});
+					await BudgetApi.SetActual(this.month.Sort, item.ID, amount);
+					item.Actual = amount;
 				}
 			}
 			this.add = 0;
 			this.expanded = false;
 		},
-		SetSpent(item) {
-			BudgetApi.SetActual(this.month.Sort, item.ID, item.Amount).done(() => {
-				item.Actual = item.Amount;
-			});
+		async SetSpent(item) {
+			await BudgetApi.SetActual(this.month.Sort, item.ID, item.Amount);
+			item.Actual = item.Amount;
 		},
-		SetAllSpent() {
+		async SetAllSpent() {
 			const ids = [];
 			const amounts = [];
 			for(const cat of this.categories)
@@ -131,16 +129,15 @@ export default {
 					ids.push(cat.ID);
 					amounts.push(cat.Amount);
 				}
-			BudgetApi.SetActual(this.month.Sort, ids, amounts).done(() => {
-				let id = ids.shift();
-				let amount = amounts.shift();
-				for(const cat of this.categories)
-					if(cat.ID == id) {
-						cat.Actual = amount;
-						id = ids.shift();
-						amount = amounts.shift();
-					}
-			});
+			await BudgetApi.SetActual(this.month.Sort, ids, amounts);
+			let id = ids.shift();
+			let amount = amounts.shift();
+			for(const cat of this.categories)
+				if(cat.ID == id) {
+					cat.Actual = amount;
+					id = ids.shift();
+					amount = amounts.shift();
+				}
 		},
 		LastDayOfMonth(yyyymm) {
 			const ym = yyyymm.split("-");

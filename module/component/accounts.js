@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import AccountApi from "../api/account.js";
 
 export default {
@@ -11,20 +12,10 @@ export default {
 			errored: []
 		};
 	},
-	created() {
-		Promise.all([
-			AccountApi.List().done(accounts => {
-				this.accounts = accounts;
-				if(!this.accounts.length)
-					this.Add();
-			}),
-			AccountApi.Types().done(result => {
-				this.types = result.Types;
-				this.banks = result.Banks;
-			})
-		]).then(() => {
-			this.loading = false;
-		});
+	async created() {
+		const accountsPromise = AccountApi.List();
+		const typesPromise = AccountApi.Types();
+
 		this.$emit("add-action", {
 			action: this.Add,
 			url: "#accounts!add",
@@ -32,9 +23,17 @@ export default {
 			text: "+",
 			tooltip: "Add another account"
 		});
+
+		this.accounts = await accountsPromise;
+		if(!this.accounts.length)
+			this.Add();
+		const types = await typesPromise;
+		this.types = types.Types;
+		this.banks = types.Banks;
+		this.loading = false;
 	},
 	methods: {
-		Add() {
+		async Add() {
 			this.Save();
 			this.editing = {
 				Name: "",
@@ -52,14 +51,16 @@ export default {
 				NewestDisplay: ""
 			};
 			this.accounts.push(this.editing);
-			setTimeout(() => $("h2 input").focus());
+			await nextTick();
+			document.querySelector("h2 input").focus();
 		},
-		Edit(account) {
+		async Edit(account) {
 			this.Save();
 			this.editing = account;
-			setTimeout(() => $("h2 input").focus());
+			await nextTick();
+			document.querySelector("h2 input").focus();
 		},
-		Save() {
+		async Save() {
 			if(this.editing) {
 				const account = this.editing;
 				if(account.Name && account.Type.ID && account.Bank.ID) {
@@ -67,18 +68,19 @@ export default {
 					const index = this.errored.indexOf(account);
 					if(index > -1)
 						this.errored.slice(index, 1);
-					(account.ID
-						? AccountApi.Save(account.ID, account.Name, account.Type.ID, account.Bank.ID, account.Balance, account.Closed)
-						: AccountApi.Add(account.Name, account.Type.ID, account.Bank.ID, account.Balance, account.Closed)
-					).done(id => {
+					try {
+						const id = await (account.ID
+							? AccountApi.Save(account.ID, account.Name, account.Type.ID, account.Bank.ID, account.Balance, account.Closed)
+							: AccountApi.Add(account.Name, account.Type.ID, account.Bank.ID, account.Balance, account.Closed)
+						);
 						if(!account.ID)
 							account.ID = id;
 						account.Bank = this.banks.find(b => b.ID == account.Bank.ID);
 						account.Type = this.types.find(t => t.ID == account.Type.ID);
 						account.BalanceDisplay = account.Balance.toFixed(2);
-					}).fail(() => {
+					} catch {
 						this.errored.push(account);
-					});
+					}
 				} else {
 					this.errored.push(account);
 					throw new Error("Accounts must have a name, type, and bank.");

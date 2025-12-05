@@ -30,29 +30,26 @@ export default {
 				this.Load();
 		}
 	},
-	created() {
+	async created() {
 		if(this.month)
 			this.Load();
-		FundApi.List().done(funds => {
-			this.funds = funds.filter(f => f.Target != 0 || f.Balance != 0).map(f => Object.assign(f, { amount: null }));
-		});
+		const funds = await FundApi.List();
+		this.funds = funds.filter(f => f.Target != 0 || f.Balance != 0).map(f => Object.assign(f, { amount: null }));
 	},
 	methods: {
-		Load() {
-			BudgetApi.Suggestions(this.month.Sort).done(result => {
-				this.names = result.Columns;
-				this.categories = result.Categories.map(c => Object.assign(c, { amount: null }));
-			});
+		async Load() {
+			const result = await BudgetApi.Suggestions(this.month.Sort);
+			this.names = result.Columns;
+			this.categories = result.Categories.map(c => Object.assign(c, { amount: null }));
 		},
 		Remove(item) {
 			this.categories.splice(this.categories.indexOf(item), 1);
 		},
-		Create() {
+		async Create() {
 			const categories = FlattenCategories(this.categories);
 			const funds = FlattenFunds(this.funds);
-			BudgetApi.Create(this.month.Sort, categories.ids, categories.amounts, funds.ids, funds.amounts).done(() => {
-				location.reload();
-			});
+			await BudgetApi.Create(this.month.Sort, categories.ids, categories.amounts, funds.ids, funds.amounts);
+			location.reload();
 		}
 	},
 	mixins: [FilterAmountKeys],
