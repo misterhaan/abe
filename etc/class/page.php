@@ -84,7 +84,7 @@ abstract class Page {
 				?>
 			</main>
 			<footer>
-				<div id=copyright>© 2017 - 2025 <?= self::siteTitleFull; ?></div>
+				<div id=copyright>© 2017 - 2026 <?= self::siteTitleFull; ?></div>
 			</footer>
 		</body>
 

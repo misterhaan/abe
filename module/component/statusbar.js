@@ -90,7 +90,7 @@ export default {
 				</ol>
 			</div>
 			<a class=errors :title="showErrors ? 'Minimize the error list' : 'Show the error list'" v-if=errors.length href=#showErrors @click.prevent=ToggleErrors>{{errors.length}}</a>
-			<div id=copyright>© 2017 - 2025 ${AppName.Full}</div>
+			<div id=copyright>© 2017 - 2026 ${AppName.Full}</div>
 		</footer>
 	`
 };
