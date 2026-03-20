@@ -1,46 +1,61 @@
 // styles for form elements common to all of Abe
+@use "!base" as abe;
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
 	font-family: inherit;
 	font-size: inherit;
 }
+
 label {
 	display: block;
 	margin: .5em;
+
 	span.label {
 		display: block;
 	}
+
 	span.field {
 		@extend %flex-container-baseline;
+
 		input:not([type="checkbox"]),
 		select {
 			@extend %flex-item-fill;
 		}
 	}
 }
-input, select, textarea {
+
+input,
+select,
+textarea {
 	background-color: #fff;
 	color: #000;
 	border: none;
-	border-radius: $gentlecorner;
+	border-radius: abe.$gentlecorner;
 	padding: .125em .25em;
+
 	&:focus {
 		outline: none;
 	}
 }
+
 button {
 	margin: .5em;
 	padding: .25em .75em;
-	background-color: $green;
+	background-color: abe.$green;
 	color: #fff;
 	border: none;
-	border-radius: $gentlecorner;
+	border-radius: abe.$gentlecorner;
 	cursor: pointer;
+
 	&:focus {
 		outline: none;
 	}
+
 	&:disabled {
-		background-color: $darkgrey;
+		background-color: abe.$darkgrey;
 		cursor: default;
 	}
 }

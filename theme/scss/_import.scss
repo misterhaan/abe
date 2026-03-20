@@ -1,17 +1,22 @@
+@use "!base" as abe;
+
 #accountlist.select .account {
 	&:not(.selected) {
-		h2{
-			background-color: $lightgreyblue;
-			color: $darkgrey;
+		h2 {
+			background-color: abe.$lightgreyblue;
+			color: abe.$darkgrey;
 		}
 	}
+
 	.bank {
 		margin-left: auto;
 	}
 }
+
 #transactionsFile {
 	@extend %flex-container-baseline;
 	margin: 1em .5em;
+
 	input {
 		margin-left: .5em;
 		@extend %flex-item-fill;
@@ -22,47 +27,59 @@
 	h2 {
 		margin: 1em .5em 0;
 	}
+
 	header {
 		@extend %flex-container;
 		align-items: baseline;
+
 		span {
 			margin: 0 1.25em 0 0;
 		}
+
 		button {
 			margin: .25em 0 .25em auto;
 		}
+
 		.status {
 			margin-left: auto;
 		}
+
 		.count:before {
 			@extend %fa-label;
 			content: "\f0ae";
 		}
+
 		.duplicates:before {
 			@extend %fa-label;
 			content: "\f24d";
 		}
+
 		.amount:before {
 			@extend %fa-label;
 			content: "\f24e";
 		}
+
 		.status:before {
 			@extend %fa-label;
 			content: "\f00c";
 		}
 	}
+
 	li.transaction {
 		display: block;
 	}
+
 	.quick {
 		@extend %flex-container;
 		margin-bottom: .25em;
+
 		.duplicate:before {
 			@extend %fa-label;
 			content: "\f071";
-			color: $red;
+			color: abe.$red;
 		}
 	}
+
 	.dismiss:before {
 		@extend %fa-label;
 		content: "\f00d";

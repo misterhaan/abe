@@ -1,0 +1,270 @@
+// general styles for all of Abe Personal Finance.
+@use "!base" as abe;
+
+body {
+	background-color: abe.$medgreyblue;
+	padding: 0;
+	margin: 0;
+	-moz-text-size-adjust: none;
+	-webkit-text-size-adjust: 100%;
+	font-family: roboto, sans-serif;
+	font-size: 1.25em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-size: 1em;
+}
+
+h2,
+p,
+dl {
+	margin: 1em .5em;
+}
+
+*[draggable] {
+	cursor: grab;
+}
+
+a:link,
+a:visited {
+	color: abe.$green;
+}
+
+a.edit,
+a.save,
+a.undo,
+a.delete,
+a.remove,
+a.up,
+a.down {
+	@extend %fa-replaced;
+
+	&:before {
+		font-size: .9em;
+		margin-left: .5em;
+		color: abe.$darkgrey;
+	}
+
+	&:hover:before {
+		color: #000;
+	}
+}
+
+a.edit:before {
+	content: "\f044";
+}
+
+a.undo:before {
+	content: "\f0e2";
+}
+
+a.save:before {
+	content: "\f0c7";
+}
+
+a.delete:before {
+	content: "\f1f8";
+}
+
+a.remove:before {
+	content: "\f057";
+}
+
+a.up:before {
+	content: "\f0d8";
+}
+
+a.down:before {
+	content: "\f0d7";
+}
+
+a.delete:hover:before,
+a.remove:hover:before {
+	color: abe.$red;
+}
+
+button.add {
+	@extend %fa-replaced;
+
+	&:before {
+		content: "\f067";
+		font-size: .9em;
+		margin: 0;
+	}
+}
+
+.slide-enter-from,
+.slide-leave-to {
+	height: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+	transition: all 300ms ease;
+	overflow-y: hidden;
+}
+
+#newBookmark {
+
+	&.slide-enter-to,
+	&.slide-leave-from {
+		height: 200px;
+	}
+}
+
+#filters {
+
+	&.slide-enter-to,
+	&.slide-leave-from {
+		height: 400px;
+	}
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.fade-enter-active {
+	transition: all 300ms ease;
+}
+
+.fade-leave-active {
+	transition: all 1600ms ease;
+
+	&.closing {
+		transition: none;
+	}
+}
+
+.fade-enter-to,
+.fade-leave-from {
+	opacity: 1;
+}
+
+.loading:before,
+.working:after {
+	@extend %fa-label;
+	content: "\f110";
+	animation: fa-spin 1s infinite steps(8);
+}
+
+.calltoaction .working:after {
+	color: #ccc;
+}
+
+.working:after {
+	margin-left: .5em;
+	margin-right: 0;
+}
+
+.calltoaction {
+	text-align: center;
+}
+
+.calltoaction a {
+	@extend button;
+	display: inline-block;
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+.percentfield {
+	margin: .125em 1em;
+	background-color: abe.$medgreyblue;
+	border-radius: abe.$gentlecorner;
+
+	.percentvalue {
+		height: .5em;
+		background-color: abe.$blue;
+		border-radius: abe.$gentlecorner;
+	}
+}
+
+@media (min-width: 35em) {
+	.tabbed {
+		display: flex;
+
+		.tabs {
+			margin: 0 .5em 0 0;
+			padding: .75em 0 0 .5em;
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: column;
+			background-color: abe.$green;
+			border-radius: 0 0 abe.$gentlecorner;
+
+			span {
+				border-radius: abe.$gentlecorner 0 0 abe.$gentlecorner;
+				margin-bottom: .5em;
+				margin-right: 0;
+				padding-right: .5em;
+				background-color: abe.$medgreyblue;
+				color: #000;
+
+				&.accounts:before,
+				&.categories:before {
+					color: abe.$darkgrey;
+				}
+			}
+
+			a {
+				color: #fff;
+				margin-bottom: .5em;
+
+				&:before {
+					color: abe.$medgreyblue;
+				}
+			}
+		}
+
+		section:last-child {
+			flex: 1 1 auto;
+		}
+	}
+}
+
+.tabs {
+	margin: 1em;
+
+	.accounts,
+	.categories {
+		&:before {
+			@extend %fa-label;
+			margin-left: .25em;
+		}
+	}
+
+	.accounts:before {
+		content: "\f19c";
+	}
+
+	.categories:before {
+		content: "\f02c";
+	}
+
+	a {
+		margin: .125em;
+		padding: .125em .25em;
+		text-decoration: none;
+	}
+
+	span {
+		background-color: abe.$green;
+		color: #fff;
+		margin: .125em;
+		padding: .125em .25em;
+		border-radius: abe.$gentlecorner;
+
+		&.accounts:before,
+		&.categories:before {
+			color: abe.$medgreyblue;
+			font-weight: normal;
+		}
+	}
+}

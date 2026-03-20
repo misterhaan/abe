@@ -1,3 +1,5 @@
+@use "!base" as abe;
+
 #categories {
 	@extend %flex-item-fill;
 }
@@ -34,10 +36,10 @@
 
 	li {
 		cursor: pointer;
-		border-radius: $gentlecorner 0 0 $gentlecorner;
+		border-radius: abe.$gentlecorner 0 0 abe.$gentlecorner;
 
 		&.selected {
-			background-color: $lightgreyblue;
+			background-color: abe.$lightgreyblue;
 		}
 
 		&.droptarget {
@@ -53,9 +55,9 @@
 
 #groupcategories {
 	@extend %flex-item-grow;
-	background-color: $lightgreyblue;
+	background-color: abe.$lightgreyblue;
 	padding-left: 1em;
-	border-radius: 0 0 0 $gentlecorner;
+	border-radius: 0 0 0 abe.$gentlecorner;
 
 	.dragging {
 		opacity: .4;

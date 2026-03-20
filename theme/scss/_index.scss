@@ -1,20 +1,24 @@
 // styles for the Abe Personal Finance main menu (/index.php)
+@use "!base" as abe;
 
 #bookmarks {
 	margin: 1em .5em .5em;
 	text-align: center;
-	& > div {
+
+	&>div {
 		display: inline-block;
 		text-align: left;
-		background-color: $lightgreyblue;
-		box-shadow: 2px 2px 1px $darkgrey;
-		border-radius: $gentlecorner;
+		background-color: abe.$lightgreyblue;
+		box-shadow: 2px 2px 1px abe.$darkgrey;
+		border-radius: abe.$gentlecorner;
 	}
+
 	header {
-		background-color: $blue;
+		background-color: abe.$blue;
 		color: #fff;
 		padding: .0625em .5em .125em;
-		border-radius: $gentlecorner $gentlecorner 0 0;
+		border-radius: abe.$gentlecorner abe.$gentlecorner 0 0;
+
 		&:before {
 			@extend %fontawesome;
 			display: inline-block;
@@ -23,33 +27,40 @@
 			content: "\f02e";
 		}
 	}
+
 	div.bookmark {
 		@extend %flex-container;
 		padding: .25em .5em;
 	}
+
 	a {
 		@extend %flex-item-fixed;
 		text-decoration: none;
+
 		&:before {
 			@extend %fontawesome;
 			display: inline-block;
 			padding-left: .5em;
 			font-size: .9em;
 		}
+
 		&.spending:before {
 			content: "\f200";
 		}
+
 		&.transactions:before {
 			content: "\f0ae";
 		}
+
 		&:first-child {
 			@extend %flex-item-grow;
 			padding-right: .5em;
 		}
+
 		&:first-child:before {
 			padding-left: 0;
 			padding-right: .5em;
-			color: $green;
+			color: abe.$green;
 		}
 	}
 }
@@ -57,37 +68,45 @@
 #mainmenu {
 	text-align: center;
 	margin: .5em 0;
+
 	a {
 		display: inline-block;
 		width: 6em;
 		text-align: center;
-		background-color: $lightgreyblue;
-		box-shadow: 2px 2px 1px $darkgrey;
+		background-color: abe.$lightgreyblue;
+		box-shadow: 2px 2px 1px abe.$darkgrey;
 		margin: .5em;
 		padding: .25em .5em;
-		border-radius: $gentlecorner;
+		border-radius: abe.$gentlecorner;
 		text-decoration: none;
+
 		&:before {
 			@extend %fontawesome;
 			display: block;
 			font-size: 2em;
 			padding: .25em 0;
 		}
+
 		&[href^='#budget']:before {
 			content: "\f24e";
 		}
+
 		&[href^='#import']:before {
 			content: "\f093";
 		}
+
 		&[href^='#settings']:before {
 			content: "\f085";
 		}
+
 		&[href^='#saving']:before {
 			content: "\f024";
 		}
+
 		&[href^='#spending']:before {
 			content: "\f200";
 		}
+
 		&[href^='#transactions']:before {
 			content: "\f0ae";
 		}

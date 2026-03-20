@@ -1,58 +1,74 @@
+@use "!base" as abe;
+
 .fundview {
 	@extend %flex-container;
 	margin-top: 1px;
+
 	&.active {
-		background-color: $lightgreyblue;
+		background-color: abe.$lightgreyblue;
+
 		.fund {
 			color: #000;
 		}
 	}
+
 	&.dragging {
 		opacity: .4;
 	}
+
 	&.droptarget {
-		border-top: 3px solid $blue;
+		border-top: 3px solid abe.$blue;
 	}
+
 	.fund {
 		@extend %flex-item-fill;
-		color: $darkgrey;
+		color: abe.$darkgrey;
+
 		h2 {
 			@extend %flex-container;
 			justify-content: center;
 			margin: .125em 0 0;
 			padding: .125em 0;
 			text-align: center;
+
 			a {
 				@extend %flex-item-fixed;
+
 				&:before {
 					margin: 0 .75em;
 				}
 			}
+
 			.name {
 				@extend %flex-item-fill;
 				margin: 0 .5em;
 			}
+
 			input {
 				width: 13.5em;
 				text-align: center;
 			}
 		}
+
 		.values {
 			padding: .125em 0 .25em;
 			margin: 0 .5em;
 			text-align: center;
+
 			input {
 				width: 5.75em;
 				text-align: right;
 			}
 		}
 	}
+
 	nav {
 		@extend %flex-item-fixed;
 		@extend %flex-container-vertical;
 		width: 1em;
 		justify-content: center;
 		padding-right: .5em;
+
 		a:before {
 			margin-left: .125em;
 		}

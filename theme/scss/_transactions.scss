@@ -1,3 +1,5 @@
+@use "!base" as abe;
+
 .transactions {
 
 	ol,
@@ -13,12 +15,12 @@
 	}
 
 	li.transaction:not(.selected) {
-		background-color: $lightgreyblue;
+		background-color: abe.$lightgreyblue;
 		margin: 1px 0;
 	}
 
 	.saveerror {
-		border-left: 7px solid $red;
+		border-left: 7px solid abe.$red;
 	}
 
 	.transaction {
@@ -87,10 +89,10 @@
 
 	.full {
 		padding: .25em .5em;
-		background-color: $lightgreyblue;
-		border: 1px solid $blue;
-		border-radius: $gentlecorner;
-		box-shadow: 2px 2px 2px $darkgrey;
+		background-color: abe.$lightgreyblue;
+		border: 1px solid abe.$blue;
+		border-radius: abe.$gentlecorner;
+		box-shadow: 2px 2px 2px abe.$darkgrey;
 		margin-top: .125em;
 
 		.details>div,
@@ -107,16 +109,16 @@
 		@extend %fa-replaced;
 
 		&:before {
-			color: $red;
+			color: abe.$red;
 			content: "\f00d";
 			margin-left: .25em;
 			padding: 0 .125em .07em;
 		}
 
 		&:hover:before {
-			background-color: $red;
+			background-color: abe.$red;
 			color: #fff;
-			border-radius: $gentlecorner;
+			border-radius: abe.$gentlecorner;
 		}
 	}
 
@@ -130,7 +132,7 @@
 		min-width: 0;
 
 		&.newcat {
-			background-color: $lightyellow;
+			background-color: abe.$lightyellow;
 		}
 
 		&.catamount {
@@ -201,9 +203,9 @@
 		margin-top: 1.45em;
 		margin-left: 1.85em;
 		padding: 0;
-		background-color: $medgreyblue;
-		box-shadow: 2px 2px 1px $darkgrey;
-		border-radius: 0 0 $gentlecorner $gentlecorner;
+		background-color: abe.$medgreyblue;
+		box-shadow: 2px 2px 1px abe.$darkgrey;
+		border-radius: 0 0 abe.$gentlecorner abe.$gentlecorner;
 		list-style-type: none;
 
 		ol {
@@ -226,13 +228,13 @@
 			&.choice:hover,
 			&.kbcursor {
 				cursor: pointer;
-				background-color: $green;
+				background-color: abe.$green;
 				color: #fff;
 			}
 
 			&.grouper {
 				font-style: italic;
-				color: $darkgrey;
+				color: abe.$darkgrey;
 			}
 
 			em {
@@ -247,7 +249,7 @@
 
 	.suggestions>li:last-child>div:last-child,
 	.suggestions>li:last-child li:last-child>div:last-child {
-		border-radius: 0 0 $gentlecorner $gentlecorner;
+		border-radius: 0 0 abe.$gentlecorner abe.$gentlecorner;
 	}
 
 	.subamounts {
@@ -267,7 +269,7 @@
 
 			&.active {
 				background-color: #fff;
-				border-radius: $gentlecorner;
+				border-radius: abe.$gentlecorner;
 			}
 		}
 	}
@@ -277,11 +279,11 @@
 		width: 14.25em;
 		z-index: 1;
 		right: 0;
-		background-color: $medgreyblue;
-		border: 2px solid $green;
+		background-color: abe.$medgreyblue;
+		border: 2px solid abe.$green;
 		border-top: none;
 		border-right: none;
-		border-radius: 0 0 0 $gentlecorner;
+		border-radius: 0 0 0 abe.$gentlecorner;
 		padding: 0 .25em .25em;
 
 		.category {
@@ -297,7 +299,7 @@
 				@extend %fontawesome;
 				content: "\f00d";
 				font-size: .75em;
-				color: $red;
+				color: abe.$red;
 				margin: 0 .5em;
 				cursor: pointer;
 			}

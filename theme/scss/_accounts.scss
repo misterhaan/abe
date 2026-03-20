@@ -1,139 +1,175 @@
 // Styles for the Abe Personal Finance account list page (/accounts.php)
+@use "!base" as abe;
 
 #accountlist {
 	@extend %flex-container;
 	align-items: flex-start;
 	flex-wrap: wrap;
+
 	.account {
 		margin: 1em .5em;
-		background-color: $lightgreyblue;
-		border-radius: $gentlecorner;
-		box-shadow: 2px 2px 1px $darkgrey;
+		background-color: abe.$lightgreyblue;
+		border-radius: abe.$gentlecorner;
+		box-shadow: 2px 2px 1px abe.$darkgrey;
 		width: calc(100% - 1em);
+
 		@media (min-width: 55.5em) {
 			display: inline-block;
 			width: calc(50% - 1.25em);
 			margin-bottom: .0625em;
 		}
+
 		@media (min-width: 78em) {
 			width: calc(33.33% - 1.1875em);
 		}
+
 		@media (min-width: 102em) {
 			width: calc(25% - 1.125em);
 		}
+
 		h2 {
 			color: #fff;
-			background-color: $blue;
+			background-color: abe.$blue;
 			padding: .25em .5em;
 			margin: 0;
-			border-radius: $gentlecorner $gentlecorner 0 0;
+			border-radius: abe.$gentlecorner abe.$gentlecorner 0 0;
 			@extend %ellipsis;
+
 			input {
 				width: calc(100% - .5em);
 			}
 		}
+
 		&.closed {
 			box-shadow: none;
-			color: $darkgrey;
+			color: abe.$darkgrey;
 			background-color: transparent;
+
 			h2 {
-				color: $blue;
+				color: abe.$blue;
 				background-color: transparent;
 			}
 		}
+
 		&.error {
-			border-left: 7px solid $red;
+			border-left: 7px solid abe.$red;
 			width: calc(100% - 1em - 7px);
+
 			h2 {
-				border-radius: 0 $gentlecorner 0 0;
+				border-radius: 0 abe.$gentlecorner 0 0;
 			}
+
 			@media (min-width: 55.5em) {
 				width: calc(50% - 1.25em - 7px);
 			}
+
 			@media (min-width: 78em) {
 				width: calc(33.33% - 1.1875em - 7px);
 			}
+
 			@media (min-width: 102em) {
 				width: calc(25% - 1.125em - 7px);
 			}
 		}
 	}
+
 	.lastupdate {
 		font-style: italic;
 		font-size: .8em;
 	}
+
 	.lastupdate:before {
 		@extend %fa-label;
 		font-style: normal;
 	}
+
 	.creditvisa .lastupdate:before {
 		@extend %icon-visa;
 	}
+
 	.creditmc .lastupdate:before {
 		@extend %icon-mastercard;
 	}
+
 	.credit .lastupdate:before {
 		@extend %icon-credit;
 	}
+
 	.checking .lastupdate:before {
 		@extend %icon-checking;
 	}
+
 	.savings .lastupdate:before {
 		@extend %icon-savings;
 	}
+
 	.detail {
 		@extend %flex-container;
 		margin: .25em 0;
 		padding: 0 .5em;
+
 		.balance {
 			@extend %flex-item-grow;
 			text-align: right;
 		}
 	}
+
 	.actions {
 		margin: .25em 0;
 		padding: 0 .5em .25em;
 		text-align: right;
+
 		a {
 			@extend %fa-replaced;
+
 			&:before {
 				font-size: .9em;
-				color: $darkgrey;
+				color: abe.$darkgrey;
 				margin-left: .5em;
 			}
+
 			&:hover:before {
-				color: $green;
+				color: abe.$green;
 			}
+
 			&.transactions:before {
 				content: "\f0ae";
 			}
+
 			&.bank:before {
 				content: "\f19c";
 			}
+
 			&.import:before {
 				content: "\f093";
 			}
 		}
 	}
-	.account > label {
+
+	.account>label {
 		@extend %flex-container-baseline;
 		margin: .25em .5em;
+
 		.label {
 			width: 5em;
 			@extend %flex-item-fixed;
 		}
+
 		input,
 		select {
 			@extend %flex-item-fill;
 		}
+
 		label {
 			margin: 0;
 		}
 	}
+
 	.accttype {
 		input {
 			display: none;
 		}
+
 		span:before {
 			@extend %fa-label;
 			font-style: normal;
@@ -142,36 +178,45 @@
 			padding: 2px;
 			margin-right: 0;
 		}
-		input:checked + span:before {
+
+		input:checked+span:before {
 			color: #000;
 			background-color: #fff;
-			border-radius: $gentlecorner;
+			border-radius: abe.$gentlecorner;
 			padding: 0;
-			border: 2px solid $blue;
+			border: 2px solid abe.$blue;
 		}
+
 		.creditvisa:before {
 			@extend %icon-visa;
 		}
+
 		.creditmc:before {
 			@extend %icon-mastercard;
 		}
+
 		.credit:before {
 			@extend %icon-credit;
 		}
+
 		.checking:before {
 			@extend %icon-checking;
 		}
+
 		.savings:before {
 			@extend %icon-savings;
 		}
 	}
+
 	.balance input {
 		text-align: right;
 		width: 5em;
 	}
+
 	label.closed {
 		@extend %flex-container;
 	}
+
 	button {
 		margin-left: auto;
 	}

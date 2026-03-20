@@ -1,4 +1,5 @@
 // Header and footer styles for Abe Personal Finance
+@use "!base" as abe;
 
 #abe {
 	@extend %flex-container-vertical;
@@ -7,7 +8,7 @@
 
 body>header,
 #abe>header {
-	background-color: $green;
+	background-color: abe.$green;
 	color: #fff;
 	@extend %flex-container-center;
 	padding: 0 .5em;
@@ -87,12 +88,12 @@ h1 {
 	z-index: 1;
 	top: 1.55em;
 	right: 0;
-	background-color: $medgreyblue;
+	background-color: abe.$medgreyblue;
 	color: #000;
-	border: 2px solid $green;
+	border: 2px solid abe.$green;
 	border-top: none;
 	border-right: none;
-	border-radius: 0 0 0 $gentlecorner;
+	border-radius: 0 0 0 abe.$gentlecorner;
 	padding: 0 .25em .25em;
 
 	input {
@@ -110,17 +111,17 @@ h1 {
 
 	#errorToast {
 		bottom: 2em;
-		border: 3px solid $red;
+		border: 3px solid abe.$red;
 		border-left: none;
-		background: linear-gradient(90deg, $red 1.85em, #fff 1.85em); // makes the red behind the icon look like it goes all the way down
-		border-radius: $gentlecorner;
+		background: linear-gradient(90deg, abe.$red 1.85em, #fff 1.85em); // makes the red behind the icon look like it goes all the way down
+		border-radius: abe.$gentlecorner;
 		padding: .125em .25em;
 		@extend %flex-container-baseline;
 
 		&:before {
 			@extend %fontawesome;
 			color: #fff;
-			background-color: $red;
+			background-color: abe.$red;
 			padding-right: 3px;
 			content: "\f06a";
 			margin: -.125em .375em -.125em -.25em;
@@ -128,25 +129,25 @@ h1 {
 		}
 
 		a {
-			color: $darkgrey;
+			color: abe.$darkgrey;
 
 			&:hover {
-				color: $red;
+				color: abe.$red;
 			}
 		}
 	}
 
 	div.errors {
 		bottom: 1.3em;
-		border: 3px solid $red;
+		border: 3px solid abe.$red;
 		border-top: none;
-		border-radius: $gentlecorner $gentlecorner $gentlecorner 0;
+		border-radius: abe.$gentlecorner abe.$gentlecorner abe.$gentlecorner 0;
 		background-color: #fff;
 
 		header {
 			@extend %flex-container-baseline;
 			padding: 0 .25em;
-			background-color: $red;
+			background-color: abe.$red;
 			color: #fff;
 
 			a {
@@ -167,14 +168,14 @@ h1 {
 			padding: .125em .25em;
 
 			&:not(:first-child) {
-				border-top: 1px solid $red;
+				border-top: 1px solid abe.$red;
 			}
 
 			a {
-				color: $darkgrey;
+				color: abe.$darkgrey;
 
 				&:hover {
-					color: $red;
+					color: abe.$red;
 				}
 			}
 		}
@@ -210,8 +211,8 @@ h1 {
 		bottom: .25em;
 		color: #fff;
 		text-decoration: none;
-		background-color: $red;
-		border-radius: $gentlecorner;
+		background-color: abe.$red;
+		border-radius: abe.$gentlecorner;
 		padding: 0 .25em;
 
 		&:before {

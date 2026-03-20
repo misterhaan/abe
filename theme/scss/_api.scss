@@ -1,4 +1,5 @@
 // Styles for Abe Personal Finance API documentation
+@use "!base" as abe;
 
 @font-face {
 	font-family: 'roboto mono';
@@ -8,7 +9,7 @@
 }
 
 .endpoint {
-	background-color: $lightgreyblue;
+	background-color: abe.$lightgreyblue;
 	margin: .25em 0;
 	padding-bottom: .1px;
 
@@ -20,7 +21,7 @@
 
 code {
 	font-family: 'roboto mono';
-	background-color: $medgreyblue;
+	background-color: abe.$medgreyblue;
 	padding: 0 .2em;
 	border-radius: .2em;
 }
